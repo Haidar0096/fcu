@@ -8,7 +8,7 @@ import 'package:pub_updater/pub_updater.dart';
 
 const executableName = 'flutter_cli_utils';
 const packageName = 'flutter_cli_utils';
-const description = 'A Very Good Project created by Very Good CLI.';
+const description = 'Helpful commands for Flutter developers.';
 
 /// {@template flutter_cli_utils_command_runner}
 /// A [CommandRunner] for the CLI.
