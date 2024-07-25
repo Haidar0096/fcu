@@ -59,8 +59,11 @@ class NewProjectCommand extends Command<int> {
           outputDirectory,
         ],
       );
-      _logger
-          .success('Flutter project created successfully at $outputDirectory');
+      final outputDir = Directory(outputDirectory);
+      _logger.success(
+        'Flutter project created successfully at '
+        '${outputDir.absolute.path}',
+      );
 
       return ExitCode.success.code;
     } catch (error) {
