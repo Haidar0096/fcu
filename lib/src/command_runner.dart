@@ -39,7 +39,7 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
       );
 
     // Add sub commands
-    addCommand(SampleCommand(logger: _logger));
+    addCommand(NewProjectCommand(logger: _logger));
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
 
@@ -86,22 +86,23 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
     }
 
     // Verbose logs
+    const tab = '  ';
     _logger
       ..detail('Argument information:')
-      ..detail('  Top level options:');
+      ..detail('${tab}Top level options:');
     for (final option in topLevelResults.options) {
       if (topLevelResults.wasParsed(option)) {
-        _logger.detail('  - $option: ${topLevelResults[option]}');
+        _logger.detail('$tab- $option: ${topLevelResults[option]}');
       }
     }
     if (topLevelResults.command != null) {
       final commandResult = topLevelResults.command!;
       _logger
-        ..detail('  Command: ${commandResult.name}')
-        ..detail('    Command options:');
+        ..detail('${tab}Command: ${commandResult.name}')
+        ..detail('$tab${tab}Command options:');
       for (final option in commandResult.options) {
         if (commandResult.wasParsed(option)) {
-          _logger.detail('    - $option: ${commandResult[option]}');
+          _logger.detail('$tab$tab- $option: ${commandResult[option]}');
         }
       }
     }
@@ -139,6 +140,8 @@ ${lightYellow.wrap('Update available!')} ${lightCyan.wrap(packageVersion)} \u219
 Run ${lightCyan.wrap('$executableName update')} to update''',
           );
       }
-    } catch (_) {}
+    } catch (e) {
+      _logger.warn('Failed to check for updates: error was $e');
+    }
   }
 }
