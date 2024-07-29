@@ -19,7 +19,7 @@ class NewProjectCommand extends Command<int> {
   String get description => 'Create a new Flutter project.';
 
   @override
-  String get name => 'create_flutter_starter_app';
+  String get name => 'create_new_flutter_project';
 
   final Logger _logger;
 
