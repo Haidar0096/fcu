@@ -14,5 +14,5 @@ fi
 flutter clean
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
-dart pub global activate --source=path $package_path
+dart pub global activate --source=path "$package_path"
 flutter_cli_utils --help
