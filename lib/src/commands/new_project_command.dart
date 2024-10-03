@@ -4,7 +4,7 @@ import 'package:args/command_runner.dart';
 import 'package:flutter_cli_utils/src/commands/command_args.dart';
 import 'package:mason_logger/mason_logger.dart';
 
-typedef _ProjectMetaData = ({
+typedef _FlutterProjectCreationData = ({
   String projectName,
   String projectDescription,
   String organization,
@@ -177,10 +177,10 @@ class NewProjectCommand extends Command<int> {
   Future<int> run() async {
     // Prompt for project details for the args that were not provided
     // in the command line
-    final metaData = await _promptForProjectMetaData();
+    final creationData = await _promptForProjectCreationData();
 
     // Check the output directory
-    final outputDir = Directory(metaData.outputDirectory);
+    final outputDir = Directory(creationData.outputDirectory);
     if (outputDir.existsSync()) {
       final overwrite = _logger.confirm('Directory already exists. Overwrite?');
       if (!overwrite) {
@@ -189,13 +189,15 @@ class NewProjectCommand extends Command<int> {
           ' exiting...',
         );
         return ExitCode.cantCreate.code;
+      } else {
+        outputDir.deleteSync(recursive: true);
       }
     }
 
     // Check if the dry run flag is set
     final dryRun = argResults?.wasParsed(_dryRunCommandFlag.name) ?? false;
     if (dryRun) {
-      _logDryRunDetails(metaData);
+      _logDryRunDetails(creationData);
       return ExitCode.success.code;
     }
 
@@ -203,7 +205,7 @@ class NewProjectCommand extends Command<int> {
     _logger.info('Creating Flutter project...');
     try {
       final flutterCreateCommandResult =
-          await _runFlutterCreateCommand(metaData);
+          await _runFlutterCreateCommand(creationData);
       if (flutterCreateCommandResult.exitCode != 0) {
         throw Exception(
           'Failed to create project:\n${flutterCreateCommandResult.stderr}',
@@ -214,6 +216,13 @@ class NewProjectCommand extends Command<int> {
         '${outputDir.absolute.path}',
       );
 
+      // Check whether the user wants to use the starter brick
+      final useStarterBrick =
+          _logger.confirm('Would you like to use the starter brick?');
+      if (useStarterBrick) {
+        await _runStarterBrick(outputDir);
+      }
+
       return ExitCode.success.code;
     } catch (error) {
       _logger.err('$error');
@@ -221,47 +230,119 @@ class NewProjectCommand extends Command<int> {
     }
   }
 
-  void _logDryRunDetails(_ProjectMetaData metaData) => _logger.info(
+  Future<void> _runStarterBrick(Directory outputDir) async {
+    // Run `mason init` command
+    final masonInitResult = await Process.run(
+      'mason',
+      ['init'],
+      workingDirectory: outputDir.path,
+    );
+    if (masonInitResult.exitCode != 0) {
+      throw Exception(
+        'Failed to run `mason init` in project:\n${masonInitResult.stderr}',
+      );
+    }
+    _logger.success('`mason init` ran successfully in project');
+
+    // Run `mason add` command
+    final masonAddResult = await Process.run(
+      'mason',
+      [
+        'add',
+        'flutter_starter_brick',
+        '--path',
+        // TODO(Haidar): change this after publishing the brick
+        '/Users/haidarmehsen/dev/projects/flutter/projects/flutter_cli_utils/bricks/flutter_starter_brick',
+      ],
+      workingDirectory: outputDir.path,
+    );
+    if (masonAddResult.exitCode != 0) {
+      throw Exception(
+        'Failed to run `mason add flutter_starter_brick` in project:\n'
+        '${masonAddResult.stderr}',
+      );
+    }
+    _logger.success(
+      '`mason add flutter_starter_brick` ran successfully in project',
+    );
+
+    // Run `mason get` command
+    final masonGetResult = await Process.run(
+      'mason',
+      ['get'],
+      workingDirectory: outputDir.path,
+    );
+    if (masonGetResult.exitCode != 0) {
+      throw Exception(
+        'Failed to run `mason get` in project:\n${masonGetResult.stderr}',
+      );
+    }
+    _logger.success('`mason get` ran successfully in project');
+
+    // Run `mason make` command
+    final masonMakeResult = await Process.start(
+      'mason',
+      ['make', 'flutter_starter_brick'],
+      workingDirectory: outputDir.path,
+      mode: ProcessStartMode.inheritStdio,
+    );
+    if ((await masonMakeResult.exitCode) != 0) {
+      throw Exception(
+        'Failed to run `mason make flutter_starter_brick` in project:\n'
+        '${masonMakeResult.stderr}',
+      );
+    }
+    _logger.success(
+      '`mason make flutter_starter_brick` ran successfully in project',
+    );
+  }
+
+  void _logDryRunDetails(
+    _FlutterProjectCreationData creationData,
+  ) =>
+      _logger.info(
         'Running this command will create a new Flutter project with the '
         'following details:'
-        '\n- Project Name: ${metaData.projectName}'
-        '\n- Project Description: ${metaData.projectDescription}'
-        '\n- Organization: ${metaData.organization}'
-        '\n- iOS Language: ${metaData.iosLanguage}'
-        '\n- Android Language: ${metaData.androidLanguage}'
-        '\n- Template: ${metaData.template}'
-        '\n- Empty: ${metaData.empty}'
-        '\n- Target Platforms: ${metaData.targetPlatforms.join(', ')}'
-        '\n- Output Directory: ${metaData.outputDirectory}'
+        '\n- Project Name: ${creationData.projectName}'
+        '\n- Project Description: ${creationData.projectDescription}'
+        '\n- Organization: ${creationData.organization}'
+        '\n- iOS Language: ${creationData.iosLanguage}'
+        '\n- Android Language: ${creationData.androidLanguage}'
+        '\n- Template: ${creationData.template}'
+        '\n- Empty: ${creationData.empty}'
+        '\n- Target Platforms: ${creationData.targetPlatforms.join(', ')}'
+        '\n- Output Directory: ${creationData.outputDirectory}'
         '\n\nExiting...',
       );
 
-  Future<ProcessResult> _runFlutterCreateCommand(_ProjectMetaData metaData) =>
+  Future<ProcessResult> _runFlutterCreateCommand(
+    _FlutterProjectCreationData creationData,
+  ) =>
       Process.run(
         'flutter',
         [
           'create',
           '--project-name',
-          metaData.projectName,
+          creationData.projectName,
           '--description',
-          metaData.projectDescription,
+          creationData.projectDescription,
           '--org',
-          metaData.organization,
-          '--ios-language=${metaData.iosLanguage}',
-          '--android-language=${metaData.androidLanguage}',
+          creationData.organization,
+          '--ios-language=${creationData.iosLanguage}',
+          '--android-language=${creationData.androidLanguage}',
           '-t',
-          metaData.template,
-          if (metaData.empty) '-e',
+          creationData.template,
+          if (creationData.empty) '-e',
           '--platforms',
-          metaData.targetPlatforms.join(','),
-          metaData.outputDirectory,
+          creationData.targetPlatforms.join(','),
+          creationData.outputDirectory,
         ],
       );
 
   String _optionOrPrompt(String argName, String Function() promptForArg) =>
       argResults?.option(argName) ?? promptForArg();
 
-  Future<_ProjectMetaData> _promptForProjectMetaData() async {
+  Future<_FlutterProjectCreationData> _promptForProjectCreationData() async {
     final projectName =
         _optionOrPrompt(_projectNameCommandOption.name, _promptForProjectName);
 
@@ -286,8 +367,12 @@ class NewProjectCommand extends Command<int> {
     final template =
         _optionOrPrompt(_templateCommandOption.name, _promptForTemplate);
 
-    final empty =
-        argResults?.wasParsed(_emptyCommandFlag.name) ?? _promptForEmpty();
+    final emptyFlagWasParsed =
+        argResults?.wasParsed(_emptyCommandFlag.name) ?? false;
+    final empty = switch (emptyFlagWasParsed) {
+      false => _promptForEmpty(),
+      true => argResults?.flag(_emptyCommandFlag.name) ?? false,
+    };
 
     final parsedTargetPlatforms =
         argResults?.multiOption(_targetPlatformsCommandMultiOption.name);
