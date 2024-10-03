@@ -78,6 +78,8 @@ class NewProjectCommand extends Command<int> {
       );
   }
 
+  Progress? _progress;
+
   final CommandOption _projectDescriptionCommandOption = const CommandOption(
     name: 'desc',
     abbr: 'd',
@@ -190,7 +192,9 @@ class NewProjectCommand extends Command<int> {
         );
         return ExitCode.cantCreate.code;
       } else {
+        _progress = _logger.progress('Deleting existing directory...');
         outputDir.deleteSync(recursive: true);
+        _progress?.complete();
       }
     }
 
@@ -202,7 +206,10 @@ class NewProjectCommand extends Command<int> {
     }
 
     // Run the Flutter create command
-    _logger.info('Creating Flutter project...');
+    _progress = _logger.progress(
+      'Creating Flutter project at '
+      '${outputDir.absolute.path}',
+    );
     try {
       final flutterCreateCommandResult =
           await _runFlutterCreateCommand(creationData);
@@ -211,10 +218,7 @@ class NewProjectCommand extends Command<int> {
           'Failed to create project:\n${flutterCreateCommandResult.stderr}',
         );
       }
-      _logger.success(
-        'Flutter project created successfully at '
-        '${outputDir.absolute.path}',
-      );
+      _progress?.complete();
 
       // Check whether the user wants to use the starter brick
       final useStarterBrick =
@@ -232,6 +236,7 @@ class NewProjectCommand extends Command<int> {
 
   Future<void> _runStarterBrick(Directory outputDir) async {
     // Run `mason init` command
+    _progress = _logger.progress('Running `mason init`...');
     final masonInitResult = await Process.run(
       'mason',
       ['init'],
@@ -242,9 +247,10 @@ class NewProjectCommand extends Command<int> {
         'Failed to run `mason init` in project:\n${masonInitResult.stderr}',
       );
     }
-    _logger.success('`mason init` ran successfully in project');
+    _progress?.complete();
 
     // Run `mason add` command
+    _progress = _logger.progress('Running `mason add`...');
     final masonAddResult = await Process.run(
       'mason',
       [
@@ -262,11 +268,10 @@ class NewProjectCommand extends Command<int> {
         '${masonAddResult.stderr}',
       );
     }
-    _logger.success(
-      '`mason add flutter_starter_brick` ran successfully in project',
-    );
+    _progress?.complete();
 
     // Run `mason get` command
+    _progress = _logger.progress('Running `mason get`...');
     final masonGetResult = await Process.run(
       'mason',
       ['get'],
@@ -277,24 +282,23 @@ class NewProjectCommand extends Command<int> {
         'Failed to run `mason get` in project:\n${masonGetResult.stderr}',
       );
     }
-    _logger.success('`mason get` ran successfully in project');
+    _progress?.complete();
 
     // Run `mason make` command
+    _progress = _logger.progress('Running `mason make`...');
     final masonMakeResult = await Process.start(
       'mason',
       ['make', 'flutter_starter_brick'],
       workingDirectory: outputDir.path,
       mode: ProcessStartMode.inheritStdio,
     );
+    _progress?.complete();
     if ((await masonMakeResult.exitCode) != 0) {
       throw Exception(
         'Failed to run `mason make flutter_starter_brick` in project:\n'
         '${masonMakeResult.stderr}',
       );
     }
-    _logger.success(
-      '`mason make flutter_starter_brick` ran successfully in project',
-    );
   }
 
   void _logDryRunDetails(
