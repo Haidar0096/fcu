@@ -5,6 +5,7 @@ sealed class Environment {
   /// The name of the environment.
   final String name;
 
+  // TODO(dev): add environment-specific variables here.
   String get greeting;
 }
 

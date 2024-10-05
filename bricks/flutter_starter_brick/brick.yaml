@@ -49,3 +49,9 @@ vars:
     description: Whether the app uses the very_good_analysis package
     default: false
     prompt: Does the app use the very_good_analysis package?
+
+  has_di:
+    type: boolean
+    description: Whether the app supports dependency injection
+    default: false
+    prompt: Does the app support dependency injection?
