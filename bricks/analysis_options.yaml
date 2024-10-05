@@ -1,0 +1,3 @@
+#analyzer:
+#  exclude:
+#    - flutter_starter_brick/__brick__/**
