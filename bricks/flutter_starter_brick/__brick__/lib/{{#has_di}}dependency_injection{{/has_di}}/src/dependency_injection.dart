@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart'{{#has_envs}} hide Environment{{/has_
 
 import 'package:{{proj_name}}/dependency_injection/src/dependency_injection.config.dart';
 {{#has_envs}}import 'package:{{proj_name}}/environments/environments.dart';{{/has_envs}}
+{{#has_log}}import 'package:{{proj_name}}/logger/logger.dart';{{/has_log}}
 
 /// Typedef for injectable's `Injectable` annotation to hide the package from
 /// the application code, so that it can be replaced with another DI package
@@ -57,4 +58,10 @@ abstract class RegisterModule {
   // TODO(dev): add manually registered services here.
   @Named('magic_number')
   int get magicNumber => 42;
+
+  {{#has_log}}
+  /// The logger to use for logging messages.
+  @lazySingleton
+  AppLogger get logger => AppLogger();
+  {{/has_log}}
 }

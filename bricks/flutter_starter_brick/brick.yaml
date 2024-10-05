@@ -55,3 +55,9 @@ vars:
     description: Whether the app supports dependency injection
     default: false
     prompt: Does the app support dependency injection?
+
+  has_log:
+    type: boolean
+    description: Whether the app uses a logger
+    default: false
+    prompt: Does the app use a logger?
