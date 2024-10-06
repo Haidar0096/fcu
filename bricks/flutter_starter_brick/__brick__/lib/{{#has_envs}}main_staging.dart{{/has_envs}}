@@ -1,4 +1,4 @@
-import 'package:{{proj_name}}/environments/environments.dart';
+import 'package:{{proj_name}}/services/environments/environments.dart';
 import 'package:{{proj_name}}/main_common.dart';
 
 Future<void> main() async {

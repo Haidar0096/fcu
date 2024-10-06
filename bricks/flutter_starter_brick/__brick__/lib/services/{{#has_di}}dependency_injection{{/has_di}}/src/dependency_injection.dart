@@ -1,8 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart'{{#has_envs}} hide Environment{{/has_envs}};
 
-import 'package:{{proj_name}}/dependency_injection/src/dependency_injection.config.dart';
-{{#has_envs}}import 'package:{{proj_name}}/environments/environments.dart';{{/has_envs}}
+import 'package:{{proj_name}}/services/dependency_injection/src/dependency_injection.config.dart';
+{{#has_envs}}import 'package:{{proj_name}}/services/environments/environments.dart';{{/has_envs}}
 {{#has_log}}import 'package:{{proj_name}}/services/logger/logger.dart';{{/has_log}}
 
 // Typedef for injectable's `Injectable` annotation to hide the package from
