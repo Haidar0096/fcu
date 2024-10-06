@@ -6,8 +6,8 @@ Future<void> run(HookContext context) async {
   Progress progress;
 
   Future<void> _executeCommand(
-    Future<void> Function() fn,
     String message,
+    Future<void> Function() fn,
   ) async {
     progress = context.logger.progress(message);
     await fn();
@@ -15,7 +15,7 @@ Future<void> run(HookContext context) async {
   }
 
   await _executeCommand(
-    () async => Directory('lib').deleteSync(recursive: true),
     'Deleting lib directory',
+    () async => Directory('lib').deleteSync(recursive: true),
   );
 }
