@@ -2,6 +2,6 @@ import 'package:{{proj_name}}/environments/environments.dart';
 import 'package:{{proj_name}}/main_common.dart';
 
 Future<void> main() async {
-  // run the app with the dev environment
-  await mainCommon(const DevEnvironment());
+  // run the app with the development environment
+  await mainCommon(const DevelopmentEnvironment());
 }

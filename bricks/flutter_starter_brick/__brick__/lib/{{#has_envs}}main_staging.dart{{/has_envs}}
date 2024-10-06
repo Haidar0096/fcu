@@ -2,6 +2,6 @@ import 'package:{{proj_name}}/environments/environments.dart';
 import 'package:{{proj_name}}/main_common.dart';
 
 Future<void> main() async {
-  // run the app with the stag environment
-  await mainCommon(const StagEnvironment());
+  // run the app with the staging environment
+  await mainCommon(const StagingEnvironment());
 }

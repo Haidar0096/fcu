@@ -5,9 +5,11 @@ import 'package:{{proj_name}}/dependency_injection/src/dependency_injection.conf
 {{#has_envs}}import 'package:{{proj_name}}/environments/environments.dart';{{/has_envs}}
 {{#has_log}}import 'package:{{proj_name}}/logger/logger.dart';{{/has_log}}
 
-/// Typedef for injectable's `Injectable` annotation to hide the package from
-/// the application code, so that it can be replaced with another DI package
-/// if needed.
+// Typedef for injectable's `Injectable` annotation to hide the package from
+// the application code, so that it can be replaced with another DI package
+// if needed.
+/// Annotation for classes that should be registered as services and available
+/// via the dependency injection container.
 typedef Service = Injectable;
 
 /// Initializes the dependency container.
@@ -29,10 +31,14 @@ Future<void> _initInjectable(
 class ServiceProvider {
   static final GetIt _getIt = GetIt.instance;
 
+  static bool _initialized = false;
+
   /// Initializes the dependency container.
   static Future<void> init(
     {{#has_envs}}{required Environment environment,}{{/has_envs}}
   ) async {
+    if (_initialized) return;
+    _initialized = true;
     {{#has_envs}}
     _getIt.registerLazySingleton<Environment>(() => environment);
     {{/has_envs}}
