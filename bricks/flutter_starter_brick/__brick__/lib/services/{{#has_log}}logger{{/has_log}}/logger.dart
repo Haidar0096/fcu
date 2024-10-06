@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 
+/// The AppLogger class provides a simple logging mechanism for the application.
 class AppLogger {
+  /// Logs a message.
   void log({
+    required String message,
     String? runtimeType,
     String? callerName,
-    required String message,
     StackTrace? stackTrace,
     bool prependDateTime = true,
   }) =>
@@ -26,14 +28,14 @@ class AppLogger {
   /// - [prependDateTime] indicates whether the current date and time should be
   ///   prepended to the log message.
   void _logMessage({
+    required String logMessage,
     String? runtimeType,
     String? callerName,
-    required String logMessage,
     Object? error,
     StackTrace? stackTrace,
     bool prependDateTime = true,
   }) {
-    final StringBuffer sb = StringBuffer();
+    final sb = StringBuffer();
     if (prependDateTime) {
       sb.write('[${DateTime.now().toIso8601String()}] ');
     }
@@ -63,7 +65,7 @@ class AppLogger {
     }
 
     if (kDebugMode) {
-      print(sb.toString());
+      print(sb);
     }
   }
 }

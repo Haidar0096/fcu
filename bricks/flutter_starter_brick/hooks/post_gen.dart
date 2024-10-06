@@ -50,6 +50,14 @@ Future<void> run(HookContext context) async {
     );
   }
 
+  final usesBuildRunner = context.vars['has_di'];
+  if (usesBuildRunner) {
+    await _executeCommand(
+      'Adding build_runner',
+      () => Process.run('dart', ['pub', 'add', '--dev', 'build_runner']),
+    );
+  }
+
   await _executeCommand(
     'Running flutter clean',
     () => Process.run('flutter', ['clean']),
@@ -60,12 +68,7 @@ Future<void> run(HookContext context) async {
     () => Process.run('flutter', ['pub', 'get']),
   );
 
-  final usesBuildRunner = context.vars['has_di'];
   if (usesBuildRunner) {
-    await _executeCommand(
-      'Adding build_runner',
-      () => Process.run('dart', ['pub', 'add', '--dev', 'build_runner']),
-    );
     await _executeCommand(
       'Running build_runner',
       () => Process.run(

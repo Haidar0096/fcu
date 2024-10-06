@@ -3,7 +3,7 @@ import 'package:injectable/injectable.dart'{{#has_envs}} hide Environment{{/has_
 
 import 'package:{{proj_name}}/dependency_injection/src/dependency_injection.config.dart';
 {{#has_envs}}import 'package:{{proj_name}}/environments/environments.dart';{{/has_envs}}
-{{#has_log}}import 'package:{{proj_name}}/logger/logger.dart';{{/has_log}}
+{{#has_log}}import 'package:{{proj_name}}/services/logger/logger.dart';{{/has_log}}
 
 // Typedef for injectable's `Injectable` annotation to hide the package from
 // the application code, so that it can be replaced with another DI package
