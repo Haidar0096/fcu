@@ -19,7 +19,7 @@ Future<void> run(HookContext context) async {
       'Adding very_good_analysis',
       () => Process.run(
         'dart',
-        ['pub', 'add', '--dev', 'very_good_analysis'],
+        ['pub', 'add', '--dev', 'very_good_analysis: ^6.0.0'],
       ),
     );
   } else {
@@ -27,7 +27,7 @@ Future<void> run(HookContext context) async {
       'Adding flutter_lints',
       () => Process.run(
         'dart',
-        ['pub', 'add', '--dev', 'flutter_lints'],
+        ['pub', 'add', '--dev', 'flutter_lints: ^5.0.0'],
       ),
     );
   }
@@ -35,17 +35,17 @@ Future<void> run(HookContext context) async {
   if (context.vars['has_di']) {
     await _executeCommand(
       'Adding injectable',
-      () => Process.run('dart', ['pub', 'add', 'injectable']),
+      () => Process.run('dart', ['pub', 'add', 'injectable: ^2.5.0']),
     );
     await _executeCommand(
       'Adding get_it',
-      () => Process.run('dart', ['pub', 'add', 'get_it']),
+      () => Process.run('dart', ['pub', 'add', 'get_it: ^8.0.0']),
     );
     await _executeCommand(
       'Adding injectable_generator',
       () => Process.run(
         'dart',
-        ['pub', 'add', '--dev', 'injectable_generator'],
+        ['pub', 'add', '--dev', 'injectable_generator: ^2.6.2'],
       ),
     );
   }
@@ -54,7 +54,10 @@ Future<void> run(HookContext context) async {
   if (usesBuildRunner) {
     await _executeCommand(
       'Adding build_runner',
-      () => Process.run('dart', ['pub', 'add', '--dev', 'build_runner']),
+      () => Process.run(
+        'dart',
+        ['pub', 'add', '--dev', 'build_runner: ^2.4.13'],
+      ),
     );
   }
 
