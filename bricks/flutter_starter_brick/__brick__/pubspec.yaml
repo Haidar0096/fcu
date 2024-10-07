@@ -17,3 +17,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  fonts:
+    - family: consolas
+      fonts:
+        - asset: assets/fonts/consolas.ttf
+        - asset: assets/fonts/consolas_bold.ttf
+          weight: 700
