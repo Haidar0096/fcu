@@ -5,12 +5,20 @@ import 'package:{{proj_name}}/services/dependency_injection/src/dependency_injec
 {{#has_envs}}import 'package:{{proj_name}}/services/environments/environments.dart';{{/has_envs}}
 {{#has_log}}import 'package:{{proj_name}}/services/logger/logger.dart';{{/has_log}}
 
-// Typedef for injectable's `Injectable` annotation to hide the package from
+// Typedefs for injectable's annotations to hide the package from
 // the application code, so that it can be replaced with another DI package
 // if needed.
 /// Annotation for classes that should be registered as services and available
 /// via the dependency injection container.
 typedef Service = Injectable;
+
+/// Annotation for classes that should be registered as singleton services and
+/// available via the dependency injection container.
+typedef SingletonService = Singleton;
+
+/// Annotation for classes that should be registered as lazy singleton services
+/// and available via the dependency injection container.
+typedef LazySingletonService = LazySingleton;
 
 /// Initializes the dependency container.
 @InjectableInit(
@@ -62,8 +70,8 @@ class ServiceProvider {
 @module
 abstract class RegisterModule {
   // TODO(dev): add manually registered services here.
-  @Named('magic_number')
-  int get magicNumber => 42;
+  @Named('increment_value')
+  int get incrementValue => 1;
 
   {{#has_log}}
   /// The logger to use for logging messages.

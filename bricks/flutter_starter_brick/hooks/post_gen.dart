@@ -32,34 +32,62 @@ Future<void> run(HookContext context) async {
     );
   }
 
-  if (context.vars['has_di']) {
-    await _executeCommand(
-      'Adding injectable',
-      () => Process.run('dart', ['pub', 'add', 'injectable: ^2.5.0']),
-    );
-    await _executeCommand(
-      'Adding get_it',
-      () => Process.run('dart', ['pub', 'add', 'get_it: ^8.0.0']),
-    );
-    await _executeCommand(
-      'Adding injectable_generator',
-      () => Process.run(
-        'dart',
-        ['pub', 'add', '--dev', 'injectable_generator: ^2.6.2'],
-      ),
-    );
-  }
+  await _executeCommand(
+    'Adding injectable',
+    () => Process.run('dart', ['pub', 'add', 'injectable: ^2.5.0']),
+  );
+  await _executeCommand(
+    'Adding get_it',
+    () => Process.run('dart', ['pub', 'add', 'get_it: ^8.0.0']),
+  );
+  await _executeCommand(
+    'Adding injectable_generator',
+    () => Process.run(
+      'dart',
+      ['pub', 'add', '--dev', 'injectable_generator: ^2.6.2'],
+    ),
+  );
 
-  final usesBuildRunner = context.vars['has_di'];
-  if (usesBuildRunner) {
-    await _executeCommand(
-      'Adding build_runner',
-      () => Process.run(
-        'dart',
-        ['pub', 'add', '--dev', 'build_runner: ^2.4.13'],
-      ),
-    );
-  }
+  await _executeCommand(
+    'Adding hydrated_bloc',
+    () => Process.run('dart', ['pub', 'add', 'hydrated_bloc: ^9.1.5']),
+  );
+
+  await _executeCommand(
+    'Adding path_provider',
+    () => Process.run('dart', ['pub', 'add', 'path_provider: ^2.1.4']),
+  );
+
+  await _executeCommand(
+    'Adding flutter_localizations',
+    () => Process.run(
+      'flutter',
+      ['pub', 'add', 'flutter_localizations', '--sdk=flutter'],
+    ),
+  );
+
+  await _executeCommand(
+    'Adding intl',
+    () => Process.run('flutter', ['pub', 'add', 'intl:any']),
+  );
+
+  await _executeCommand(
+    'Adding nested',
+    () => Process.run('dart', ['pub', 'add', 'nested: ^1.0.0']),
+  );
+
+  await _executeCommand(
+    'Adding flutter_bloc',
+    () => Process.run('flutter', ['pub', 'add', 'flutter_bloc: ^8.1.6']),
+  );
+
+  await _executeCommand(
+    'Adding build_runner',
+    () => Process.run(
+      'dart',
+      ['pub', 'add', '--dev', 'build_runner: ^2.4.13'],
+    ),
+  );
 
   await _executeCommand(
     'Running flutter clean',
@@ -71,15 +99,18 @@ Future<void> run(HookContext context) async {
     () => Process.run('flutter', ['pub', 'get']),
   );
 
-  if (usesBuildRunner) {
-    await _executeCommand(
-      'Running build_runner',
-      () => Process.run(
-        'dart',
-        ['pub', 'run', 'build_runner', 'build', '--delete-conflicting-outputs'],
-      ),
-    );
-  }
+  await _executeCommand(
+    'Running build_runner',
+    () => Process.run(
+      'dart',
+      ['pub', 'run', 'build_runner', 'build', '--delete-conflicting-outputs'],
+    ),
+  );
+
+  await _executeCommand(
+    'Running flutter gen-l10n',
+    () => Process.run('flutter', ['gen-l10n']),
+  );
 
   await _executeCommand(
     'Running dart format .',

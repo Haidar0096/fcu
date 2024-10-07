@@ -7,8 +7,8 @@ sealed class Environment {
   final String name;
 
   // TODO(dev): Add environment-specific variables here.
-  /// Returns a greeting message for the environment.
-  String get greeting;
+  /// Returns an initial counter value according to the environment.
+  int get initialCounterValue;
 }
 
 /// The development environment.
@@ -17,7 +17,7 @@ final class DevelopmentEnvironment extends Environment {
   const DevelopmentEnvironment() : super('development');
 
   @override
-  String get greeting => 'Hello, world from dev environment!';
+  int get initialCounterValue => 42;
 }
 
 /// The staging environment.
@@ -26,7 +26,7 @@ final class StagingEnvironment extends Environment {
   const StagingEnvironment() : super('staging');
 
   @override
-  String get greeting => 'Hello, world from staging environment!';
+  int get initialCounterValue => 43;
 }
 
 /// The production environment.
@@ -35,5 +35,5 @@ final class ProductionEnvironment extends Environment {
   const ProductionEnvironment() : super('production');
 
   @override
-  String get greeting => 'Hello, world from production environment!';
+  int get initialCounterValue => 44;
 }

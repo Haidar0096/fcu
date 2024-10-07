@@ -23,3 +23,8 @@ $ fcu --version
 # Show usage help
 $ fcu --help
 ```
+
+Example:
+```sh
+fcu create --desc "Cool counter app" --org "com.countermeasures" --name "counter_app" --ios-lang swift --android-lang "java" --template app --target-platforms "android,ios" --output-directory "counter_app_flutter" --overwrite-existing-directory --use-starter-brick
+```
