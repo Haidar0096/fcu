@@ -1,0 +1,65 @@
+import 'package:{{proj_name}}/blocs/connectivity_cubit/connectivity_cubit.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+typedef OnConnected = void Function({
+  required BuildContext context,
+
+  /// Whether this is the first state captured by this listener.
+  /// "First state" does not necessarily means that the cubit has not
+  /// emitted any state before, but that this listener has not captured
+  /// any state before.
+  /// This flag might be useful if you do not want to act (ex: show a
+  /// snackbar) on the first state captured by this listener, but rather
+  /// only for the subsequent states.
+  required bool isFirstCapturedState,
+});
+
+typedef OnDisconnected = void Function({
+  required BuildContext context,
+  required bool isFirstCapturedState,
+});
+
+class ConnectivityCubitListener extends StatefulWidget {
+  const ConnectivityCubitListener({
+    required this.child,
+    required this.onConnected,
+    required this.onDisconnected,
+    super.key,
+  });
+
+  final Widget child;
+
+  final OnConnected onConnected;
+
+  final OnDisconnected onDisconnected;
+
+  @override
+  State<ConnectivityCubitListener> createState() =>
+      _ConnectivityCubitListenerState();
+}
+
+class _ConnectivityCubitListenerState extends State<ConnectivityCubitListener> {
+  bool _isFirstCapturedState = false;
+
+  @override
+  Widget build(BuildContext context) =>
+      BlocListener<ConnectivityCubit, ConnectivityState>(
+        listener: (context, connectivityState) {
+          switch (connectivityState) {
+            case Disconnected():
+              widget.onDisconnected(
+                context: context,
+                isFirstCapturedState: _isFirstCapturedState,
+              );
+            case Connected():
+              widget.onConnected(
+                context: context,
+                isFirstCapturedState: _isFirstCapturedState,
+              );
+          }
+          _isFirstCapturedState = true;
+        },
+        child: widget.child,
+      );
+}

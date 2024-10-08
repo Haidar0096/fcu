@@ -14,6 +14,7 @@ Future<void> run(HookContext context) async {
     progress.complete();
   }
 
+  // Delete the lib directory to avoid conflicts with the generated code
   await _executeCommand(
     'Deleting lib directory',
     () async => Directory('lib').deleteSync(recursive: true),

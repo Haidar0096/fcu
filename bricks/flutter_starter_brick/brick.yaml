@@ -55,3 +55,9 @@ vars:
     description: Whether the app uses a logger
     default: false
     prompt: Does the app use a logger?
+
+  has_ic:
+    type: boolean
+    description: Whether the app needs internet connectivity
+    default: false
+    prompt: Does the app need internet connectivity?

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:mason/mason.dart';
+import 'package:xml/xml.dart';
 
 Future<void> run(HookContext context) async {
   Progress progress;
@@ -82,12 +83,56 @@ Future<void> run(HookContext context) async {
   );
 
   await _executeCommand(
+    'Adding bloc',
+    () => Process.run('dart', ['pub', 'add', 'bloc: ^8.1.4']),
+  );
+
+  if (context.vars['has_ic']) {
+    await _executeCommand(
+      'Adding internet_connection_checker_plus',
+      () => Process.run(
+        'flutter',
+        ['pub', 'add', 'internet_connection_checker_plus: ^2.5.2'],
+      ),
+    );
+    await _executeCommand(
+      'Adding connectivity_plus',
+      () => Process.run(
+        'flutter',
+        ['pub', 'add', 'connectivity_plus: ^6.0.5'],
+      ),
+    );
+  }
+
+  await _executeCommand(
     'Adding build_runner',
     () => Process.run(
       'dart',
       ['pub', 'add', '--dev', 'build_runner: ^2.4.13'],
     ),
   );
+
+  if (context.vars['has_ic']) {
+    await _executeCommand(
+      'Adding internet permission to android manifest',
+      () async {
+        final file = File('android/app/src/main/AndroidManifest.xml');
+        final document = XmlDocument.parse(await file.readAsString());
+        final manifestElement = document.findElements('manifest').first;
+        final internetPermission = XmlElement(
+          XmlName('uses-permission'),
+          [
+            XmlAttribute(
+              XmlName('android:name'),
+              'android.permission.INTERNET',
+            )
+          ],
+        );
+        manifestElement.children.insert(0, internetPermission);
+        await file.writeAsString(document.toXmlString(pretty: true));
+      },
+    );
+  }
 
   await _executeCommand(
     'Running flutter clean',
