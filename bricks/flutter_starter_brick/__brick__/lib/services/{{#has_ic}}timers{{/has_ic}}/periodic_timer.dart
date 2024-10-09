@@ -6,7 +6,7 @@ Timer createPeriodicTimer({
   required void Function(Timer timer) callback,
   bool fireImmediately = false,
 }) {
-  var timer = Timer.periodic(period, callback);
+  final timer = Timer.periodic(period, callback);
   if (fireImmediately) {
     callback(timer);
   }

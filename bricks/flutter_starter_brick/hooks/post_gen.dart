@@ -62,14 +62,14 @@ Future<void> run(HookContext context) async {
   await _executeCommand(
     'Adding flutter_localizations',
     () => Process.run(
-      'flutter',
+      'dart',
       ['pub', 'add', 'flutter_localizations', '--sdk=flutter'],
     ),
   );
 
   await _executeCommand(
     'Adding intl',
-    () => Process.run('flutter', ['pub', 'add', 'intl:any']),
+    () => Process.run('dart', ['pub', 'add', 'intl:any']),
   );
 
   await _executeCommand(
@@ -79,7 +79,7 @@ Future<void> run(HookContext context) async {
 
   await _executeCommand(
     'Adding flutter_bloc',
-    () => Process.run('flutter', ['pub', 'add', 'flutter_bloc: ^8.1.6']),
+    () => Process.run('dart', ['pub', 'add', 'flutter_bloc: ^8.1.6']),
   );
 
   await _executeCommand(
@@ -91,14 +91,14 @@ Future<void> run(HookContext context) async {
     await _executeCommand(
       'Adding internet_connection_checker_plus',
       () => Process.run(
-        'flutter',
+        'dart',
         ['pub', 'add', 'internet_connection_checker_plus: ^2.5.2'],
       ),
     );
     await _executeCommand(
       'Adding connectivity_plus',
       () => Process.run(
-        'flutter',
+        'dart',
         ['pub', 'add', 'connectivity_plus: ^6.0.5'],
       ),
     );
@@ -110,6 +110,21 @@ Future<void> run(HookContext context) async {
       'dart',
       ['pub', 'add', '--dev', 'build_runner: ^2.4.13'],
     ),
+  );
+
+  await _executeCommand(
+    'Adding android_id',
+    () => Process.run('dart', ['pub', 'add', 'android_id: ^0.4.0']),
+  );
+
+  await _executeCommand(
+    'Adding device_info_plus',
+    () => Process.run('dart', ['pub', 'add', 'device_info_plus: ^11.0.0']),
+  );
+
+  await _executeCommand(
+    'Adding package_info_plus',
+    () => Process.run('dart', ['pub', 'add', 'package_info_plus: ^8.0.3']),
   );
 
   if (context.vars['has_ic']) {
@@ -125,7 +140,7 @@ Future<void> run(HookContext context) async {
             XmlAttribute(
               XmlName('android:name'),
               'android.permission.INTERNET',
-            )
+            ),
           ],
         );
         manifestElement.children.insert(0, internetPermission);

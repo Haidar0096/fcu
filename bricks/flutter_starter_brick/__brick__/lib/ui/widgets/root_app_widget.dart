@@ -1,3 +1,4 @@
+import 'package:{{proj_name}}/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
 {{#has_ic}}
 import 'package:{{proj_name}}/blocs/connectivity_cubit/connectivity_cubit.dart';
 {{/has_ic}}
@@ -31,6 +32,9 @@ class RootAppWidget extends StatelessWidget {
             create: (_) => ServiceProvider.get<ConnectivityCubit>(),
           ),
           {{/has_ic}}
+          BlocProvider<AppMetaDataCubit>(
+            create: (_) => ServiceProvider.get<AppMetaDataCubit>(),
+          ),
         ],
         child: Builder(
           builder: (context) {

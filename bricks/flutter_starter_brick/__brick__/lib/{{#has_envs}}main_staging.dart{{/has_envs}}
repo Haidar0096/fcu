@@ -1,5 +1,5 @@
-import 'package:{{proj_name}}/services/environments/environments.dart';
 import 'package:{{proj_name}}/main_common.dart';
+import 'package:{{proj_name}}/services/environments/environments.dart';
 
 Future<void> main() async {
   // run the app with the staging environment

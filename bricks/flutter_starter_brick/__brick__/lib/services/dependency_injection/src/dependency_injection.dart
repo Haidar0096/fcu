@@ -1,9 +1,7 @@
-import 'package:get_it/get_it.dart';
-import 'package:injectable/injectable.dart'{{#has_envs}} hide Environment{{/has_envs}};
-
 import 'package:{{proj_name}}/services/dependency_injection/src/dependency_injection.config.dart';
 {{#has_envs}}import 'package:{{proj_name}}/services/environments/environments.dart';{{/has_envs}}
-{{#has_log}}import 'package:{{proj_name}}/services/logger/logger.dart';{{/has_log}}
+import 'package:get_it/get_it.dart';
+import 'package:injectable/injectable.dart' hide Environment;
 
 // Typedefs for injectable's annotations to hide the package from
 // the application code, so that it can be replaced with another DI package
@@ -72,10 +70,4 @@ abstract class RegisterModule {
   // TODO(dev): add manually registered services here.
   @Named('increment_value')
   int get incrementValue => 1;
-
-  {{#has_log}}
-  /// The logger to use for logging messages.
-  @lazySingleton
-  AppLogger get logger => AppLogger();
-  {{/has_log}}
 }

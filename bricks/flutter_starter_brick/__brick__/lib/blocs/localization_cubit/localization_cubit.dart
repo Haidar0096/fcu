@@ -1,5 +1,5 @@
-import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:{{proj_name}}/services/dependency_injection/dependency_injection.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 /// Manages the locale of the app.
 @LazySingletonService()
