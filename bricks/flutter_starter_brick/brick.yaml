@@ -1,5 +1,6 @@
 name: flutter_starter_brick
 description: A brick for bootstrapping a new flutter project with useful features
+repository: https://github.com/Haidar0096/fcu/tree/main/bricks/flutter_starter_brick
 
 # The following defines the brick repository url.
 # Uncomment and update the following line before publishing the brick.
