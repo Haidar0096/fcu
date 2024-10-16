@@ -267,9 +267,10 @@ class NewProjectCommand extends Command<int> {
       [
         'add',
         'flutter_starter_brick',
-        '--path',
-        // TODO(Haidar): change this after publishing the brick
-        '/Users/haidarmehsen/dev/projects/flutter/projects/flutter_cli_utils/bricks/flutter_starter_brick',
+        '--git-url',
+        'https://github.com/Haidar0096/fcu',
+        '--git-path',
+        'bricks/flutter_starter_brick',
       ],
       workingDirectory: outputDir.path,
     );
