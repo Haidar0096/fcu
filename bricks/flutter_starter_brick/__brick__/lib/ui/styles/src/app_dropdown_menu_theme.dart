@@ -1,4 +1,4 @@
-import 'package:{{proj_name}}/ui/styles/src/app_colors.dart';
+import 'package:{{proj_name}}/ui/styles/src/app_colors_theme.dart';
 import 'package:flutter/material.dart';
 
 const double _defaultBorderWidth = 1;
@@ -44,19 +44,19 @@ final class AppDropdownMenuThemeLight extends AppDropdownMenuTheme {
 
   static final AppDropdownMenuThemeLight instance = AppDropdownMenuThemeLight._(
     enabledBorder: _buildDropdownMenuBorder(
-      color: AppColorsLight.instance.enabledBorderColor,
+      color: AppColorsThemeLight.instance.enabledBorderColor,
     ),
     disabledBorder: _buildDropdownMenuBorder(
-      color: AppColorsLight.instance.disabledBorderColor,
+      color: AppColorsThemeLight.instance.disabledBorderColor,
     ),
     focusedBorder: _buildDropdownMenuBorder(
-      color: AppColorsLight.instance.focusedBorderColor,
+      color: AppColorsThemeLight.instance.focusedBorderColor,
     ),
     errorBorder: _buildDropdownMenuBorder(
-      color: AppColorsLight.instance.errorBorderColor,
+      color: AppColorsThemeLight.instance.errorBorderColor,
     ),
     focusedErrorBorder: _buildDropdownMenuBorder(
-      color: AppColorsLight.instance.focusedErrorBorderColor,
+      color: AppColorsThemeLight.instance.focusedErrorBorderColor,
     ),
   );
 
@@ -83,8 +83,6 @@ final class AppDropdownMenuThemeLight extends AppDropdownMenuTheme {
   ) {
     if (other == null) return this;
     if (other is! AppDropdownMenuTheme) return this;
-    // TODO(dev): this lerp can be improved by providing more smoother
-    // transition between the old and new values of the AppDropdownMenuTheme
     if (t < 0.5) return this;
     return other;
   }

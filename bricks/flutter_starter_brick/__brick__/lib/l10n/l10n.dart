@@ -4,3 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 extension AppLocalizationsExtension on BuildContext {
   AppLocalizations get appLocalizations => AppLocalizations.of(this);
 }
+
+extension AppLocalizationsNullableExtension on BuildContext? {
+  AppLocalizations? get appLocalizations => this?.appLocalizations;
+}

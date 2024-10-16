@@ -1,14 +1,17 @@
+import 'package:{{proj_name}}/blocs/bloc_utils/bloc_utils.dart';
 import 'package:{{proj_name}}/services/dependency_injection/dependency_injection.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 /// Manages the locale of the app.
 @LazySingletonService()
-class LocalizationCubit extends HydratedCubit<Language> {
+class LocalizationCubit extends BaseHydratedCubit<Language> {
   // initially the locale is set to english
   LocalizationCubit() : super(Language.english);
 
   /// Sets the language to the given [language].
   void setLanguage(Language language) => emit(language);
+
+  /// Sets the language to the next language in the list of languages.
+  void setNextLanguage() => emit(state.nextLanguage);
 
   @override
   Language? fromJson(Map<String, dynamic> json) =>

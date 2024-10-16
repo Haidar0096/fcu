@@ -26,11 +26,23 @@ environment:
 #  * a list of values (enums only)
 #  * an optional separator (list only)
 vars:
+  dev_name:
+    type: string
+    description: Developer name
+    default: developer
+    prompt: What is your name?
+
   proj_name:
     type: string
     description: Project name
     default: my_project
     prompt: What is your project name?
+
+  org_name:
+    type: string
+    description: Organization name
+    default: my_org
+    prompt: What is your organization name?
 
   proj_desc:
     type: string
@@ -41,17 +53,11 @@ vars:
   has_envs:
     type: boolean
     description: Whether the app supports multiple environments
-    default: false
+    default: true
     prompt: Does the app support multiple environments?
-
-  has_vga:
-    type: boolean
-    description: Whether the app uses the very_good_analysis package
-    default: false
-    prompt: Does the app use the very_good_analysis package?
 
   has_ic:
     type: boolean
     description: Whether the app needs internet connectivity
-    default: false
+    default: true
     prompt: Does the app need internet connectivity?

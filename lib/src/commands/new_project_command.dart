@@ -172,9 +172,10 @@ class NewProjectCommand extends Command<int> {
 
   final CommandFlag _overwriteExistingDirectoryCommandFlag = const CommandFlag(
     name: 'overwrite-existing-directory',
-    help: 'Overwrite the existing directory.',
+    help: 'Overwrite the existing directory if it exists.',
     defaultsTo: false,
-    prompt: 'Output directory already exists. Overwrite?',
+    prompt: 'If the output directory already exists, would you like to '
+        'overwrite it?',
   );
 
   @override
@@ -307,6 +308,8 @@ class NewProjectCommand extends Command<int> {
         creationData.projectName,
         '--proj_desc',
         creationData.projectDescription,
+        '--org_name',
+        creationData.organization,
       ],
       workingDirectory: outputDir.path,
       mode: ProcessStartMode.inheritStdio,
@@ -339,27 +342,35 @@ class NewProjectCommand extends Command<int> {
 
   Future<ProcessResult> _runFlutterCreateCommand(
     _FlutterProjectCreationData creationData,
-  ) =>
-      Process.run(
-        'flutter',
-        [
-          'create',
-          '--project-name',
-          creationData.projectName,
-          '--description',
-          creationData.projectDescription,
-          '--org',
-          creationData.organization,
+  ) {
+    final isApp = creationData.template == 'app';
+    final isPlugin = creationData.template == 'plugin';
+    final isPluginFfi = creationData.template == 'plugin_ffi';
+    return Process.run(
+      'flutter',
+      [
+        'create',
+        '--project-name',
+        creationData.projectName,
+        '--description',
+        creationData.projectDescription,
+        '--org',
+        creationData.organization,
+        if (!isPluginFfi) ...[
           '--ios-language=${creationData.iosLanguage}',
           '--android-language=${creationData.androidLanguage}',
-          '-t',
-          creationData.template,
-          '--empty',
+        ],
+        '-t',
+        creationData.template,
+        if (isApp) '--empty',
+        if (isApp || isPlugin) ...[
           '--platforms',
           creationData.targetPlatforms.join(','),
-          creationData.outputDirectory,
         ],
-      );
+        creationData.outputDirectory,
+      ],
+    );
+  }
 
   String _optionOrPrompt(String argName, String Function() promptForArg) =>
       argResults?.option(argName) ?? promptForArg();
@@ -396,12 +407,20 @@ class NewProjectCommand extends Command<int> {
 
     final template =
         _optionOrPrompt(_templateCommandOption.name, _promptForTemplate);
+    final isApp = template == 'app';
+    final isPlugin = template == 'plugin';
 
-    final parsedTargetPlatforms =
-        argResults?.multiOption(_targetPlatformsCommandMultiOption.name);
-    final targetPlatforms = (parsedTargetPlatforms ?? []).isEmpty
-        ? _promptForTargetPlatforms()
-        : parsedTargetPlatforms!;
+    final List<String>? parsedTargetPlatforms;
+    final List<String> targetPlatforms;
+    if (isApp || isPlugin) {
+      parsedTargetPlatforms =
+          argResults?.multiOption(_targetPlatformsCommandMultiOption.name);
+      targetPlatforms = (parsedTargetPlatforms ?? []).isEmpty
+          ? _promptForTargetPlatforms()
+          : parsedTargetPlatforms!;
+    } else {
+      targetPlatforms = [];
+    }
 
     final outputDirectory = _optionOrPrompt(
       _outputDirectoryCommandOption.name,
@@ -413,10 +432,15 @@ class NewProjectCommand extends Command<int> {
       _promptForOverwriteExistingDirectory,
     );
 
-    final useStarterBrick = _flagOrPrompt(
-      _useStarterBrickCommandFlag.name,
-      _promptForUseStarterBrick,
-    );
+    final bool useStarterBrick;
+    if (isApp) {
+      useStarterBrick = _flagOrPrompt(
+        _useStarterBrickCommandFlag.name,
+        _promptForUseStarterBrick,
+      );
+    } else {
+      useStarterBrick = false;
+    }
 
     return (
       projectName: projectName,

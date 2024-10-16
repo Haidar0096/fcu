@@ -15,119 +15,74 @@ Future<void> run(HookContext context) async {
     progress.complete();
   }
 
-  if (context.vars['has_vga']) {
-    await _executeCommand(
-      'Adding very_good_analysis',
-      () => Process.run(
-        'dart',
-        ['pub', 'add', '--dev', 'very_good_analysis: ^6.0.0'],
-      ),
-    );
-  } else {
-    await _executeCommand(
-      'Adding flutter_lints',
-      () => Process.run(
-        'dart',
-        ['pub', 'add', '--dev', 'flutter_lints: ^5.0.0'],
-      ),
-    );
-  }
-
   await _executeCommand(
-    'Adding injectable',
-    () => Process.run('dart', ['pub', 'add', 'injectable: ^2.5.0']),
-  );
-  await _executeCommand(
-    'Adding get_it',
-    () => Process.run('dart', ['pub', 'add', 'get_it: ^8.0.0']),
-  );
-  await _executeCommand(
-    'Adding injectable_generator',
+    'Adding non-conditional dev dependencies',
     () => Process.run(
       'dart',
-      ['pub', 'add', '--dev', 'injectable_generator: ^2.6.2'],
+      [
+        'pub',
+        'add',
+        '--dev',
+        'very_good_analysis: ^6.0.0',
+        'injectable_generator: ^2.6.2',
+        'build_runner: ^2.4.13',
+      ],
     ),
   );
 
   await _executeCommand(
-    'Adding hydrated_bloc',
-    () => Process.run('dart', ['pub', 'add', 'hydrated_bloc: ^9.1.5']),
-  );
-
-  await _executeCommand(
-    'Adding path_provider',
-    () => Process.run('dart', ['pub', 'add', 'path_provider: ^2.1.4']),
-  );
-
-  await _executeCommand(
-    'Adding flutter_localizations',
+    'Adding non-conditional standard dependencies',
     () => Process.run(
       'dart',
-      ['pub', 'add', 'flutter_localizations', '--sdk=flutter'],
+      [
+        'pub',
+        'add',
+        'injectable: ^2.5.0',
+        'get_it: ^8.0.0',
+        'hydrated_bloc: ^9.1.5',
+        'flutter_bloc: ^8.1.6',
+        'bloc: ^8.1.4',
+        'path_provider: ^2.1.4',
+        'intl:any',
+        'nested: ^1.0.0',
+        'android_id: ^0.4.0',
+        'device_info_plus: ^11.0.0',
+        'package_info_plus: ^8.0.3',
+        'go_router: ^14.3.0',
+        'flutter_animate: ^4.5.0',
+        'cached_network_image: ^3.4.1',
+        'loading_animation_widget: ^1.3.0',
+        'flutter_hooks: ^0.20.5',
+        'carousel_slider: ^5.0.0'
+      ],
     ),
   );
 
   await _executeCommand(
-    'Adding intl',
-    () => Process.run('dart', ['pub', 'add', 'intl:any']),
-  );
-
-  await _executeCommand(
-    'Adding nested',
-    () => Process.run('dart', ['pub', 'add', 'nested: ^1.0.0']),
-  );
-
-  await _executeCommand(
-    'Adding flutter_bloc',
-    () => Process.run('dart', ['pub', 'add', 'flutter_bloc: ^8.1.6']),
-  );
-
-  await _executeCommand(
-    'Adding bloc',
-    () => Process.run('dart', ['pub', 'add', 'bloc: ^8.1.4']),
+    'Adding other non-conditional dependencies',
+    () => Process.run('flutter', [
+      'pub',
+      'add',
+      'flutter_localizations',
+      '--sdk=flutter',
+    ]),
   );
 
   if (context.vars['has_ic']) {
     await _executeCommand(
-      'Adding internet_connection_checker_plus',
+      'Adding internet dependencies',
       () => Process.run(
         'dart',
-        ['pub', 'add', 'internet_connection_checker_plus: ^2.5.2'],
+        [
+          'pub',
+          'add',
+          'fconnectivity: ^0.1.1',
+          'dio: ^5.7.0',
+          'dio_smart_retry: ^6.0.0',
+          'pretty_dio_logger: ^1.4.0',
+        ],
       ),
     );
-    await _executeCommand(
-      'Adding connectivity_plus',
-      () => Process.run(
-        'dart',
-        ['pub', 'add', 'connectivity_plus: ^6.0.5'],
-      ),
-    );
-  }
-
-  await _executeCommand(
-    'Adding build_runner',
-    () => Process.run(
-      'dart',
-      ['pub', 'add', '--dev', 'build_runner: ^2.4.13'],
-    ),
-  );
-
-  await _executeCommand(
-    'Adding android_id',
-    () => Process.run('dart', ['pub', 'add', 'android_id: ^0.4.0']),
-  );
-
-  await _executeCommand(
-    'Adding device_info_plus',
-    () => Process.run('dart', ['pub', 'add', 'device_info_plus: ^11.0.0']),
-  );
-
-  await _executeCommand(
-    'Adding package_info_plus',
-    () => Process.run('dart', ['pub', 'add', 'package_info_plus: ^8.0.3']),
-  );
-
-  if (context.vars['has_ic']) {
     await _executeCommand(
       'Adding internet permission to android manifest',
       () async {

@@ -1,5 +1,4 @@
-{{#has_vga}}include: package:very_good_analysis/analysis_options.yaml
+include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   errors:
     public_member_api_docs: ignore
-{{/has_vga}}{{^has_vga}}include: package:flutter_lints/flutter.yaml{{/has_vga}}

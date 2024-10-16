@@ -6,7 +6,7 @@ sealed class Environment {
   /// The name of the environment.
   final String name;
 
-  // TODO(dev): Add environment-specific variables here.
+  // TODO({{{dev_name}}}): Add environment-specific variables here.
   /// Returns an initial counter value according to the environment.
   int get initialCounterValue;
 }

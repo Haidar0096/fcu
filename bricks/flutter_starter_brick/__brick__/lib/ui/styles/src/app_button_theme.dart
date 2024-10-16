@@ -1,4 +1,4 @@
-import 'package:{{proj_name}}/ui/styles/src/app_colors.dart';
+import 'package:{{proj_name}}/ui/styles/src/app_colors_theme.dart';
 import 'package:{{proj_name}}/ui/styles/src/font_family.dart';
 import 'package:flutter/material.dart';
 
@@ -19,18 +19,19 @@ final class AppButtonThemeLight extends AppButtonTheme {
   static final AppButtonThemeLight instance = AppButtonThemeLight._(
     baseElevatedButtonStyle: ButtonStyle(
       backgroundColor:
-          _buildBackgroundColor(nonDisabledStateColor: AppColors.white),
+          _buildBackgroundColor(nonDisabledStateColor: AppColorsTheme.white),
       shape: _buildOutlineBorder(
-        borderSide: BorderSide(color: AppColorsLight.instance.primaryColor),
+        borderSide:
+            BorderSide(color: AppColorsThemeLight.instance.primaryColor),
       ),
       minimumSize: WidgetStateProperty.all(const Size(_defaultButtonWidth, 0)),
       fixedSize: _buildFixedSize(),
       overlayColor:
-          _buildOverlayColor(nonDisabledStateColor: AppColors.lightGrey),
+          _buildOverlayColor(nonDisabledStateColor: AppColorsTheme.lightGrey),
       elevation: _buildDefaultElevation(),
       textStyle: _buildDefaultTextStyle(),
       foregroundColor: _buildForegroundColor(
-        nonDisabledStateColor: AppColorsLight.instance.primaryColor,
+        nonDisabledStateColor: AppColorsThemeLight.instance.primaryColor,
       ),
     ),
   );
@@ -42,7 +43,7 @@ final class AppButtonThemeLight extends AppButtonTheme {
         (states) {
           final Color color;
           if (states.contains(WidgetState.disabled)) {
-            color = AppColorsLight.instance.onPrimary.withOpacity(.5);
+            color = AppColorsThemeLight.instance.onPrimary.withOpacity(.5);
           } else {
             color = nonDisabledStateColor;
           }
@@ -52,8 +53,8 @@ final class AppButtonThemeLight extends AppButtonTheme {
 
   static WidgetStateProperty<TextStyle?> _buildDefaultTextStyle() =>
       WidgetStateProperty.all(
-        const TextStyle(
-          fontFamily: FontFamily.consolas,
+        TextStyle(
+          fontFamily: FontFamily.consolas.name,
           fontWeight: FontWeight.w700,
           fontSize: 18,
         ),
@@ -82,7 +83,7 @@ final class AppButtonThemeLight extends AppButtonTheme {
         (states) {
           final Color color;
           if (states.contains(WidgetState.disabled)) {
-            color = AppColorsLight.instance.disabledButtonBackgroundColor;
+            color = AppColorsThemeLight.instance.disabledButtonBackgroundColor;
           } else {
             color = nonDisabledStateColor;
           }
@@ -103,7 +104,7 @@ final class AppButtonThemeLight extends AppButtonTheme {
             shape = RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(_defaultButtonBorderRadius),
               side: BorderSide(
-                color: AppColorsLight.instance.disabledBorderColor,
+                color: AppColorsThemeLight.instance.disabledBorderColor,
               ),
             );
           } else {
@@ -118,8 +119,6 @@ final class AppButtonThemeLight extends AppButtonTheme {
 
   @override
   ThemeExtension<AppButtonTheme> copyWith({
-    ButtonStyle? mainElevatedButtonStyle,
-    ButtonStyle? secondaryElevatedButtonStyle,
     ButtonStyle? baseElevatedButtonStyle,
   }) =>
       AppButtonThemeLight._(

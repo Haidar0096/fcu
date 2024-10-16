@@ -1,7 +1,95 @@
 {
-    "@@locale": "es",
-    "counterAppBarTitle": "Contador",
-    "@counterAppBarTitle": {
-        "description": "Texto mostrado en la AppBar de la página del contador"
+  "@@locale": "es",
+  "noValueSelected": "No se ha seleccionado ningún valor",
+  "@noValueSelected": {
+    "description": "Texto mostrado cuando no se ha seleccionado ningún valor"
+  },
+  "valueMustBeNumericLessThan": "El valor debe ser numérico y tener menos de {max} caracteres",
+  "@valueMustBeNumericLessThan": {
+    "description": "Texto mostrado cuando el valor no es numérico o es mayor que el máximo permitido",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
     }
+  },
+  "valueMustBeNumericBetween": "El valor debe ser numérico y estar entre {min} y {max} caracteres",
+  "@valueMustBeNumericBetween": {
+    "description": "Texto mostrado cuando el valor no es numérico o no está entre el mínimo y el máximo permitido",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "valueCannotBeEmpty": "El valor no puede estar vacío",
+  "@valueCannotBeEmpty": {
+    "description": "Texto mostrado cuando el valor está vacío"
+  },
+  "valueMustBeNumeric": "El valor debe ser numérico",
+  "@valueMustBeNumeric": {
+    "description": "Texto mostrado cuando el valor no es numérico"
+  },
+  "valueMustBeNumericWithLength": "El valor debe ser numérico y tener {length} caracteres",
+  "@valueMustBeNumericWithLength": {
+    "description": "Texto mostrado cuando el valor no es numérico o no tiene la longitud requerida",
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "valueMustBeBetween": "El valor debe estar entre {min} y {max} caracteres",
+  "@valueMustBeBetween": {
+    "description": "Texto mostrado cuando el valor no está entre el mínimo y el máximo permitido",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "cancel": "Cancelar",
+  "@cancel": {
+    "description": "Texto mostrado en el botón de cancelar"
+  },
+  "ok": "Aceptar",
+  "@ok": {
+    "description": "Texto mostrado en el botón de aceptar"
+  },
+  "back": "Atrás",
+  "@back": {
+    "description": "Texto mostrado en el botón de atrás"
+  },
+  "submit": "Enviar",
+  "@submit": {
+    "description": "Texto mostrado en el botón de enviar"
+  },
+  "next": "Siguiente",
+  "@next": {
+    "description": "Texto mostrado en el botón de siguiente"
+  },
+  "invalidEmailAddress": "Correo electrónico inválido",
+  "@invalidEmailAddress": {
+    "description": "Texto mostrado cuando el correo electrónico es inválido"
+  },
+  "oopsAnErrorHasOccurred": "¡Vaya! Hemos encontrado un error grave, ¡por favor contacta con soporte!",
+  "@oopsAnErrorHasOccurred": {
+    "description": "Texto mostrado cuando se produce un error grave"
+  }
+  {{#has_ic}}
+  ,"connected": "Conectado",
+  "@connected": {
+    "description": "Texto mostrado cuando la aplicación está conectada a internet"
+  },
+  "disconnected": "Desconectado",
+  "@disconnected": {
+    "description": "Texto mostrado cuando la aplicación está desconectada de internet"
+  }
+  {{/has_ic}}
 }

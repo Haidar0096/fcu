@@ -1,88 +1,57 @@
 part of 'app_meta_data_cubit.dart';
 
-abstract class AppMetaDataState {
+/// Base class for all app meta data states.
+sealed class AppMetaDataState {
   const AppMetaDataState();
 
-  bool get loading;
-
-  /// The device id, if available and if the cubit initialized successfully,
-  /// otherwise empty string.
-  String get deviceId;
-
-  /// The operating system type, if available and if the cubit initialized
-  /// successfully, otherwise empty string.
-  String get osType;
-
-  /// The operating system version, if available and if the cubit initialized
-  /// successfully, otherwise empty string.
-  String get osVersion;
-
-  /// The app version, if available and if the cubit initialized successfully,
-  /// otherwise empty string.
-  String get appVersion;
-
-  /// The build number, if available and if the cubit initialized successfully,
-  /// otherwise empty string.
-  String get buildNumber;
-
-  /// Returns a string that contains the app version and build number, if they
-  /// are both not empty, otherwise an empty string.
-  String get appVersionAndBuildNumberString;
-}
-
-/// Initial state of the app meta data, the cubit is not initialized yet.
-final class AppMetaDataInitial extends AppMetaDataState {
-  const AppMetaDataInitial();
-
-  @override
+  /// Indicates whether the app meta data is currently being loaded.
   bool get loading => false;
 
-  @override
+  /// The unique identifier for the device.
+  ///
+  /// Returns an empty string if not available or if initialization failed.
   String get deviceId => '';
 
-  @override
+  /// The type of the operating system (e.g., iOS, Android).
+  ///
+  /// Returns an empty string if not available or if initialization failed.
   String get osType => '';
 
-  @override
+  /// The version of the operating system.
+  ///
+  /// Returns an empty string if not available or if initialization failed.
   String get osVersion => '';
 
-  @override
+  /// The version of the app.
+  ///
+  /// Returns an empty string if not available or if initialization failed.
   String get appVersion => '';
 
-  @override
+  /// The build number of the app.
+  ///
+  /// Returns an empty string if not available or if initialization failed.
   String get buildNumber => '';
 
-  @override
+  /// A formatted string containing both the app version and build number.
+  ///
+  /// Returns an empty string if either appVersion or buildNumber is empty.
   String get appVersionAndBuildNumberString => '';
 }
 
-/// The app meta data is being loaded.
+/// Represents the initial state when the app meta data has not been loaded yet.
+final class AppMetaDataInitial extends AppMetaDataState {
+  const AppMetaDataInitial();
+}
+
+/// Represents the state when the app meta data is being loaded.
 final class AppMetaDataLoading extends AppMetaDataState {
   const AppMetaDataLoading();
 
   @override
   bool get loading => true;
-
-  @override
-  String get deviceId => '';
-
-  @override
-  String get osType => '';
-
-  @override
-  String get osVersion => '';
-
-  @override
-  String get appVersion => '';
-
-  @override
-  String get buildNumber => '';
-
-  @override
-  String get appVersionAndBuildNumberString => '';
 }
 
-/// The app meta data has been loaded.
+/// Represents the state when the app meta data has been successfully loaded.
 final class AppMetaDataLoaded extends AppMetaDataState {
   const AppMetaDataLoaded({
     required this.deviceId,
@@ -91,9 +60,6 @@ final class AppMetaDataLoaded extends AppMetaDataState {
     required this.appVersion,
     required this.buildNumber,
   });
-
-  @override
-  bool get loading => false;
 
   @override
   final String deviceId;
@@ -119,7 +85,7 @@ final class AppMetaDataLoaded extends AppMetaDataState {
   }
 }
 
-/// The app meta data loading has failed.
+/// Represents the state when the app meta data loading has failed.
 final class AppMetaDataLoadingFailed extends AppMetaDataState {
   const AppMetaDataLoadingFailed({
     required this.error,
@@ -129,27 +95,6 @@ final class AppMetaDataLoadingFailed extends AppMetaDataState {
   /// The error that caused the loading to fail.
   final Object error;
 
-  /// The stack trace of the error that caused the loading to fail.
+  /// The stack trace associated with the error, if available.
   final StackTrace? stackTrace;
-
-  @override
-  bool get loading => false;
-
-  @override
-  String get deviceId => '';
-
-  @override
-  String get osType => '';
-
-  @override
-  String get osVersion => '';
-
-  @override
-  String get appVersion => '';
-
-  @override
-  String get buildNumber => '';
-
-  @override
-  String get appVersionAndBuildNumberString => '';
 }

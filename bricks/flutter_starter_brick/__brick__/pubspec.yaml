@@ -17,7 +17,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
-  fonts: # TODO(dev): use your own fonts if needed
+  assets:
+    - assets/images/common/
+  fonts: # TODO({{dev_name}}): use your own fonts if needed
     - family: consolas
       fonts:
         - asset: assets/fonts/consolas.ttf

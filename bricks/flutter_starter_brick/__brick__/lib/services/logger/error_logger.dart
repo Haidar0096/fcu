@@ -48,7 +48,7 @@ class ErrorLogger {
     required dynamic error,
     StackTrace? stackTrace,
   }) async {
-    // TODO(dev): Implement this method to record errors in your chosen error
-    // reporting system.
+    // TODO({{dev_name}}): Implement this method to record errors in your chosen
+    // error reporting system.
   }
 }

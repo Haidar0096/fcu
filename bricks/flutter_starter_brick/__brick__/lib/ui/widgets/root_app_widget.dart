@@ -1,22 +1,35 @@
 import 'package:{{proj_name}}/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
-{{#has_ic}}
-import 'package:{{proj_name}}/blocs/connectivity_cubit/connectivity_cubit.dart';
-{{/has_ic}}
 import 'package:{{proj_name}}/blocs/localization_cubit/localization_cubit.dart';
 import 'package:{{proj_name}}/blocs/theme_cubit/theme_cubit.dart';
-import 'package:{{proj_name}}/l10n/l10n.dart';
 import 'package:{{proj_name}}/services/dependency_injection/dependency_injection.dart';
-import 'package:{{proj_name}}/ui/styles/app_styles.dart';
+import 'package:{{proj_name}}/ui/app_router/app_router.dart';
 {{#has_ic}}
-import 'package:{{proj_name}}/ui/widgets/connectivity_cubit_listener.dart';
-import 'package:{{proj_name}}/ui/widgets/snackbars.dart';
+import 'package:{{proj_name}}/ui/widgets/core_widgets/snackbars.dart';
+{{/has_ic}}
+import 'package:{{proj_name}}/ui/widgets/global_keys.dart';
+{{#has_ic}}
+import 'package:fconnectivity/fconnectivity.dart';
 {{/has_ic}}
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class RootAppWidget extends StatelessWidget {
+/// The root widget of the application.
+///
+/// This widget sets up the BLoC providers, routing, theming, and localization
+/// for the entire app.{{#has_ic}} It also handles connectivity status.{{/has_ic}}  
+class RootAppWidget extends State{{#has_ic}}fulWidget{{/has_ic}}{{^has_ic}}lessWidget{{/has_ic}} {
+  /// Creates a [RootAppWidget].
   const RootAppWidget({super.key});
+
+  {{#has_ic}}
+  @override
+  State<RootAppWidget> createState() => _RootAppWidgetState();
+}
+
+class _RootAppWidgetState extends State<RootAppWidget> {
+  bool _isFirstCapturedState = true;
+  {{/has_ic}}
 
   @override
   Widget build(BuildContext context) => MultiBlocProvider(
@@ -27,11 +40,6 @@ class RootAppWidget extends StatelessWidget {
           BlocProvider<ThemeCubit>(
             create: (_) => ServiceProvider.get<ThemeCubit>(),
           ),
-          {{#has_ic}}
-          BlocProvider<ConnectivityCubit>(
-            create: (_) => ServiceProvider.get<ConnectivityCubit>(),
-          ),
-          {{/has_ic}}
           BlocProvider<AppMetaDataCubit>(
             create: (_) => ServiceProvider.get<AppMetaDataCubit>(),
           ),
@@ -40,62 +48,42 @@ class RootAppWidget extends StatelessWidget {
           builder: (context) {
             final language = context.watch<LocalizationCubit>().state;
             final theme = context.watch<ThemeCubit>().state;
-            return MaterialApp(
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              routerConfig: appRouter,
               theme: theme.themeData,
-              home: Builder(
+              builder: (context, routerWidget) => Builder(
                 builder: (context) {
-                  final result = Scaffold(
-                    appBar: AppBar(
-                      title: Text(
-                        context.appLocalizations.counterAppBarTitle,
-                        style: Theme.of(context)
-                            .extension<AppTextTheme>()
-                            ?.title4
-                            ?.copyWith(color: AppColors.green),
-                      ),
-                    ),
-                    body: Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Text(
-                        'Hello World!',
-                        style: Theme.of(context)
-                            .extension<AppTextTheme>()
-                            ?.body5
-                            ?.copyWith(color: AppColors.green),
-                      ),
-                    ),
-                  );
+                  {{#has_ic}}var{{/has_ic}}{{^has_ic}}final{{/has_ic}} result = routerWidget!;
 
                   {{#has_ic}}
-                  return ConnectivityCubitListener(
-                    onConnected: ({
-                      required BuildContext context,
-                      required bool isFirstCapturedState,
-                    }) {
-                      // TODO(dev): handle connected state
-                      if (isFirstCapturedState) {
-                        showSuccessSnackBar(
-                          context: context,
-                          text: 'Connected',
-                        );
+                  // Wrap the result widget with the InternetAccessCubitListener
+                  result = InternetAccessListener(
+                    onInternetAccessGained: (BuildContext context) {
+                      // TODO({{dev_name}}): handle connected state
+                      if (!_isFirstCapturedState) {
+                        context.showSuccessSnackBar(text: 'Connected');
                       }
+                      _isFirstCapturedState = false;
                     },
-                    onDisconnected: ({
-                      required BuildContext context,
-                      required bool isFirstCapturedState,
-                    }) {
-                      // TODO(dev): handle disconnected state
-                      showErrorSnackBar(
-                        context: context,
-                        text: 'Disconnected',
-                      );
+                    onInternetAccessLost: (BuildContext context) {
+                      // TODO({{dev_name}}): handle disconnected state
+                      context.showErrorSnackBar(text: 'Disconnected');
+                      _isFirstCapturedState = false;
                     },
                     child: result,
                   );
                   {{/has_ic}}
-                  {{^has_ic}}
-                  return result;
-                  {{/has_ic}}
+
+                  // Wrap the result with a scaffold with a global key
+                  // to be used to show snackbars from anywhere in the app
+                  {{#has_ic}}result = {{/has_ic}}{{^has_ic}}return {{/has_ic}}Scaffold(
+                    key: globalScaffoldKey,
+                    resizeToAvoidBottomInset: false,
+                    body: result,
+                  );
+
+                  {{#has_ic}}return result;{{/has_ic}}
                 },
               ),
               localizationsDelegates: AppLocalizations.localizationsDelegates,

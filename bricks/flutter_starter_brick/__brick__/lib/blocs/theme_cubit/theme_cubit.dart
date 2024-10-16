@@ -1,10 +1,10 @@
+import 'package:{{proj_name}}/blocs/bloc_utils/bloc_utils.dart';
 import 'package:{{proj_name}}/services/dependency_injection/dependency_injection.dart';
 import 'package:{{proj_name}}/ui/styles/app_styles.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 /// Manages the theme of the app.
 @LazySingletonService()
-class ThemeCubit extends HydratedCubit<AppTheme> {
+class ThemeCubit extends BaseHydratedCubit<AppTheme> {
   // initially the theme is set to light theme
   ThemeCubit() : super(AppThemeLight.instance);
 
@@ -14,7 +14,7 @@ class ThemeCubit extends HydratedCubit<AppTheme> {
   @override
   AppTheme? fromJson(Map<String, dynamic> json) => switch (json['theme']) {
         'light' => AppThemeLight.instance,
-        // TODO(dev): Change the next line after adding the dark theme
+        // fallback to light theme if an unknown theme is saved
         _ => AppThemeLight.instance,
       };
 
