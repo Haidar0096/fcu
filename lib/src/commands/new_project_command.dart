@@ -264,14 +264,7 @@ class NewProjectCommand extends Command<int> {
     _progress = _logger.progress('Running `mason add`...');
     final masonAddResult = await Process.run(
       'mason',
-      [
-        'add',
-        'flutter_starter_brick',
-        '--git-url',
-        'https://github.com/Haidar0096/fcu',
-        '--git-path',
-        'bricks/flutter_starter_brick',
-      ],
+      ['add', 'flutter_starter_brick'],
       workingDirectory: outputDir.path,
     );
     if (masonAddResult.exitCode != 0) {
