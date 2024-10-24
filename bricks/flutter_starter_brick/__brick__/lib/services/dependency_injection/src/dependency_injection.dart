@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:{{proj_name}}/services/dependency_injection/src/dependency_injection.config.dart';
-import 'package:{{proj_name}}/services/dependency_injection/src/dependency_injection_instance_names.dart';
+import 'package:{{proj_name}}/services/dependency_injection/src/dependency_injection_instances.dart';
 {{#has_envs}}import 'package:{{proj_name}}/services/environments/environments.dart';{{/has_envs}}
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart' hide Environment;
