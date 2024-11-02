@@ -76,7 +76,7 @@ Future<void> run(HookContext context) async {
         [
           'pub',
           'add',
-          'fconnectivity: ^0.1.1',
+          'fconnectivity: ^0.3.0',
           'dio: ^5.7.0',
           'dio_smart_retry: ^6.0.0',
           'pretty_dio_logger: ^1.4.0',
