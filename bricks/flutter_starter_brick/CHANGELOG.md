@@ -9,3 +9,7 @@
 # 0.4.0
 
 - Updated a dependency in the starter brick.
+
+# 0.4.1
+
+- Fixed a typo in README of the starter brick

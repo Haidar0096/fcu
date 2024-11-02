@@ -16,7 +16,7 @@ Includes multiple environments, API support, and Bloc for state management.
 - [&check;] **Theming and Styling**: Implement consistent theming across your application with predefined color schemes.
 - [&check;] **Internationalization (i18n)**: Support multiple languages effortlessly.
 - [&check;] **Form Validation**: Built-in validation utilities to ensure data integrity in forms.
-- [&check;] **Script to create APK for all platforms**: Automatically detect and handle changes in internet connectivity.
+- [&check;] **Script to create APK for all platforms**.
 - [&cross;] **Github actions (Coming Soon)**: Release to github releases, google play internal track, and testflight.
 
 ## Support Me
