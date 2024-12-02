@@ -2,17 +2,17 @@
 
 # This script activates the dart package globally
 
-# Parse the path to the package from the command line arguments
-package_path=$1
+# Get the directory where the script is located, regardless of where it's called from
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Ensure the package path is not empty
-if [ -z "$package_path" ]; then
-  echo "Error: Package path is required"
-  exit 1
-fi
+# Get the parent directory (project root)
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
+
+# Navigate to project root
+cd "$PROJECT_ROOT" || { echo "Failed to cd to $PROJECT_ROOT"; exit 1; }
 
 flutter clean
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
-dart pub global activate --source=path "$package_path"
+dart pub global activate --source=path "$PROJECT_ROOT"
 fcu --help
