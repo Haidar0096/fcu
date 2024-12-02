@@ -1,29 +1,36 @@
 #!/bin/bash
 
 # This script builds the app in release mode for different servers and copies each output into
-# a specified output folder
+# a specified output folder. It reads the android version name and code from a file called
+# versions present at the project root
 
 # Initialize variables
-version=""
-version_code=""
 output_path=""{{#has_envs}}
 servers=("development" "staging" "production"){{/has_envs}}
 platforms=("android-arm" "android-arm64" "android-x64")
 
-# Parse the named arguments for the script itself
+# Parse the output directory argument
 while [[ "$#" -gt 0 ]]; do
   case $1 in
-    --version-name) version="$2"; shift ;;
-    --version-code) version_code="$2"; shift ;;
     --output-dir) output_path="$2"; shift ;;
     *) echo "Unknown parameter passed: $1"; exit 1 ;;
   esac
   shift
 done
 
-# Ensure required parameters are set
+# Read versions from file
+if [[ ! -f "versions" ]]; then
+  echo "versions file not found at project root"
+  exit 1
+fi
+
+# Extract versions using grep and cut
+version=$(grep "android_version_name" versions | cut -d'=' -f2)
+version_code=$(grep "android_build_number" versions | cut -d'=' -f2)
+
+# Validate versions were read correctly
 if [[ -z "$version" || -z "$version_code" ]]; then
-  echo "Missing required arguments: --version-name and --version-code"
+  echo "Failed to read version information from versions file"
   exit 1
 fi
 

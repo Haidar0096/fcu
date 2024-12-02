@@ -13,3 +13,7 @@
 # 0.4.1
 
 - Fixed a typo in README of the starter brick
+
+# 0.4.2
+
+- Upgraded mason version.
