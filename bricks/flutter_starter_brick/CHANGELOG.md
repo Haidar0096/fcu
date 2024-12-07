@@ -17,3 +17,12 @@
 # 0.4.2
 
 - Upgraded mason version.
+
+# 1.0.0-preview.1
+
+- First stable release!
+- Refactored the whole architecture of the starter flutter app to make it more modular and easier to maintain and scale.
+
+# 1.0.0-preview.2
+
+- Added mermaid diagram to the README file to visualize the project structure.

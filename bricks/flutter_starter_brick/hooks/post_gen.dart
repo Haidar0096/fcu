@@ -26,6 +26,8 @@ Future<void> run(HookContext context) async {
         'very_good_analysis: ^6.0.0',
         'injectable_generator: ^2.6.2',
         'build_runner: ^2.4.13',
+        'go_router_builder: ^2.7.1',
+        'build_verify: ^3.1.0',
       ],
     ),
   );
@@ -38,22 +40,20 @@ Future<void> run(HookContext context) async {
         'pub',
         'add',
         'injectable: ^2.5.0',
-        'get_it: ^8.0.0',
+        'get_it: ^8.0.2',
         'hydrated_bloc: ^9.1.5',
         'flutter_bloc: ^8.1.6',
         'bloc: ^8.1.4',
-        'path_provider: ^2.1.4',
+        'path_provider: ^2.1.5',
         'intl:any',
         'nested: ^1.0.0',
         'android_id: ^0.4.0',
-        'device_info_plus: ^11.0.0',
-        'package_info_plus: ^8.0.3',
-        'go_router: ^14.3.0',
+        'device_info_plus: ^11.1.1',
+        'package_info_plus: ^8.1.1',
+        'go_router: ^14.6.2',
         'flutter_animate: ^4.5.0',
         'cached_network_image: ^3.4.1',
         'loading_animation_widget: ^1.3.0',
-        'flutter_hooks: ^0.20.5',
-        'carousel_slider: ^5.0.0'
       ],
     ),
   );
@@ -78,8 +78,6 @@ Future<void> run(HookContext context) async {
           'add',
           'fconnectivity: ^0.3.0',
           'dio: ^5.7.0',
-          'dio_smart_retry: ^6.0.0',
-          'pretty_dio_logger: ^1.4.0',
         ],
       ),
     );
@@ -128,13 +126,13 @@ Future<void> run(HookContext context) async {
   );
 
   await _executeCommand(
-    'Running dart format .',
-    () => Process.run('dart', ['format', '.']),
+    'Running dart fix --apply',
+    () => Process.run('dart', ['fix', '--apply']),
   );
 
   await _executeCommand(
-    'Running dart fix --apply',
-    () => Process.run('dart', ['fix', '--apply']),
+    'Running dart format .',
+    () => Process.run('dart', ['format', '.']),
   );
 
   context.logger.success('🎉 Brick generated successfully!');

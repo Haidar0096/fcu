@@ -1,0 +1,43 @@
+{
+  "@@locale": "es",
+  "noValueSelected": "Ningún valor seleccionado",
+  "@noValueSelected": {
+    "description": "Texto mostrado cuando no se selecciona ningún valor"
+  },
+  "valueCannotBeEmpty": "El valor no puede estar vacío",
+  "@valueCannotBeEmpty": {
+    "description": "Texto mostrado cuando el valor está vacío"
+  },
+  "valueMustBeBetween": "El valor debe tener entre {min} y {max} caracteres",
+  "@valueMustBeBetween": {
+    "description": "Texto mostrado cuando el valor no está entre el mínimo y máximo permitido",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "cancel": "Cancelar",
+  "@cancel": {
+    "description": "Texto mostrado en el botón de cancelar"
+  },
+  "ok": "Aceptar",
+  "@ok": {
+    "description": "Texto mostrado en el botón de aceptar"
+  },
+  "oopsAnErrorHasOccurred": "¡Ups! Hemos encontrado un error grave, por favor contacte con soporte.",
+  "@oopsAnErrorHasOccurred": {
+    "description": "Texto mostrado cuando ocurre un error"
+  },
+  "connected": "Conectado",
+  "@connected": {
+    "description": "Texto mostrado cuando la aplicación está conectada a internet"
+  },
+  "disconnected": "Desconectado",
+  "@disconnected": {
+    "description": "Texto mostrado cuando la aplicación está desconectada de internet"
+  }
+}

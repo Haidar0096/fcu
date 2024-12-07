@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+import 'theme_data.dart';
+
+final ThemeData lightThemeData = themeData(_colorScheme);
+
+// A nice resource to generate color schemes:
+// https://material-foundation.github.io/material-theme-builder/
+
+const ColorScheme _colorScheme = ColorScheme(
+  brightness: Brightness.light,
+  primary: Color(4282474385),
+  surfaceTint: Color(4282474385),
+  onPrimary: Color(4294967295),
+  primaryContainer: Color(4292273151),
+  onPrimaryContainer: Color(4278197054),
+  secondary: Color(4283850609),
+  onSecondary: Color(4294967295),
+  secondaryContainer: Color(4292535033),
+  onSecondaryContainer: Color(4279442475),
+  tertiary: Color(4285551989),
+  onTertiary: Color(4294967295),
+  tertiaryContainer: Color(4294629629),
+  onTertiaryContainer: Color(4280816430),
+  error: Color(4290386458),
+  onError: Color(4294967295),
+  errorContainer: Color(4294957782),
+  onErrorContainer: Color(4282449922),
+  surface: Color(4294572543),
+  onSurface: Color(4279835680),
+  onSurfaceVariant: Color(4282664782),
+  outline: Color(4285822847),
+  outlineVariant: Color(4291086032),
+  shadow: Color(4278190080),
+  scrim: Color(4278190080),
+  inverseSurface: Color(4281217078),
+  inversePrimary: Color(4289382399),
+  primaryFixed: Color(4292273151),
+  onPrimaryFixed: Color(4278197054),
+  primaryFixedDim: Color(4289382399),
+  onPrimaryFixedVariant: Color(4280829815),
+  secondaryFixed: Color(4292535033),
+  onSecondaryFixed: Color(4279442475),
+  secondaryFixedDim: Color(4290692828),
+  onSecondaryFixedVariant: Color(4282271577),
+  tertiaryFixed: Color(4294629629),
+  onTertiaryFixed: Color(4280816430),
+  tertiaryFixedDim: Color(4292721888),
+  onTertiaryFixedVariant: Color(4283907676),
+  surfaceDim: Color(4292467168),
+  surfaceBright: Color(4294572543),
+  surfaceContainerLowest: Color(4294967295),
+  surfaceContainerLow: Color(4294177786),
+  surfaceContainer: Color(4293783028),
+  surfaceContainerHigh: Color(4293388526),
+  surfaceContainerHighest: Color(4293059305),
+);

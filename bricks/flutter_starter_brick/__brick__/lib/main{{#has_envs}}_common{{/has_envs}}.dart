@@ -1,7 +1,7 @@
-import 'package:{{proj_name}}/services/dependency_injection/dependency_injection.dart';
-{{#has_envs}}import 'package:{{proj_name}}/services/environments/environments.dart';{{/has_envs}}
-import 'package:{{proj_name}}/services/logger/error_logger.dart';
-import 'package:{{proj_name}}/ui/widgets/root_app_widget.dart';
+import 'package:{{proj_name}}/common/dependency_injection/dependency_injection.dart';
+{{#has_envs}}import 'package:{{proj_name}}/common/environments/environments.dart';{{/has_envs}}
+import 'package:{{proj_name}}/common/logging/logging.dart';
+import 'package:{{proj_name}}/app/app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
