@@ -26,3 +26,8 @@
 # 1.0.0-preview.2
 
 - Added mermaid diagram to the README file to visualize the project structure.
+
+# 1.0.0-preview.3
+
+- Moved the router folder to the lib folder.
+- Improved the BaseScreenWidget.
