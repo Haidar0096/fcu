@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:{{proj_name}}/router/router.dart';
 import 'package:{{proj_name}}/common/ui/core_widgets/src/base_blur_widget.dart';
 import 'package:{{proj_name}}/common/ui/core_widgets/src/base_dim_widget.dart';
 import 'package:{{proj_name}}/common/ui/core_widgets/src/base_loader_widget.dart';

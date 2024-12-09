@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:{{proj_name}}/common/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
 import 'package:{{proj_name}}/common/dependency_injection/dependency_injection.dart';
-import 'package:{{proj_name}}/common/router/router.dart';
+import 'package:{{proj_name}}/router/router.dart';
 import 'package:{{proj_name}}/common/ui/core_widgets/core_widgets.dart';
 
 class SplashScreen extends StatefulWidget {

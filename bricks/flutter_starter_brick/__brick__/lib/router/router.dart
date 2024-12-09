@@ -34,14 +34,26 @@ void clearAllRoutesAndGoToNamed(
 }
 
 /// Returns a [Page] based on the platform.
-Page<T> getPageByPlatform<T>({required Widget child}) {
+Page<T> getPageByPlatform<T>({
+  required Widget child,
+  required LocalKey pageKey,
+}) {
   if (Platform.isAndroid) {
-    return MaterialPage(child: child);
+    return MaterialPage(
+      child: child,
+      key: pageKey,
+    );
   }
   if (Platform.isIOS) {
-    return CupertinoPage(child: child);
+    return CupertinoPage(
+      child: child,
+      key: pageKey,
+    );
   }
-  return MaterialPage(child: child);
+  return MaterialPage(
+    child: child,
+    key: pageKey,
+  );
 }
 
 @TypedGoRoute<SplashScreenRoute>(
@@ -53,7 +65,10 @@ class SplashScreenRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
-      getPageByPlatform<void>(child: const SplashScreen());
+      getPageByPlatform<void>(
+        pageKey: state.pageKey,
+        child: const SplashScreen(),
+      );
 }
 
 @TypedGoRoute<HomeScreenRoute>(
@@ -65,7 +80,10 @@ class HomeScreenRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
-      getPageByPlatform<void>(child: const HomeScreen());
+      getPageByPlatform<void>(
+        pageKey: state.pageKey,
+        child: const HomeScreen(),
+      );
 }
 
 @TypedGoRoute<ErrorScreenRoute>(
@@ -79,5 +97,12 @@ class ErrorScreenRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
-      getPageByPlatform<void>(child: ErrorScreen(errorMessage: errorMessage));
+      getPageByPlatform<void>(
+        pageKey: state.pageKey,
+        child: ErrorScreen(errorMessage: errorMessage),
+      );
+}
+
+extension RouterExtension on BuildContext {
+  void pop<T extends Object?>([T? result]) => GoRouter.of(this).pop<T>(result);
 }

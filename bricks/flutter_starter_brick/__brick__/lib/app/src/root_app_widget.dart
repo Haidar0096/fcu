@@ -1,7 +1,7 @@
 import 'package:{{proj_name}}/common/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
 import 'package:{{proj_name}}/common/dependency_injection/dependency_injection.dart';
 import 'package:{{proj_name}}/common/ui/theme/theme.dart';
-import 'package:{{proj_name}}/common/router/router.dart';
+import 'package:{{proj_name}}/router/router.dart';
 {{#has_ic}}
 import 'package:fconnectivity/fconnectivity.dart';
 {{/has_ic}}
