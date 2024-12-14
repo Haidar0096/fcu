@@ -14,7 +14,7 @@ class BaseObscureTextField extends StatefulWidget {
     this.validator,
     this.width,
     this.keyboardType,
-    this.autoFocus,
+    this.autofocus,
     this.hintText,
     this.floatingLabelBehavior,
     this.labelPadding,
@@ -40,7 +40,7 @@ class BaseObscureTextField extends StatefulWidget {
   final TextInputType? keyboardType;
 
   /// Whether the text field should auto-focus on load.
-  final bool? autoFocus;
+  final bool? autofocus;
 
   /// The style for the label text.
   final TextStyle? labelStyle;
@@ -115,7 +115,7 @@ class _BaseObscureTextFieldState extends State<BaseObscureTextField> {
         fontWeight: FontWeight.w700,
       ),
       validator: widget.validator,
-      autoFocus: widget.autoFocus ?? false,
+      autofocus: widget.autofocus ?? false,
     );
   }
 }

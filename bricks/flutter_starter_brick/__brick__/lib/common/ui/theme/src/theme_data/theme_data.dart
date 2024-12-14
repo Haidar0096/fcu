@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' hide ButtonTheme, Typography;
 import 'typography.dart';
 import 'input_decoration_theme.dart';
 import 'elevated_button_theme_data.dart';
+import 'text_button_theme_data.dart';
 import 'text_selection_theme_data.dart';
 import 'checkbox_theme_data.dart';
 import 'divider_theme_data.dart';
@@ -22,12 +23,11 @@ ThemeData themeData(ColorScheme colorScheme) => ThemeData(
       progressIndicatorTheme: progressIndicatorThemeData(colorScheme),
       scrollbarTheme: scrollbarThemeData(colorScheme),
       elevatedButtonTheme: elevatedButtonThemeData(colorScheme),
+      textButtonTheme: textButtonThemeData(colorScheme),
       inputDecorationTheme: inputDecorationTheme(colorScheme),
       dropdownMenuTheme: dropdownMenuThemeData(colorScheme),
       extensions: [
         Typography(colorScheme),
-        // AppDropdownMenuThemeLight.instance,
-        // AppColorsThemeLight.instance,
       ],
     );
 

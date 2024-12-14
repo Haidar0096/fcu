@@ -31,3 +31,8 @@
 
 - Moved the router folder to the lib folder.
 - Improved the BaseScreenWidget.
+
+# 1.0.0-preview.4
+
+- Several improvements to the flutter started brick.
+- Updated the example of the fcu command in README

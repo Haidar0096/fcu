@@ -7,9 +7,6 @@ import 'package:{{proj_name}}/common/ui/theme/theme.dart';
 /// - If [child] is provided, it will be used instead of [text].
 /// - Only one of [text] or [child] can be provided, and at least one must be
 ///  specified.
-///
-/// Use properties like [backgroundColor], [padding], [side], etc. to customize
-/// the button's appearance.
 class BaseElevatedButton extends StatelessWidget {
   const BaseElevatedButton({
     required this.onPressed,
@@ -22,14 +19,7 @@ class BaseElevatedButton extends StatelessWidget {
     this.maxLines,
     this.overflow,
     this.textStyle,
-    this.backgroundColor,
-    this.padding,
-    this.side,
-    this.minimumSize,
-    this.fixedSize,
-    this.maximumSize,
-    this.tapTargetSize,
-    this.shape,
+    this.style,
   })  : assert(
           text == null || child == null,
           'Provide either text or child, not both',
@@ -66,45 +56,15 @@ class BaseElevatedButton extends StatelessWidget {
   /// The style to use for the text.
   final TextStyle? textStyle;
 
-  /// The background color of the button in different states.
-  final WidgetStateProperty<Color>? backgroundColor;
-
-  /// The padding inside the button.
-  final WidgetStateProperty<EdgeInsetsGeometry>? padding;
-
-  /// The side (border) of the button.
-  final WidgetStateProperty<BorderSide>? side;
-
-  /// The minimum size of the button.
-  final WidgetStateProperty<Size>? minimumSize;
-
-  /// The fixed size of the button.
-  final WidgetStateProperty<Size>? fixedSize;
-
-  /// The maximum size of the button.
-  final WidgetStateProperty<Size>? maximumSize;
-
-  /// Configures the minimum size of the tap target.
-  final MaterialTapTargetSize? tapTargetSize;
-
-  /// The shape of the button's material.
-  final WidgetStateProperty<OutlinedBorder?>? shape;
+  /// A button style to merge the base elevated button's style with.
+  final ButtonStyle? style;
 
   @override
   Widget build(BuildContext context) => SizedBox(
         width: width,
         height: height,
         child: ElevatedButton(
-          style: context.themeData.elevatedButtonTheme.style?.copyWith(
-            backgroundColor: backgroundColor,
-            padding: padding,
-            side: side,
-            shape: shape,
-            minimumSize: minimumSize,
-            fixedSize: fixedSize,
-            maximumSize: maximumSize,
-            tapTargetSize: tapTargetSize,
-          ),
+          style: context.themeData.elevatedButtonTheme.style?.merge(style),
           onPressed: onPressed,
           child: child ??
               Text(

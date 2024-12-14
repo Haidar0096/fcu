@@ -33,7 +33,9 @@ class BaseTextFormField extends StatelessWidget {
     this.validator,
     this.hintText,
     this.errorMaxLines,
-    this.autoFocus = false,
+    this.autofocus = false,
+    this.cursorHeight,
+    this.cursorWidth = 2.0,
     this.onTapOutside,
     this.obscureText = false,
     this.suffixIcon,
@@ -51,6 +53,7 @@ class BaseTextFormField extends StatelessWidget {
     this.maxLines,
     this.labelPadding,
     this.autoValidateMode,
+    this.contextMenuBuilder,
   });
 
   /// Whether to show input suggestions.
@@ -114,7 +117,13 @@ class BaseTextFormField extends StatelessWidget {
 
   /// Whether this text field should focus itself if nothing else is already
   /// focused.
-  final bool autoFocus;
+  final bool autofocus;
+
+  /// The height of the cursor.
+  final double? cursorHeight;
+
+  /// The width of the cursor.
+  final double cursorWidth;
 
   /// Called when the user taps outside of the text field.
   final void Function(PointerDownEvent event)? onTapOutside;
@@ -167,6 +176,11 @@ class BaseTextFormField extends StatelessWidget {
   /// Used to configure the auto validation of [FormField] and [Form] widgets.
   final AutovalidateMode? autoValidateMode;
 
+  /// A builder for the context menu that appears when the user long-presses
+  /// this text field.
+  final EditableTextContextMenuBuilder? contextMenuBuilder;
+
+
   @override
   Widget build(BuildContext context) => SizedBox(
         width: width,
@@ -182,15 +196,18 @@ class BaseTextFormField extends StatelessWidget {
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
           obscureText: obscureText,
+          contextMenuBuilder: contextMenuBuilder,
           controller: controller,
           textAlign: textAlign ?? TextAlign.start,
           onTap: () => focusNode?.requestFocus(),
-          autofocus: autoFocus,
+          autofocus: autofocus,
           autovalidateMode: autoValidateMode,
           style: style ??
               context.typography?.body3.copyWith(
                 color: context.themeData.colorScheme.onSurface,
               ),
+          cursorHeight: cursorHeight,
+          cursorWidth: cursorWidth,
           decoration: decoration ??
               InputDecoration(
                 filled: filled ?? true,
@@ -217,7 +234,7 @@ class BaseTextFormField extends StatelessWidget {
                           .withOpacity(0.6),
                     ),
                 contentPadding:
-                    contentPadding ?? const EdgeInsets.only(left: 5),
+                    contentPadding ?? const EdgeInsets.only(left: 10),
                 enabledBorder:
                     context.themeData.inputDecorationTheme.enabledBorder,
                 disabledBorder:

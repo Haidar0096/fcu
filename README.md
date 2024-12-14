@@ -29,5 +29,5 @@ $ fcu --help
 
 Example:
 ```sh
-fcu create --desc "Cool counter app" --org "com.my_cool_company" --name "counter_app" --ios-lang swift --android-lang "java" --template app --target-platforms "android,ios" --output-directory "counter_app_flutter" --overwrite-existing-directory --use-starter-brick
+fcu create --desc "My starter app" --org "com.my_startup" --name "starter_app" --ios-lang swift --android-lang "java" --template app --target-platforms "android,ios" --output-directory "starter_app" --overwrite-existing-directory --use-starter-brick
 ```

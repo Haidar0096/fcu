@@ -1,1 +1,1 @@
-export 'src/error_screen.dart';
+export 'ui/error_screen.dart';

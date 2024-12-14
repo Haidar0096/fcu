@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:{{proj_name}}/common/blocs/bloc_utils/bloc_utils.dart';
 import 'package:{{proj_name}}/common/dependency_injection/dependency_injection.dart';
 
@@ -23,19 +25,27 @@ class LocalizationCubit extends BaseHydratedCubit<Language> {
 
 /// Instances of this type represent a language in the supported languages set.
 enum Language {
-  english(isLTR: true, displayName: 'English', code: 'en'),
+  english(
+    textDirection: TextDirection.ltr,
+    displayName: 'English',
+    code: 'en',
+  ),
   // TODO(developer): Edit the supported languages here if needed and add
   // the corresponding ARB file.
-  spanish(isLTR: true, displayName: 'Español', code: 'es');
+  spanish(
+    textDirection: TextDirection.ltr,
+    displayName: 'Español',
+    code: 'es',
+  );
 
   const Language({
-    required this.isLTR,
+    required this.textDirection,
     required this.displayName,
     required this.code,
   });
 
-  /// Whether the language is written from left to right.
-  final bool isLTR;
+  /// The text direction of the language.
+  final TextDirection textDirection;
 
   /// The display name of the language, can be displayed to the user.
   final String displayName;

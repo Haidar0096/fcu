@@ -1,6 +1,6 @@
 name: flutter_cli_utils
 description: A command-line tool that provides useful Flutter utilities.
-version: 1.0.0-preview.2
+version: 1.0.0-preview.4
 publish_to: none
 
 environment:

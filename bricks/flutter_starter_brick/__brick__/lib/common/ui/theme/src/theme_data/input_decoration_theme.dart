@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-
-const double _defaultBorderWidth = 1;
-const double _defaultBorderRadius = 8;
+import 'package:{{proj_name}}/common/ui/theme/src/theme_data/defaults.dart';
 
 OutlineInputBorder _buildTextFieldBorder({
   required Color color,
-  double? borderRadius,
+  BorderRadius? borderRadius,
   double? borderWidth,
 }) =>
     OutlineInputBorder(
-      borderRadius: BorderRadius.circular(borderRadius ?? _defaultBorderRadius),
+      borderRadius: borderRadius ?? defaultInputFieldBorderRadius,
       borderSide: BorderSide(
         color: color,
-        width: borderWidth ?? _defaultBorderWidth,
+        width: borderWidth ?? defaultInputBorderWidth,
       ),
     );
 
