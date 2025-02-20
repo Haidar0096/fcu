@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: ^3.5.3
+  sdk: ^3.7.0
 
 dependencies:
   cupertino_icons: ^1.0.8
@@ -21,8 +21,10 @@ flutter:
   assets:
     - assets/images/common/
   fonts: # TODO({{dev_name}}): use your own fonts if needed
-    - family: consolas
+    - family: montserrat
       fonts:
-        - asset: assets/fonts/consolas.ttf
-        - asset: assets/fonts/consolas_bold.ttf
+        - asset: assets/fonts/montserrat_bold.ttf
           weight: 700
+        - asset: assets/fonts/montserrat_italic.ttf
+          style: italic
+        - asset: assets/fonts/montserrat_regular.ttf

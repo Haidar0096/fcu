@@ -9,7 +9,7 @@ repository: https://github.com/Haidar0096/fcu/tree/main/bricks/flutter_starter_b
 # The following defines the version and build number for your brick.
 # A version number is three numbers separated by dots, like 1.2.34
 # followed by an optional build number (separated by a +).
-version: 1.0.0-preview.4
+version: 2.0.0
 
 # The following defines the environment for the current brick.
 # It includes the version of mason that the brick requires.
@@ -50,15 +50,3 @@ vars:
     description: Project description
     default: A new Flutter project
     prompt: What is your project description?
-
-  has_envs:
-    type: boolean
-    description: Whether the app supports multiple environments
-    default: true
-    prompt: Does the app support multiple environments?
-
-  has_ic:
-    type: boolean
-    description: Whether the app needs internet connectivity
-    default: true
-    prompt: Does the app need internet connectivity?

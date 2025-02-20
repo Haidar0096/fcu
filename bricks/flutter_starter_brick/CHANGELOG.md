@@ -36,3 +36,6 @@
 
 - Several improvements to the flutter started brick.
 - Updated the example of the fcu command in README
+
+# 2.0.0
+- Implemented second iteration of the opinionated architecture of the generated flutter app.

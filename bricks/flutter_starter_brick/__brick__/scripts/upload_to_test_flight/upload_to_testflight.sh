@@ -34,7 +34,7 @@ issuer_id=$(cat ./issuer_id) || {
 }
 
 # Set the main dart file based on environment
-main_file="lib/main{{#has_envs}}_production{{/has_envs}}.dart"
+main_file="lib/main_production.dart"
 
 # Build command
 build_command="flutter build ipa \
