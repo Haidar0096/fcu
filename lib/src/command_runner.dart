@@ -19,12 +19,10 @@ const description = 'Helpful commands for Flutter developers.';
 /// {@endtemplate}
 class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
   /// {@macro flutter_cli_utils_command_runner}
-  FlutterCliUtilsCommandRunner({
-    Logger? logger,
-    PubUpdater? pubUpdater,
-  })  : _logger = logger ?? Logger(),
-        _pubUpdater = pubUpdater ?? PubUpdater(),
-        super(executableName, description) {
+  FlutterCliUtilsCommandRunner({Logger? logger, PubUpdater? pubUpdater})
+    : _logger = logger ?? Logger(),
+      _pubUpdater = pubUpdater ?? PubUpdater(),
+      super(executableName, description) {
     // Add root options and flags
     argParser
       ..addFlag(
@@ -134,11 +132,9 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
       if (!isUpToDate) {
         _logger
           ..info('')
-          ..info(
-            '''
+          ..info('''
 ${lightYellow.wrap('Update available!')} ${lightCyan.wrap(packageVersion)} \u2192 ${lightCyan.wrap(latestVersion)}
-Run ${lightCyan.wrap('$executableName update')} to update''',
-          );
+Run ${lightCyan.wrap('$executableName update')} to update''');
       }
     } catch (e) {
       _logger.warn('Failed to check for updates: error was $e');

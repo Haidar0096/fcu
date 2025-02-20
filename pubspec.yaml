@@ -1,24 +1,24 @@
 name: flutter_cli_utils
 description: A command-line tool that provides useful Flutter utilities.
-version: 1.0.0-preview.4
+version: 2.0.0
 publish_to: none
 
 environment:
-  sdk: ^3.5.3
+  sdk: ^3.7.0
 
 dependencies:
   args: ^2.6.0
   cli_completion: ^0.5.1
-  mason_logger: ^0.3.1
+  mason_logger: ^0.3.2
   pub_updater: ^0.5.0
 
 dev_dependencies:
-  build_runner: ^2.4.13
+  build_runner: ^2.4.15
   build_verify: ^3.1.0
   build_version: ^2.1.1
   mocktail: ^1.0.4
-  test: ^1.25.8
-  very_good_analysis: ^6.0.0
+  test: ^1.25.15
+  very_good_analysis: ^7.0.0
 
 executables:
   fcu: flutter_cli_utils

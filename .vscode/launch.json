@@ -1,0 +1,39 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "flutter_cli_utils",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "__brick__",
+            "cwd": "bricks/flutter_starter_brick/__brick__",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "__brick__ (profile mode)",
+            "cwd": "bricks/flutter_starter_brick/__brick__",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "__brick__ (release mode)",
+            "cwd": "bricks/flutter_starter_brick/__brick__",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "hooks",
+            "cwd": "bricks/flutter_starter_brick/hooks",
+            "request": "launch",
+            "type": "dart"
+        }
+    ]
+}

@@ -25,26 +25,32 @@ Here is the project structure of the starter brick using mermaid.
 You can view it at [https://mermaid.live/](https://mermaid.live/).
 ```mermaid
 graph TD
-    lib --> app
-    lib --> common
-    lib --> error_screen
-    lib --> home_screen
-    lib --> splash_screen
+    lib --> dependency_injection[dependency_injection_impl]
+    lib --> features
+    lib --> infrastructure
+    lib --> resources
+    lib --> router
     lib --> main_files[main files]
 
-    app --> app_src[src]
-    app_src --> |files| app_files[global_scaffold_key.dart<br/>root_app_widget.dart<br/>root_blocs_provider.dart]
+    features --> common
+    features --> error_screen
+    features --> home
+    features --> splash_screen
 
-    common --> basic_types
-    common --> blocs
-    common --> dependency_injection
-    common --> environments
-    common --> l10n
-    common --> logging
-    common --> networking
-    common --> router
-    common --> ui
-    common --> validators
+    common --> variables
+    common --> widgets
+
+    home --> home_screen
+
+    infrastructure --> basic_types
+    infrastructure --> blocs
+    infrastructure --> dependency_injection
+    infrastructure --> environments
+    infrastructure --> l10n
+    infrastructure --> logging
+    infrastructure --> networking
+    infrastructure --> ui
+    infrastructure --> validators
 
     blocs --> app_meta_data_cubit
     blocs --> bloc_utils
@@ -53,13 +59,17 @@ graph TD
     networking --> http_client[http_client_adapter]
 
     ui --> animations
-    ui --> core_widgets
-    ui --> images
     ui --> theme
+    ui --> widgets
 
     theme --> theme_src[src]
     theme_src --> theme_cubit
     theme_src --> theme_data
+
+    resources --> src
+    src --> arb
+    src --> fonts.dart
+    src --> images.dart
 
     main_files --> |files| main_list[main_common.dart<br/>main_development.dart<br/>main_production.dart<br/>main_staging.dart]
 

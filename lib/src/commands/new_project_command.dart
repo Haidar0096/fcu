@@ -4,18 +4,19 @@ import 'package:args/command_runner.dart';
 import 'package:flutter_cli_utils/src/commands/command_args.dart';
 import 'package:mason_logger/mason_logger.dart';
 
-typedef _FlutterProjectCreationData = ({
-  String projectName,
-  String projectDescription,
-  String organization,
-  String iosLanguage,
-  String androidLanguage,
-  String template,
-  List<String> targetPlatforms,
-  String outputDirectory,
-  bool overwriteExistingDirectory,
-  bool useStarterBrick,
-});
+typedef _FlutterProjectCreationData =
+    ({
+      String projectName,
+      String projectDescription,
+      String organization,
+      String iosLanguage,
+      String androidLanguage,
+      String template,
+      List<String> targetPlatforms,
+      String outputDirectory,
+      bool overwriteExistingDirectory,
+      bool useStarterBrick,
+    });
 
 /// {@template new_project_command}
 /// A [Command] to create a new Flutter project.
@@ -25,9 +26,7 @@ typedef _FlutterProjectCreationData = ({
 /// {@endtemplate}
 class NewProjectCommand extends Command<int> {
   /// {@macro new_project_command}
-  NewProjectCommand({
-    required Logger logger,
-  }) : _logger = logger {
+  NewProjectCommand({required Logger logger}) : _logger = logger {
     argParser
       ..addOption(
         _projectDescriptionCommandOption.name,
@@ -68,10 +67,7 @@ class NewProjectCommand extends Command<int> {
         abbr: _outputDirectoryCommandOption.abbr,
         help: _outputDirectoryCommandOption.help,
       )
-      ..addFlag(
-        _dryRunCommandFlag.name,
-        help: _dryRunCommandFlag.help,
-      )
+      ..addFlag(_dryRunCommandFlag.name, help: _dryRunCommandFlag.help)
       ..addFlag(
         _useStarterBrickCommandFlag.name,
         help: _useStarterBrickCommandFlag.help,
@@ -127,26 +123,19 @@ class NewProjectCommand extends Command<int> {
     name: 'template',
     abbr: 't',
     help: 'Template for the project.',
-    choices: [
-      'app',
-      'module',
-      'package',
-      'plugin',
-      'plugin_ffi',
-      'skeleton',
-    ],
+    choices: ['app', 'module', 'package', 'plugin', 'plugin_ffi', 'skeleton'],
     defaultsTo: 'app',
     prompt: 'Select the template:',
   );
 
   final CommandMultiOption _targetPlatformsCommandMultiOption =
       const CommandMultiOption(
-    name: 'target-platforms',
-    help: 'Target platforms for the project.',
-    choices: ['ios', 'android', 'windows', 'linux', 'macos', 'web'],
-    defaultsTo: ['android', 'ios', 'web', 'windows', 'linux', 'macos'],
-    prompt: 'Select the target platforms:',
-  );
+        name: 'target-platforms',
+        help: 'Target platforms for the project.',
+        choices: ['ios', 'android', 'windows', 'linux', 'macos', 'web'],
+        defaultsTo: ['android', 'ios', 'web', 'windows', 'linux', 'macos'],
+        prompt: 'Select the target platforms:',
+      );
 
   final CommandOption _outputDirectoryCommandOption = const CommandOption(
     name: 'output-directory',
@@ -174,7 +163,8 @@ class NewProjectCommand extends Command<int> {
     name: 'overwrite-existing-directory',
     help: 'Overwrite the existing directory if it exists.',
     defaultsTo: false,
-    prompt: 'If the output directory already exists, would you like to '
+    prompt:
+        'If the output directory already exists, would you like to '
         'overwrite it?',
   );
 
@@ -221,8 +211,9 @@ class NewProjectCommand extends Command<int> {
       '${outputDir.absolute.path}',
     );
     try {
-      final flutterCreateCommandResult =
-          await _runFlutterCreateCommand(creationData);
+      final flutterCreateCommandResult = await _runFlutterCreateCommand(
+        creationData,
+      );
       if (flutterCreateCommandResult.exitCode != 0) {
         throw Exception(
           'Failed to create project:\n${flutterCreateCommandResult.stderr}',
@@ -248,11 +239,9 @@ class NewProjectCommand extends Command<int> {
     final outputDir = Directory(creationData.outputDirectory);
     // Run `mason init` command
     _progress = _logger.progress('Running `mason init`...');
-    final masonInitResult = await Process.run(
-      'mason',
-      ['init'],
-      workingDirectory: outputDir.path,
-    );
+    final masonInitResult = await Process.run('mason', [
+      'init',
+    ], workingDirectory: outputDir.path);
     if (masonInitResult.exitCode != 0) {
       throw Exception(
         'Failed to run `mason init` in project:\n${masonInitResult.stderr}',
@@ -262,11 +251,10 @@ class NewProjectCommand extends Command<int> {
 
     // Run `mason add` command
     _progress = _logger.progress('Running `mason add`...');
-    final masonAddResult = await Process.run(
-      'mason',
-      ['add', 'flutter_starter_brick'],
-      workingDirectory: outputDir.path,
-    );
+    final masonAddResult = await Process.run('mason', [
+      'add',
+      'flutter_starter_brick',
+    ], workingDirectory: outputDir.path);
     if (masonAddResult.exitCode != 0) {
       throw Exception(
         'Failed to run `mason add flutter_starter_brick` in project:\n'
@@ -277,11 +265,9 @@ class NewProjectCommand extends Command<int> {
 
     // Run `mason get` command
     _progress = _logger.progress('Running `mason get`...');
-    final masonGetResult = await Process.run(
-      'mason',
-      ['get'],
-      workingDirectory: outputDir.path,
-    );
+    final masonGetResult = await Process.run('mason', [
+      'get',
+    ], workingDirectory: outputDir.path);
     if (masonGetResult.exitCode != 0) {
       throw Exception(
         'Failed to run `mason get` in project:\n${masonGetResult.stderr}',
@@ -317,9 +303,7 @@ class NewProjectCommand extends Command<int> {
     }
   }
 
-  void _logDryRunDetails(
-    _FlutterProjectCreationData creationData,
-  ) =>
+  void _logDryRunDetails(_FlutterProjectCreationData creationData) =>
       _logger.info(
         'Running this command will create a new Flutter project with the '
         'following details:'
@@ -340,30 +324,27 @@ class NewProjectCommand extends Command<int> {
     final isApp = creationData.template == 'app';
     final isPlugin = creationData.template == 'plugin';
     final isPluginFfi = creationData.template == 'plugin_ffi';
-    return Process.run(
-      'flutter',
-      [
-        'create',
-        '--project-name',
-        creationData.projectName,
-        '--description',
-        creationData.projectDescription,
-        '--org',
-        creationData.organization,
-        if (!isPluginFfi) ...[
-          '--ios-language=${creationData.iosLanguage}',
-          '--android-language=${creationData.androidLanguage}',
-        ],
-        '-t',
-        creationData.template,
-        if (isApp) '--empty',
-        if (isApp || isPlugin) ...[
-          '--platforms',
-          creationData.targetPlatforms.join(','),
-        ],
-        creationData.outputDirectory,
+    return Process.run('flutter', [
+      'create',
+      '--project-name',
+      creationData.projectName,
+      '--description',
+      creationData.projectDescription,
+      '--org',
+      creationData.organization,
+      if (!isPluginFfi) ...[
+        '--ios-language=${creationData.iosLanguage}',
+        '--android-language=${creationData.androidLanguage}',
       ],
-    );
+      '-t',
+      creationData.template,
+      if (isApp) '--empty',
+      if (isApp || isPlugin) ...[
+        '--platforms',
+        creationData.targetPlatforms.join(','),
+      ],
+      creationData.outputDirectory,
+    ]);
   }
 
   String _optionOrPrompt(String argName, String Function() promptForArg) =>
@@ -378,8 +359,10 @@ class NewProjectCommand extends Command<int> {
   }
 
   Future<_FlutterProjectCreationData> _promptForProjectCreationData() async {
-    final projectName =
-        _optionOrPrompt(_projectNameCommandOption.name, _promptForProjectName);
+    final projectName = _optionOrPrompt(
+      _projectNameCommandOption.name,
+      _promptForProjectName,
+    );
 
     final projectDescription = _optionOrPrompt(
       _projectDescriptionCommandOption.name,
@@ -391,27 +374,33 @@ class NewProjectCommand extends Command<int> {
       _promptForOrganization,
     );
 
-    final iosLanguage =
-        _optionOrPrompt(_iosLanguageCommandOption.name, _promptForIosLanguage);
+    final iosLanguage = _optionOrPrompt(
+      _iosLanguageCommandOption.name,
+      _promptForIosLanguage,
+    );
 
     final androidLanguage = _optionOrPrompt(
       _androidLanguageCommandOption.name,
       _promptForAndroidLanguage,
     );
 
-    final template =
-        _optionOrPrompt(_templateCommandOption.name, _promptForTemplate);
+    final template = _optionOrPrompt(
+      _templateCommandOption.name,
+      _promptForTemplate,
+    );
     final isApp = template == 'app';
     final isPlugin = template == 'plugin';
 
     final List<String>? parsedTargetPlatforms;
     final List<String> targetPlatforms;
     if (isApp || isPlugin) {
-      parsedTargetPlatforms =
-          argResults?.multiOption(_targetPlatformsCommandMultiOption.name);
-      targetPlatforms = (parsedTargetPlatforms ?? []).isEmpty
-          ? _promptForTargetPlatforms()
-          : parsedTargetPlatforms!;
+      parsedTargetPlatforms = argResults?.multiOption(
+        _targetPlatformsCommandMultiOption.name,
+      );
+      targetPlatforms =
+          (parsedTargetPlatforms ?? []).isEmpty
+              ? _promptForTargetPlatforms()
+              : parsedTargetPlatforms!;
     } else {
       targetPlatforms = [];
     }
@@ -451,56 +440,56 @@ class NewProjectCommand extends Command<int> {
   }
 
   String _promptForProjectDescription() => _logger.prompt(
-        _projectDescriptionCommandOption.prompt,
-        defaultValue: _projectDescriptionCommandOption.defaultsTo,
-      );
+    _projectDescriptionCommandOption.prompt,
+    defaultValue: _projectDescriptionCommandOption.defaultsTo,
+  );
 
   String _promptForOrganization() => _logger.prompt(
-        _organizationCommandOption.prompt,
-        defaultValue: _organizationCommandOption.defaultsTo,
-      );
+    _organizationCommandOption.prompt,
+    defaultValue: _organizationCommandOption.defaultsTo,
+  );
 
   String _promptForProjectName() => _logger.prompt(
-        _projectNameCommandOption.prompt,
-        defaultValue: _projectNameCommandOption.defaultsTo,
-      );
+    _projectNameCommandOption.prompt,
+    defaultValue: _projectNameCommandOption.defaultsTo,
+  );
 
   String _promptForIosLanguage() => _logger.chooseOne(
-        _iosLanguageCommandOption.prompt,
-        choices: _iosLanguageCommandOption.choices!,
-        defaultValue: _iosLanguageCommandOption.defaultsTo,
-      );
+    _iosLanguageCommandOption.prompt,
+    choices: _iosLanguageCommandOption.choices!,
+    defaultValue: _iosLanguageCommandOption.defaultsTo,
+  );
 
   String _promptForAndroidLanguage() => _logger.chooseOne(
-        _androidLanguageCommandOption.prompt,
-        choices: _androidLanguageCommandOption.choices!,
-        defaultValue: _androidLanguageCommandOption.defaultsTo,
-      );
+    _androidLanguageCommandOption.prompt,
+    choices: _androidLanguageCommandOption.choices!,
+    defaultValue: _androidLanguageCommandOption.defaultsTo,
+  );
 
   String _promptForTemplate() => _logger.chooseOne(
-        _templateCommandOption.prompt,
-        choices: _templateCommandOption.choices!,
-        defaultValue: _templateCommandOption.defaultsTo,
-      );
+    _templateCommandOption.prompt,
+    choices: _templateCommandOption.choices!,
+    defaultValue: _templateCommandOption.defaultsTo,
+  );
 
   List<String> _promptForTargetPlatforms() => _logger.chooseAny(
-        _targetPlatformsCommandMultiOption.prompt,
-        choices: _targetPlatformsCommandMultiOption.choices!,
-        defaultValues: _targetPlatformsCommandMultiOption.defaultsTo,
-      );
+    _targetPlatformsCommandMultiOption.prompt,
+    choices: _targetPlatformsCommandMultiOption.choices!,
+    defaultValues: _targetPlatformsCommandMultiOption.defaultsTo,
+  );
 
   String _promptForOutputDirectory(String projectName) => _logger.prompt(
-        _outputDirectoryCommandOption.prompt,
-        defaultValue: projectName,
-      );
+    _outputDirectoryCommandOption.prompt,
+    defaultValue: projectName,
+  );
 
   bool _promptForOverwriteExistingDirectory() => _logger.confirm(
-        _overwriteExistingDirectoryCommandFlag.prompt,
-        defaultValue: _overwriteExistingDirectoryCommandFlag.defaultsTo,
-      );
+    _overwriteExistingDirectoryCommandFlag.prompt,
+    defaultValue: _overwriteExistingDirectoryCommandFlag.defaultsTo,
+  );
 
   bool _promptForUseStarterBrick() => _logger.confirm(
-        _useStarterBrickCommandFlag.prompt,
-        defaultValue: _useStarterBrickCommandFlag.defaultsTo,
-      );
+    _useStarterBrickCommandFlag.prompt,
+    defaultValue: _useStarterBrickCommandFlag.defaultsTo,
+  );
 }

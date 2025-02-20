@@ -16,50 +16,52 @@ Future<void> run(HookContext context) async {
   }
 
   await _executeCommand(
-    'Adding non-conditional dev dependencies',
+    'Adding dev dependencies',
     () => Process.run(
       'dart',
       [
         'pub',
         'add',
         '--dev',
-        'very_good_analysis: ^6.0.0',
-        'injectable_generator: ^2.6.2',
-        'build_runner: ^2.4.13',
-        'go_router_builder: ^2.7.1',
+        'very_good_analysis: ^7.0.0',
+        'injectable_generator: ^2.7.0',
+        'build_runner: ^2.4.15',
+        'go_router_builder: ^2.8.0',
         'build_verify: ^3.1.0',
       ],
     ),
   );
 
   await _executeCommand(
-    'Adding non-conditional standard dependencies',
+    'Adding dependencies',
     () => Process.run(
       'dart',
       [
         'pub',
         'add',
         'injectable: ^2.5.0',
-        'get_it: ^8.0.2',
-        'hydrated_bloc: ^9.1.5',
-        'flutter_bloc: ^8.1.6',
-        'bloc: ^8.1.4',
+        'get_it: ^8.0.3',
+        'hydrated_bloc: ^10.0.0',
+        'flutter_bloc: ^9.0.0',
+        'bloc: ^9.0.0',
         'path_provider: ^2.1.5',
         'intl:any',
         'nested: ^1.0.0',
         'android_id: ^0.4.0',
-        'device_info_plus: ^11.1.1',
-        'package_info_plus: ^8.1.1',
-        'go_router: ^14.6.2',
-        'flutter_animate: ^4.5.0',
+        'device_info_plus: ^11.3.0',
+        'package_info_plus: ^8.2.1',
+        'go_router: ^14.8.0',
+        'flutter_animate: ^4.5.2',
         'cached_network_image: ^3.4.1',
         'loading_animation_widget: ^1.3.0',
+        'fconnectivity: ^0.5.0',
+        'dio: ^5.8.0+1',
       ],
     ),
   );
 
   await _executeCommand(
-    'Adding other non-conditional dependencies',
+    'Adding sdk dependencies',
     () => Process.run('flutter', [
       'pub',
       'add',
@@ -68,39 +70,25 @@ Future<void> run(HookContext context) async {
     ]),
   );
 
-  if (context.vars['has_ic']) {
-    await _executeCommand(
-      'Adding internet dependencies',
-      () => Process.run(
-        'dart',
+  await _executeCommand(
+    'Adding internet permission to android manifest',
+    () async {
+      final file = File('android/app/src/main/AndroidManifest.xml');
+      final document = XmlDocument.parse(await file.readAsString());
+      final manifestElement = document.findElements('manifest').first;
+      final internetPermission = XmlElement(
+        XmlName('uses-permission'),
         [
-          'pub',
-          'add',
-          'fconnectivity: ^0.3.0',
-          'dio: ^5.7.0',
+          XmlAttribute(
+            XmlName('android:name'),
+            'android.permission.INTERNET',
+          ),
         ],
-      ),
-    );
-    await _executeCommand(
-      'Adding internet permission to android manifest',
-      () async {
-        final file = File('android/app/src/main/AndroidManifest.xml');
-        final document = XmlDocument.parse(await file.readAsString());
-        final manifestElement = document.findElements('manifest').first;
-        final internetPermission = XmlElement(
-          XmlName('uses-permission'),
-          [
-            XmlAttribute(
-              XmlName('android:name'),
-              'android.permission.INTERNET',
-            ),
-          ],
-        );
-        manifestElement.children.insert(0, internetPermission);
-        await file.writeAsString(document.toXmlString(pretty: true));
-      },
-    );
-  }
+      );
+      manifestElement.children.insert(0, internetPermission);
+      await file.writeAsString(document.toXmlString(pretty: true));
+    },
+  );
 
   await _executeCommand(
     'Running flutter clean',

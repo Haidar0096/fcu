@@ -6,8 +6,8 @@
 # The output folder can be specified with the --output-dir parameter.
 
 # Initialize variables
-output_path=""{{#has_envs}}
-servers=("development" "staging" "production"){{/has_envs}}
+output_path=""
+servers=("development" "staging" "production")
 platforms=("android-arm" "android-arm64" "android-x64")
 VERSIONS_FILE="versions"
 
@@ -42,10 +42,9 @@ version_formatted="v$version-build-$version_code"
 get_build_cmd() {
     local version="$1"
     local version_code="$2"
-    local target_platform="$3"{{#has_envs}}
+    local target_platform="$3"
     local target_server="$4"
-    local main_file="lib/main_$target_server.dart"{{/has_envs}}{{^has_envs}}
-    local main_file="lib/main.dart"{{/has_envs}}
+    local main_file="lib/main_$target_server.dart"
 
     echo "flutter build apk --release \
 --target-platform=\"$target_platform\" \
@@ -56,39 +55,33 @@ get_build_cmd() {
 
 # Function to get output APK path
 get_output_path() {
-    local platform="$1"{{#has_envs}}
+    local platform="$1"
     local server="$2"
-    echo "$output_path/app-$server-$version_formatted-$platform.apk"{{/has_envs}}{{^has_envs}}
-    echo "$output_path/app-$version_formatted-$platform.apk"{{/has_envs}}
+    echo "$output_path/app-$server-$version_formatted-$platform.apk"
 }
 
 # Function that builds the app and copies the output to the output path
 build_and_copy() {
     local version="$1"
     local version_code="$2"
-    local target_platform="$3"{{#has_envs}}
+    local target_platform="$3"
     local target_server="$4"
-    echo "Building version $version_formatted for $target_server on $target_platform"{{/has_envs}}{{^has_envs}}
-    echo "Building version $version_formatted for $target_platform"{{/has_envs}}
+    echo "Building version $version_formatted for $target_server on $target_platform"
 
     # Get and execute build command
-    local build_cmd=$(get_build_cmd "$version" "$version_code" "$target_platform"{{#has_envs}} "$target_server"{{/has_envs}})
+    local build_cmd=$(get_build_cmd "$version" "$version_code" "$target_platform" "$target_server")
     echo "Executing: $build_cmd"
     eval "$build_cmd"
 
     # Copy the output
     mkdir -p "$output_path"
-    local output_file=$(get_output_path "$target_platform"{{#has_envs}} "$target_server"{{/has_envs}})
+    local output_file=$(get_output_path "$target_platform" "$target_server")
     cp build/app/outputs/flutter-apk/app-release.apk "$output_file"
 }
 
 # Build for all combinations of servers and platforms
-{{#has_envs}}
 for server in "${servers[@]}"; do
     for platform in "${platforms[@]}"; do
         build_and_copy "$version" "$version_code" "$platform" "$server"
     done
-done{{/has_envs}}{{^has_envs}}
-for platform in "${platforms[@]}"; do
-    build_and_copy "$version" "$version_code" "$platform"
-done{{/has_envs}}
+done

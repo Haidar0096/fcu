@@ -1,0 +1,56 @@
+import 'package:{{proj_name}}/infrastructure/ui/theme/src/theme_data/theme_data.dart';
+import 'package:flutter/material.dart';
+
+final ThemeData darkThemeData = themeData(darkColorScheme);
+
+// A nice resource to generate color schemes:
+// https://material-foundation.github.io/material-theme-builder/
+
+const ColorScheme darkColorScheme = ColorScheme(
+  brightness: Brightness.dark,
+  primary: Color(0xfffff6e9),
+  surfaceTint: Color(0xfff3c000),
+  onPrimary: Color(0xff3d2e00),
+  primaryContainer: Color(0xfffac600),
+  onPrimaryContainer: Color(0xff493800),
+  secondary: Color(0xffe0c47b),
+  onSecondary: Color(0xff3d2e00),
+  secondaryContainer: Color(0xff4d3b00),
+  onSecondaryContainer: Color(0xffebce84),
+  tertiary: Color(0xffecffa4),
+  onTertiary: Color(0xff2a3400),
+  tertiaryContainer: Color(0xffbad846),
+  onTertiaryContainer: Color(0xff323e00),
+  error: Color(0xffffb4ab),
+  onError: Color(0xff690005),
+  errorContainer: Color(0xff93000a),
+  onErrorContainer: Color(0xffffdad6),
+  surface: Color(0xff000000),
+  onSurface: Color(0xffffffff),
+  onSurfaceVariant: Color(0xffd2c5ab),
+  outline: Color(0xff9b9078),
+  outlineVariant: Color(0xff4e4632),
+  shadow: Color(0xff000000),
+  scrim: Color(0xff000000),
+  inverseSurface: Color(0xffffffff),
+  inversePrimary: Color(0xff755b00),
+  primaryFixed: Color(0xffffe08f),
+  onPrimaryFixed: Color(0xff241a00),
+  primaryFixedDim: Color(0xfff3c000),
+  onPrimaryFixedVariant: Color(0xff584400),
+  secondaryFixed: Color(0xfffee094),
+  onSecondaryFixed: Color(0xff241a00),
+  secondaryFixedDim: Color(0xffe0c47b),
+  onSecondaryFixedVariant: Color(0xff584405),
+  tertiaryFixed: Color(0xffd1f05b),
+  onTertiaryFixed: Color(0xff171e00),
+  tertiaryFixedDim: Color(0xffb5d342),
+  onTertiaryFixedVariant: Color(0xff3e4c00),
+  surfaceDim: Color(0xff000000),
+  surfaceBright: Color(0xff1a1a1a),
+  surfaceContainerLowest: Color(0xff000000),
+  surfaceContainerLow: Color(0xff0a0a0a),
+  surfaceContainer: Color(0xff0f0f0f),
+  surfaceContainerHigh: Color(0xff141414),
+  surfaceContainerHighest: Color(0xff1f1f1f),
+);
