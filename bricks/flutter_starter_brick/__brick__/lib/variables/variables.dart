@@ -1,1 +1,1 @@
-export 'src/variables.dart';
+export 'src/global_variables.dart';
