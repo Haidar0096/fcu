@@ -1,7 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
 import 'package:{{proj_name}}/infrastructure/networking/dio_http_client/src/dio_http_client.dart';
 import 'package:{{proj_name}}/infrastructure/networking/dio_http_client/src/interceptors.dart';
-import 'package:dio/dio.dart';
 
 const Duration _defaultTimeout = Duration(seconds: 30);
 
@@ -38,6 +38,5 @@ class BackendDioHttpClient extends DioHttpClient {
     return BackendDioHttpClient._(client: dio);
   }
 
-  BackendDioHttpClient._({required super.client})
-    : super(serverErrorMessageResolver: null);
+  BackendDioHttpClient._({required super.client});
 }

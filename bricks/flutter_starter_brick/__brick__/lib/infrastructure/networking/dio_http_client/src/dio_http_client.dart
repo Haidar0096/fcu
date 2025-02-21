@@ -1,15 +1,12 @@
 import 'dart:io' hide HttpResponse;
 
+import 'package:dio/dio.dart' as dio;
 import 'package:{{proj_name}}/infrastructure/basic_types/basic_types.dart';
 import 'package:{{proj_name}}/infrastructure/networking/http_client/http_client.dart';
-import 'package:dio/dio.dart' as dio;
 
 class DioHttpClient extends HttpClient {
-  DioHttpClient({required dio.Dio client, this.serverErrorMessageResolver})
-    : _client = client;
+  DioHttpClient({required dio.Dio client}) : _client = client;
   final dio.Dio _client;
-
-  final String? Function(Object? error)? serverErrorMessageResolver;
 
   @override
   Future<Result<NetworkFailure, S>> request<S>({
@@ -60,18 +57,16 @@ class DioHttpClient extends HttpClient {
           return Result.failure(
             NetworkError(
               statusCode: dioException.response?.statusCode,
-              serverErrorMessage: serverErrorMessageResolver?.call(
-                dioException.response?.toHttpResponse,
-              ),
+              serverErrorMessage:
+                  ApiErrorDTO.fromObject(dioException.response?.data)?.message,
             ),
           );
         case dio.DioExceptionType.cancel:
           return Result.failure(
             CancelError(
               statusCode: dioException.response?.statusCode,
-              serverErrorMessage: serverErrorMessageResolver?.call(
-                dioException.response?.toHttpResponse,
-              ),
+              serverErrorMessage:
+                  ApiErrorDTO.fromObject(dioException.response?.data)?.message,
             ),
           );
         case dio.DioExceptionType.badCertificate:
@@ -79,27 +74,21 @@ class DioHttpClient extends HttpClient {
           return Result.failure(
             ServerError(
               statusCode: dioException.response?.statusCode,
-              serverErrorMessage: serverErrorMessageResolver?.call(
-                dioException.response?.toHttpResponse,
-              ),
+              serverErrorMessage:
+                  ApiErrorDTO.fromObject(dioException.response?.data)?.message,
             ),
           );
         case dio.DioExceptionType.unknown:
           return Result.failure(
             UnknownError(
               statusCode: dioException.response?.statusCode,
-              serverErrorMessage: serverErrorMessageResolver?.call(
-                dioException.response?.toHttpResponse,
-              ),
+              serverErrorMessage:
+                  ApiErrorDTO.fromObject(dioException.response?.data)?.message,
             ),
           );
       }
     } catch (error) {
-      return Result.failure(
-        UnknownError(
-          serverErrorMessage: serverErrorMessageResolver?.call(error),
-        ),
-      );
+      return Result.failure(const UnknownError());
     }
   }
 }
