@@ -1,6 +1,6 @@
 import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
-import 'package:{{proj_name}}/infrastructure/networking/dio_http_client_adapter/src/dio_http_client_adapter.dart';
-import 'package:{{proj_name}}/infrastructure/networking/dio_http_client_adapter/src/interceptors.dart';
+import 'package:{{proj_name}}/infrastructure/networking/dio_http_client/src/dio_http_client.dart';
+import 'package:{{proj_name}}/infrastructure/networking/dio_http_client/src/interceptors.dart';
 import 'package:dio/dio.dart';
 
 const Duration _defaultTimeout = Duration(seconds: 30);
@@ -10,7 +10,7 @@ const Duration _defaultTimeout = Duration(seconds: 30);
 /// This class is responsible for managing HTTP requests to the backend,
 /// including setting up the Dio client with appropriate interceptors
 /// and error handling mechanisms.
-class BackendDioHttpClient extends DioHttpClientAdapter {
+class BackendDioHttpClient extends DioHttpClient {
   /// Creates a new backend request handler.
   /// - [appLogger] is the logger to be used for logging.
   /// - [errorLogger] is the error logger to be used for logging errors.

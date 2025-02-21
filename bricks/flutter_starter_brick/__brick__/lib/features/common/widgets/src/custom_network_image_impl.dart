@@ -1,4 +1,4 @@
-import 'package:{{proj_name}}/features/common/variables/variables.dart';
+import 'package:{{proj_name}}/variables/variables.dart';
 import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
 import 'package:{{proj_name}}/infrastructure/ui/widgets/widgets.dart';
 

@@ -1,10 +1,10 @@
 import 'package:{{proj_name}}/infrastructure/basic_types/basic_types.dart';
-import 'package:{{proj_name}}/infrastructure/networking/http_client_adapter/src/http_response.dart';
-import 'package:{{proj_name}}/infrastructure/networking/http_client_adapter/src/network_failure.dart';
+import 'package:{{proj_name}}/infrastructure/networking/http_client/src/http_response.dart';
+import 'package:{{proj_name}}/infrastructure/networking/http_client/src/network_failure.dart';
 
 /// An interface specifying the contract for making HTTP requests.
 // ignore: one_member_abstracts
-abstract class HttpClientAdapter {
+abstract class HttpClient {
   /// - S is the returned success result's data type.
   Future<Result<NetworkFailure, S>> request<S>({
     required String path,

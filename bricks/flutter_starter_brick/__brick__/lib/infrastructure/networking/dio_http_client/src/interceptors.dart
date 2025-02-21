@@ -1,5 +1,5 @@
 import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
-import 'package:{{proj_name}}/infrastructure/networking/dio_http_client_adapter/src/build_api_error_reporting_message.dart';
+import 'package:{{proj_name}}/infrastructure/networking/dio_http_client/src/build_api_error_reporting_message.dart';
 import 'package:dio/dio.dart';
 
 /// An interceptor for logging errors during API requests.

@@ -1,9 +1,9 @@
-import 'package:{{proj_name}}/features/common/variables/variables.dart';
+import 'package:flutter/widgets.dart';
 import 'package:{{proj_name}}/infrastructure/ui/theme/theme.dart';
 import 'package:{{proj_name}}/infrastructure/ui/widgets/src/blur_widget.dart';
 import 'package:{{proj_name}}/infrastructure/ui/widgets/src/dim_widget.dart';
 import 'package:{{proj_name}}/infrastructure/ui/widgets/src/loader_widget.dart';
-import 'package:flutter/widgets.dart';
+import 'package:{{proj_name}}/variables/variables.dart';
 
 const _loadingIndicatorSpacing = 24.0;
 

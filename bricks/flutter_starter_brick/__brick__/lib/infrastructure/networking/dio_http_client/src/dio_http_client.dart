@@ -1,14 +1,12 @@
 import 'dart:io' hide HttpResponse;
 
 import 'package:{{proj_name}}/infrastructure/basic_types/basic_types.dart';
-import 'package:{{proj_name}}/infrastructure/networking/http_client_adapter/http_client_adapter.dart';
+import 'package:{{proj_name}}/infrastructure/networking/http_client/http_client.dart';
 import 'package:dio/dio.dart' as dio;
 
-class DioHttpClientAdapter extends HttpClientAdapter {
-  DioHttpClientAdapter({
-    required dio.Dio client,
-    this.serverErrorMessageResolver,
-  }) : _client = client;
+class DioHttpClient extends HttpClient {
+  DioHttpClient({required dio.Dio client, this.serverErrorMessageResolver})
+    : _client = client;
   final dio.Dio _client;
 
   final String? Function(Object? error)? serverErrorMessageResolver;
