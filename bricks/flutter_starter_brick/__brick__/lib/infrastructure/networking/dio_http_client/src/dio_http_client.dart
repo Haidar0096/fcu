@@ -4,6 +4,9 @@ import 'package:dio/dio.dart' as dio;
 import 'package:{{proj_name}}/infrastructure/basic_types/basic_types.dart';
 import 'package:{{proj_name}}/infrastructure/networking/http_client/http_client.dart';
 
+/// An implementation of [HttpClient] that uses the Dio package for making
+/// HTTP requests. The dio object can be provided to the constructor to allow
+/// for customization of the client.
 class DioHttpClient extends HttpClient {
   DioHttpClient({required dio.Dio client}) : _client = client;
   final dio.Dio _client;
