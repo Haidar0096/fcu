@@ -13,6 +13,7 @@ sealed class Result<F, S> {
 
 class Success<S> extends Result<Never, S> {
   const Success._(this.data);
+
   final S data;
 
   @override
@@ -20,10 +21,14 @@ class Success<S> extends Result<Never, S> {
     required T Function(S data) success,
     required T Function(Never data) failure,
   }) => success(data);
+
+  @override
+  String toString() => 'Success{data: $data}';
 }
 
 class Failure<F> extends Result<F, Never> {
   const Failure._(this.data);
+
   final F data;
 
   @override
@@ -31,4 +36,7 @@ class Failure<F> extends Result<F, Never> {
     required T Function(Never data) success,
     required T Function(F data) failure,
   }) => failure(data);
+
+  @override
+  String toString() => 'Failure{data: $data}';
 }
