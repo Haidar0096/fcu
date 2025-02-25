@@ -8,8 +8,13 @@ import 'package:{{proj_name}}/infrastructure/networking/http_client/http_client.
 /// HTTP requests. The dio object can be provided to the constructor to allow
 /// for customization of the client.
 class DioHttpClient extends HttpClient {
-  DioHttpClient({required dio.Dio client}) : _client = client;
+  DioHttpClient({required dio.Dio client, this.serverErrorMessageParser})
+    : _client = client;
   final dio.Dio _client;
+
+  /// A function that takes the response, and returns an [ApiErrorDTO] object,
+  /// which contains info about the error response.
+  final ApiErrorDTO? Function(dynamic response)? serverErrorMessageParser;
 
   @override
   Future<Result<NetworkFailure, S>> request<S>({
@@ -60,16 +65,18 @@ class DioHttpClient extends HttpClient {
           return Result.failure(
             NetworkError(
               statusCode: dioException.response?.statusCode,
-              serverErrorMessage:
-                  ApiErrorDTO.fromObject(dioException.response?.data)?.message,
+              apiErrorDTO: serverErrorMessageParser?.call(
+                dioException.response?.data,
+              ),
             ),
           );
         case dio.DioExceptionType.cancel:
           return Result.failure(
             CancelError(
               statusCode: dioException.response?.statusCode,
-              serverErrorMessage:
-                  ApiErrorDTO.fromObject(dioException.response?.data)?.message,
+              apiErrorDTO: serverErrorMessageParser?.call(
+                dioException.response?.data,
+              ),
             ),
           );
         case dio.DioExceptionType.badCertificate:
@@ -77,21 +84,25 @@ class DioHttpClient extends HttpClient {
           return Result.failure(
             ServerError(
               statusCode: dioException.response?.statusCode,
-              serverErrorMessage:
-                  ApiErrorDTO.fromObject(dioException.response?.data)?.message,
+              apiErrorDTO: serverErrorMessageParser?.call(
+                dioException.response?.data,
+              ),
             ),
           );
         case dio.DioExceptionType.unknown:
           return Result.failure(
             UnknownError(
               statusCode: dioException.response?.statusCode,
-              serverErrorMessage:
-                  ApiErrorDTO.fromObject(dioException.response?.data)?.message,
+              apiErrorDTO: serverErrorMessageParser?.call(
+                dioException.response?.data,
+              ),
             ),
           );
       }
     } catch (error) {
-      return Result.failure(const UnknownError());
+      return Result.failure(
+        UnknownError(apiErrorDTO: serverErrorMessageParser?.call(error)),
+      );
     }
   }
 }
