@@ -16,6 +16,7 @@ typedef _FlutterProjectCreationData =
       String outputDirectory,
       bool overwriteExistingDirectory,
       bool useStarterBrick,
+      bool initGitRepo,
     });
 
 /// {@template new_project_command}
@@ -75,6 +76,10 @@ class NewProjectCommand extends Command<int> {
       ..addFlag(
         _overwriteExistingDirectoryCommandFlag.name,
         help: _overwriteExistingDirectoryCommandFlag.help,
+      )
+      ..addFlag(
+        _initializeGitRepoCommandFlag.name,
+        help: _initializeGitRepoCommandFlag.help,
       );
   }
 
@@ -168,6 +173,15 @@ class NewProjectCommand extends Command<int> {
         'overwrite it?',
   );
 
+  final CommandFlag _initializeGitRepoCommandFlag = const CommandFlag(
+    name: 'initialize-git-repo',
+    help: 'Initialize a git repository in the project directory.',
+    defaultsTo: false,
+    prompt:
+        'Would you like to initialize a git repository in the project'
+        ' directory?',
+  );
+
   @override
   String get description => 'Create a new Flutter project.';
 
@@ -226,6 +240,11 @@ class NewProjectCommand extends Command<int> {
         await _runStarterBrick(creationData);
       }
 
+      // Initialize a git repository in the project directory
+      if (creationData.initGitRepo) {
+        await _initGitRepo(creationData);
+      }
+
       return ExitCode.success.code;
     } catch (error) {
       _logger.err('$error');
@@ -233,15 +252,73 @@ class NewProjectCommand extends Command<int> {
     }
   }
 
+  Future<void> _initGitRepo(_FlutterProjectCreationData creationData) async {
+    _progress = _logger.progress(
+      'Initializing git repository and creating first'
+      ' commit...',
+    );
+
+    // Add .config.dart files to .gitignore
+    // Add .g.dart files to .gitignore
+    final gitIgnoreLines = [
+      '\n# Generated files',
+      '**/dependency_injection.config.dart',
+      '**/**.g.dart',
+    ].join('\n');
+    final addToGitIgnoreResult = await Process.run('bash', [
+      '-c',
+      'echo "$gitIgnoreLines" >> .gitignore',
+    ], workingDirectory: creationData.outputDirectory);
+    if (addToGitIgnoreResult.exitCode != 0) {
+      throw Exception(
+        'Failed to add files to .gitignore:\n${addToGitIgnoreResult.stderr}',
+      );
+    }
+
+    // Run git init command
+    final gitInitResult = await Process.run('git', [
+      'init',
+    ], workingDirectory: creationData.outputDirectory);
+    if (gitInitResult.exitCode != 0) {
+      throw Exception(
+        'Failed to initialize git repository:\n${gitInitResult.stderr}',
+      );
+    }
+
+    // Run git add command
+    final gitAddResult = await Process.run('git', [
+      'add',
+      '.',
+    ], workingDirectory: creationData.outputDirectory);
+    if (gitAddResult.exitCode != 0) {
+      throw Exception(
+        'Failed to add files to git repository:\n${gitAddResult.stderr}',
+      );
+    }
+
+    // Run git commit command
+    final gitCommitResult = await Process.run('git', [
+      'commit',
+      '-m',
+      "'Initial commit'",
+    ], workingDirectory: creationData.outputDirectory);
+    if (gitCommitResult.exitCode != 0) {
+      throw Exception(
+        'Failed to create initial commit:\n${gitCommitResult.stderr}',
+      );
+    }
+
+    _progress?.complete();
+  }
+
   Future<void> _runStarterBrick(
     _FlutterProjectCreationData creationData,
   ) async {
-    final outputDir = Directory(creationData.outputDirectory);
     // Run `mason init` command
     _progress = _logger.progress('Running `mason init`...');
     final masonInitResult = await Process.run('mason', [
       'init',
-    ], workingDirectory: outputDir.path);
+    ], workingDirectory: creationData.outputDirectory);
     if (masonInitResult.exitCode != 0) {
       throw Exception(
         'Failed to run `mason init` in project:\n${masonInitResult.stderr}',
@@ -254,7 +331,7 @@ class NewProjectCommand extends Command<int> {
     final masonAddResult = await Process.run('mason', [
       'add',
       'flutter_starter_brick',
-    ], workingDirectory: outputDir.path);
+    ], workingDirectory: creationData.outputDirectory);
     if (masonAddResult.exitCode != 0) {
       throw Exception(
         'Failed to run `mason add flutter_starter_brick` in project:\n'
@@ -267,7 +344,7 @@ class NewProjectCommand extends Command<int> {
     _progress = _logger.progress('Running `mason get`...');
     final masonGetResult = await Process.run('mason', [
       'get',
-    ], workingDirectory: outputDir.path);
+    ], workingDirectory: creationData.outputDirectory);
     if (masonGetResult.exitCode != 0) {
       throw Exception(
         'Failed to run `mason get` in project:\n${masonGetResult.stderr}',
@@ -291,7 +368,7 @@ class NewProjectCommand extends Command<int> {
         '--org_name',
         creationData.organization,
       ],
-      workingDirectory: outputDir.path,
+      workingDirectory: creationData.outputDirectory,
       mode: ProcessStartMode.inheritStdio,
     );
     _progress?.complete();
@@ -425,6 +502,11 @@ class NewProjectCommand extends Command<int> {
       useStarterBrick = false;
     }
 
+    final bool initGitRepo = _flagOrPrompt(
+      _initializeGitRepoCommandFlag.name,
+      _promptForInitializeGitRepo,
+    );
+
     return (
       projectName: projectName,
       projectDescription: projectDescription,
@@ -436,6 +518,7 @@ class NewProjectCommand extends Command<int> {
       outputDirectory: outputDirectory,
       overwriteExistingDirectory: overwrite,
       useStarterBrick: useStarterBrick,
+      initGitRepo: initGitRepo,
     );
   }
 
@@ -491,5 +574,10 @@ class NewProjectCommand extends Command<int> {
   bool _promptForUseStarterBrick() => _logger.confirm(
     _useStarterBrickCommandFlag.prompt,
     defaultValue: _useStarterBrickCommandFlag.defaultsTo,
+  );
+
+  bool _promptForInitializeGitRepo() => _logger.confirm(
+    _initializeGitRepoCommandFlag.prompt,
+    defaultValue: _initializeGitRepoCommandFlag.defaultsTo,
   );
 }

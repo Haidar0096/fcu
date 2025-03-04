@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:{{proj_name}}/dependency_injection_impl/src/dependency_injection_impl.config.dart';
+import 'package:{{proj_name}}/dependency_injection/src/dependency_injection.config.dart';
 import 'package:{{proj_name}}/infrastructure/dependency_injection/dependency_injection.dart';
 import 'package:{{proj_name}}/infrastructure/environments/environments.dart';
 import 'package:get_it/get_it.dart';

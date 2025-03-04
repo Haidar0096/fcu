@@ -1,6 +1,6 @@
 import 'package:{{proj_name}}/infrastructure/dependency_injection/dependency_injection.dart';
 import 'package:{{proj_name}}/infrastructure/environments/environments.dart';
-import 'package:{{proj_name}}/variables/src/global_variables.dart';
+import 'package:{{proj_name}}/common/variables/src/global_variables.dart';
 
 @LazySingletonService()
 sealed class EnvironmentVariables {

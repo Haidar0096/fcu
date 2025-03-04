@@ -39,3 +39,8 @@
 
 # 2.0.0
 - Implemented second iteration of the opinionated architecture of the generated flutter app.
+
+# 3.0.0
+- Implemented third iteration of the opinionated architecture of the generated flutter app.
+- In this iteration, there are not alot of changes from the second iteration, just restructured
+some files and folders.

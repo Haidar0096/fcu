@@ -1,4 +1,4 @@
-import 'package:{{proj_name}}/variables/variables.dart';
+import 'package:{{proj_name}}/common/variables/variables.dart';
 import 'package:{{proj_name}}/infrastructure/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
 import 'package:{{proj_name}}/infrastructure/l10n/l10n.dart';
 import 'package:{{proj_name}}/infrastructure/ui/theme/theme.dart';

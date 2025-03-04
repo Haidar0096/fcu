@@ -37,7 +37,6 @@ class MainButton extends StatelessWidget {
             return inactiveGray;
           }
           return yellow;
-          ;
         }),
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) return null;
