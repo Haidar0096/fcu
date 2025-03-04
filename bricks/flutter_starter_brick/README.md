@@ -38,7 +38,8 @@ graph TD
     features --> splash_screen
 
     common --> variables
-    common --> widgets
+    common --> common_widgets
+    common --> data
 
     home --> home_screen
 
@@ -60,7 +61,7 @@ graph TD
 
     ui --> animations
     ui --> theme
-    ui --> widgets
+    ui --> core_widgets
 
     theme --> theme_src[src]
     theme_src --> theme_cubit
