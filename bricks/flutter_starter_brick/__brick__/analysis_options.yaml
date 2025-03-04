@@ -5,3 +5,4 @@ analyzer:
     avoid_catches_without_on_clauses: ignore
   exclude:
     - lib/**/*.g.dart
+    - bricks/new_feature_brick/__brick__/**
