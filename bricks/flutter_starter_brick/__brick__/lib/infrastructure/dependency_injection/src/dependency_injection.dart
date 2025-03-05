@@ -23,6 +23,14 @@ typedef LazySingletonService = LazySingleton;
 /// resolver function.
 const ignoreParameter = ignoreParam;
 
+/// Used to register a dependency under a name instead of type, also used to
+/// annotate named injected dependencies in constructors
+typedef DIName = Named;
+
+/// Marks a factory, a named constructor or a static create function as an
+/// injectable constructor. if not added the default constructor will be used.
+typedef FactoryConstructor = FactoryMethod;
+
 /// The ServiceProvider class encapsulates the dependency injection logic
 /// and provides access to the services that are registered in the container.
 abstract class ServiceProvider {

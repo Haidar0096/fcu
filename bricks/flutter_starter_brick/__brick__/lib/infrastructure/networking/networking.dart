@@ -1,2 +1,2 @@
-export 'dio_http_client_adapter/dio_http_client_adapter.dart';
-export 'http_client_adapter/http_client_adapter.dart';
+export 'dio_http_client/dio_http_client.dart';
+export 'http_client/http_client.dart';

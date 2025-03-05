@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:{{proj_name}}/features/common/variables/variables.dart';
+import 'package:{{proj_name}}/common/variables/variables.dart';
 import 'package:{{proj_name}}/features/error_screen/error_screen.dart';
 import 'package:{{proj_name}}/features/home/home.dart';
 import 'package:{{proj_name}}/features/splash_screen/splash_screen.dart';

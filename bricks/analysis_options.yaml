@@ -1,3 +1,4 @@
 analyzer:
  exclude:
    - flutter_starter_brick/__brick__/**
+   - new_feature_brick/__brick__/**

@@ -25,20 +25,21 @@ Here is the project structure of the starter brick using mermaid.
 You can view it at [https://mermaid.live/](https://mermaid.live/).
 ```mermaid
 graph TD
-    lib --> dependency_injection[dependency_injection_impl]
+    lib --> common
+    lib --> dependency_injection
     lib --> features
     lib --> infrastructure
     lib --> resources
     lib --> router
     lib --> main_files[main files]
 
-    features --> common
     features --> error_screen
     features --> home
     features --> splash_screen
 
     common --> variables
-    common --> widgets
+    common --> common_widgets
+    common --> data
 
     home --> home_screen
 
@@ -55,12 +56,12 @@ graph TD
     blocs --> app_meta_data_cubit
     blocs --> bloc_utils
 
-    networking --> dio_client[dio_http_client_adapter]
-    networking --> http_client[http_client_adapter]
+    networking --> dio_http_client[dio_http_client]
+    networking --> http_client
 
     ui --> animations
     ui --> theme
-    ui --> widgets
+    ui --> core_widgets
 
     theme --> theme_src[src]
     theme_src --> theme_cubit
@@ -68,8 +69,8 @@ graph TD
 
     resources --> src
     src --> arb
-    src --> fonts.dart
-    src --> images.dart
+    src --> fonts
+    src --> images
 
     main_files --> |files| main_list[main_common.dart<br/>main_development.dart<br/>main_production.dart<br/>main_staging.dart]
 

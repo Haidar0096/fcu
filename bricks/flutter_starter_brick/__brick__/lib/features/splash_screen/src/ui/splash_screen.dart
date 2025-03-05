@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:{{proj_name}}/features/common/variables/variables.dart';
+import 'package:{{proj_name}}/common/variables/variables.dart';
 import 'package:{{proj_name}}/infrastructure/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
 import 'package:{{proj_name}}/infrastructure/ui/theme/theme.dart';
 import 'package:{{proj_name}}/infrastructure/ui/widgets/widgets.dart';

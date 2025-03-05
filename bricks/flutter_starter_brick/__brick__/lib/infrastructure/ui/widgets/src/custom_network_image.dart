@@ -8,7 +8,7 @@ import 'package:{{proj_name}}/resources/resources.dart';
 ///
 /// Provides a loading placeholder and an error widget if the image fails to
 /// load.
-abstract class CustomNetworkImage extends StatelessWidget {
+class CustomNetworkImage extends StatelessWidget {
   /// Creates a [CustomNetworkImage].
   CustomNetworkImage({
     required this.imageUrl,
@@ -18,6 +18,7 @@ abstract class CustomNetworkImage extends StatelessWidget {
     this.fit,
     this.placeholderFit,
     this.errorWidgetFit,
+    this.errorListener,
     BorderRadiusGeometry? placeholderBorderRadius,
     BorderRadiusGeometry? errorWidgetBorderRadius,
   }) : placeholderBorderRadius =
@@ -72,7 +73,7 @@ abstract class CustomNetworkImage extends StatelessWidget {
   /// {@template custom_network_image.errorListener}
   /// A callback that is called when an error occurs while loading the image.
   /// {@endtemplate}
-  void Function(Object)? get errorListener;
+  final void Function(Object)? errorListener;
 
   @override
   Widget build(BuildContext context) => CachedNetworkImage(

@@ -39,3 +39,13 @@
 
 # 2.0.0
 - Implemented second iteration of the opinionated architecture of the generated flutter app.
+
+# 3.0.0
+- Implemented third iteration of the opinionated architecture of the generated flutter app.
+- In this iteration, there aren't a lot of changes from the second iteration, just restructured
+some files and folders.
+
+# 3.1.0
+- Added a command to add new_feature_brick in the generated directory.
+- Updated docs.
+- Fixed new_feature_brick special chars not being escaped properly.
