@@ -378,6 +378,20 @@ class NewProjectCommand extends Command<int> {
         '${masonMakeResult.stderr}',
       );
     }
+
+    // Add new_feature_brick
+    final masonAddNewFeatureBrickResult = await Process.run('mason', [
+      'add',
+      'new_feature_brick',
+      '--path',
+      './bricks/new_feature_brick/',
+    ], workingDirectory: creationData.outputDirectory);
+    if (masonAddNewFeatureBrickResult.exitCode != 0) {
+      throw Exception(
+        'Failed to run `mason add new_feature_brick` in project:\n'
+        '${masonAddNewFeatureBrickResult.stderr}',
+      );
+    }
   }
 
   void _logDryRunDetails(_FlutterProjectCreationData creationData) =>
