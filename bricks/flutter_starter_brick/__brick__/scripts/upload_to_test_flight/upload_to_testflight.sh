@@ -1,62 +1,74 @@
 #!/bin/bash
 
 # This script builds the app in release mode and uploads it to TestFlight.
-# It reads the ios version name and build number from a file called
+# It reads the iOS version name and build number from a file called
 # versions present at the project root.
 
-# Change to the directory of the script
-cd "$(dirname "$0")" || {
-    echo "Failed to change to script directory"
-    exit 1
-}
+# Resolve paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+VERSIONS_FILE="$PROJECT_ROOT/versions"
 
-# Source the versions file from parent directory
-source ../../versions || {
-    echo "Failed to source versions file from parent directory"
+# Source the versions file
+if [[ -f "$VERSIONS_FILE" ]]; then
+    source "$VERSIONS_FILE"
+else
+    echo "❌ versions file not found at $VERSIONS_FILE"
     exit 1
-}
+fi
 
 # Ensure required parameters are set
 if [[ -z "$ios_version_name" || -z "$ios_build_number" ]]; then
-    echo "Missing required version information in versions file"
+    echo "❌ Missing required version information in versions file"
     exit 1
 fi
 
 # Read the API key and issuer ID
-api_key=$(cat ./api_key_name) || {
-    echo "Failed to read api_key_name file"
+API_KEY_FILE="$SCRIPT_DIR/api_key_name"
+ISSUER_ID_FILE="$SCRIPT_DIR/issuer_id"
+
+if [[ ! -f "$API_KEY_FILE" ]]; then
+    echo "❌ API key file not found: $API_KEY_FILE"
     exit 1
-}
+fi
 
-issuer_id=$(cat ./issuer_id) || {
-    echo "Failed to read issuer_id file"
+if [[ ! -f "$ISSUER_ID_FILE" ]]; then
+    echo "❌ Issuer ID file not found: $ISSUER_ID_FILE"
     exit 1
-}
+fi
 
-# Set the main dart file based on environment
-main_file="lib/main_production.dart"
+api_key=$(cat "$API_KEY_FILE")
+issuer_id=$(cat "$ISSUER_ID_FILE")
 
-# Build command
-build_command="flutter build ipa \
+# Set the main Dart file
+main_file="lib/main.dart"
+
+# Build IPA
+echo "🚀 Building IPA for version $ios_version_name ($ios_build_number)..."
+flutter build ipa \
     --release \
-    --build-name=$ios_version_name \
-    --build-number=$ios_build_number \
-    -t $main_file"
-
-echo "Running command: $build_command"
-eval "$build_command" || {
-    echo "Build failed"
+    --build-name="$ios_version_name" \
+    --build-number="$ios_build_number" \
+    -t "$main_file" || {
+    echo "❌ Build failed"
     exit 1
 }
 
-# Upload command
-upload_command="xcrun altool --upload-app --type ios \
-    -f build/ios/ipa/*.ipa \
-    --apiKey $api_key \
-    --apiIssuer $issuer_id"
+# Upload to TestFlight via App Store Connect API
+ipa_path=$(find "$PROJECT_ROOT/build/ios/ipa" -name "*.ipa" | head -n 1)
 
-echo "Running command: $upload_command"
-eval "$upload_command" || {
-    echo "Upload failed"
+if [[ -z "$ipa_path" ]]; then
+    echo "❌ No IPA file found in build/ios/ipa"
+    exit 1
+fi
+
+echo "📤 Uploading $ipa_path to TestFlight..."
+xcrun altool --upload-app --type ios \
+    -f "$ipa_path" \
+    --apiKey "$api_key" \
+    --apiIssuer "$issuer_id" || {
+    echo "❌ Upload failed"
     exit 1
 }
+
+echo "✅ Upload complete!"
