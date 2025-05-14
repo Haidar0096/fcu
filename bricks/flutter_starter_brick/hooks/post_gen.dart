@@ -50,7 +50,7 @@ Future<void> run(HookContext context) async {
         'android_id: ^0.4.0',
         'device_info_plus: ^11.3.0',
         'package_info_plus: ^8.2.1',
-        'go_router: ^14.8.0',
+        'go_router: ^15.1.2',
         'flutter_animate: ^4.5.2',
         'cached_network_image: ^3.4.1',
         'loading_animation_widget: ^1.3.0',
