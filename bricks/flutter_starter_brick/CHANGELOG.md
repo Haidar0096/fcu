@@ -49,3 +49,7 @@ some files and folders.
 - Added a command to add new_feature_brick in the generated directory.
 - Updated docs.
 - Fixed new_feature_brick special chars not being escaped properly.
+
+# 3.2.0
+- Restructured some files.
+- Updated some package dependencies.
