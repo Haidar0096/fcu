@@ -53,3 +53,6 @@ some files and folders.
 # 3.2.0
 - Restructured some files.
 - Updated some package dependencies.
+
+# 3.2.1
+- Fixed wrong version of bloc package.

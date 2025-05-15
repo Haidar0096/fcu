@@ -43,7 +43,7 @@ Future<void> run(HookContext context) async {
         'get_it: ^8.0.3',
         'hydrated_bloc: ^10.0.0',
         'flutter_bloc: ^9.1.1',
-        'bloc: ^9.1.1',
+        'bloc: ^9.0.0',
         'path_provider: ^2.1.5',
         'intl:any',
         'nested: ^1.0.0',
