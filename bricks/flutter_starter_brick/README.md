@@ -31,17 +31,18 @@ graph TD
     lib --> infrastructure
     lib --> resources
     lib --> router
-    lib --> main_files[main files]
+    lib --> main_files[main_common.dart<br/>main_development.dart<br/>main_production.dart<br/>main_staging.dart]
 
     features --> error_screen
     features --> home
     features --> splash_screen
-
-    common --> variables
-    common --> common_widgets
-    common --> data
-
     home --> home_screen
+
+    common --> networking
+    common --> variables
+    common --> widgets
+
+    networking --> backend_http_client
 
     infrastructure --> basic_types
     infrastructure --> blocs
@@ -49,30 +50,26 @@ graph TD
     infrastructure --> environments
     infrastructure --> l10n
     infrastructure --> logging
-    infrastructure --> networking
+    infrastructure --> networking_inf
     infrastructure --> ui
     infrastructure --> validators
 
     blocs --> app_meta_data_cubit
     blocs --> bloc_utils
 
-    networking --> dio_http_client[dio_http_client]
-    networking --> http_client
+    networking_inf --> dio_http_client
+    networking_inf --> http_client
 
     ui --> animations
     ui --> theme
-    ui --> core_widgets
+    ui --> widgets_inf
 
-    theme --> theme_src[src]
-    theme_src --> theme_cubit
-    theme_src --> theme_data
+    theme --> theme_cubit
+    theme --> theme_data
 
-    resources --> src
-    src --> arb
-    src --> fonts
-    src --> images
-
-    main_files --> |files| main_list[main_common.dart<br/>main_development.dart<br/>main_production.dart<br/>main_staging.dart]
+    resources --> arb
+    resources --> fonts
+    resources --> images
 
     classDef default fill:#f9f,stroke:#333,stroke-width:2px;
     classDef folder fill:#bbf,stroke:#333,stroke-width:2px;
