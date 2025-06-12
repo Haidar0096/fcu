@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
-import 'package:scotch_bot/infrastructure/networking/dio_http_client/dio_http_client.dart';
+import 'package:{{proj_name}}/infrastructure/networking/dio_http_client/dio_http_client.dart';
 
 const Duration _defaultTimeout = Duration(seconds: 30);
 

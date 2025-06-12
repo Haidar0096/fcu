@@ -56,3 +56,6 @@ some files and folders.
 
 # 3.2.1
 - Fixed wrong version of bloc package.
+
+# 3.2.2
+- Fixed a wrong import.
