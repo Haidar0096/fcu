@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lia/features/random_jokes/random_jokes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:{{proj_name}}/common/variables/variables.dart';
 import 'package:{{proj_name}}/features/error_screen/error_screen.dart';
-import 'package:{{proj_name}}/features/home/home.dart';
 import 'package:{{proj_name}}/features/splash_screen/splash_screen.dart';
 
 part 'router.g.dart';
@@ -45,24 +46,30 @@ class _SplashScreenRoute extends GoRouteData {
       _getPageByPlatform<void>(
         pageKey: state.pageKey,
         child: SplashScreen(
-          onShouldNavigateToHomeScreen:
-              () => const _HomeScreenRoute().go(context),
+          onShouldNavigateToRandomJokesScreen:
+              () => const _RandomJokesScreenRoute().go(context),
           onShouldNavigateToErrorScreen:
               () => const _ErrorScreenRoute().go(context),
         ),
       );
 }
 
-@TypedGoRoute<_HomeScreenRoute>(path: _HomeScreenRoute.path)
+@TypedGoRoute<_RandomJokesScreenRoute>(path: _RandomJokesScreenRoute.path)
 @immutable
-class _HomeScreenRoute extends GoRouteData {
-  const _HomeScreenRoute();
+class _RandomJokesScreenRoute extends GoRouteData {
+  const _RandomJokesScreenRoute();
 
-  static const String path = '/home_screen';
+  static const String path = '/random_jokes_screen';
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
-      _getPageByPlatform<void>(pageKey: state.pageKey, child: HomeScreen());
+      _getPageByPlatform<void>(
+        pageKey: state.pageKey,
+        child: BlocProvider(
+          create: (_) => serviceProvider.get<JokesCubit>(),
+          child: const RandomJokesScreen(),
+        ),
+      );
 }
 
 @TypedGoRoute<_ErrorScreenRoute>(path: _ErrorScreenRoute.path)

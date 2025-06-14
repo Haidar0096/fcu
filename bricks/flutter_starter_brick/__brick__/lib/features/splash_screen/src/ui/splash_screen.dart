@@ -8,14 +8,14 @@ import 'package:{{proj_name}}/infrastructure/ui/widgets/widgets.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
-    required this.onShouldNavigateToHomeScreen,
+    required this.onShouldNavigateToRandomJokesScreen,
     required this.onShouldNavigateToErrorScreen,
     super.key,
   });
 
   static const routeName = 'splash_screen';
 
-  final void Function() onShouldNavigateToHomeScreen;
+  final void Function() onShouldNavigateToRandomJokesScreen;
 
   final void Function() onShouldNavigateToErrorScreen;
 
@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
               break;
             case AppMetaDataLoaded():
               await _enableEdgeToEdge();
-              widget.onShouldNavigateToHomeScreen();
+              widget.onShouldNavigateToRandomJokesScreen();
             case AppMetaDataLoadingFailed():
               await _enableEdgeToEdge();
               widget.onShouldNavigateToErrorScreen();

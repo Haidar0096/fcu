@@ -16,41 +16,26 @@ sealed class EnvironmentVariables {
     ProductionEnvironment() => ProductionEnvironmentVariables(),
   };
 
-  /**
- * TODO({{dev_name}}): Add your environment variables here
- * example:
- * String get apiUrl;
- */
+  String get jokesBackendBaseUrl;
 }
 
 final class DevelopmentEnvironmentVariables extends EnvironmentVariables {
   DevelopmentEnvironmentVariables() : super._();
-  /**
- * TODO({{dev_name}}): Add your environment variables here
- * example:
- * @override
- * String get apiUrl => 'https://api.example-dev.com';
- */
+
+  @override
+  String get jokesBackendBaseUrl => 'https://api.chucknorris.io';
 }
 
 final class StagingEnvironmentVariables extends EnvironmentVariables {
   StagingEnvironmentVariables() : super._();
 
-  /**
- * TODO({{dev_name}}): Add your environment variables here
- * example:
- * @override
- * String get apiUrl => 'https://api.example-stg.com';
- */
+  @override
+  String get jokesBackendBaseUrl => 'https://api.chucknorris.io';
 }
 
 final class ProductionEnvironmentVariables extends EnvironmentVariables {
   ProductionEnvironmentVariables() : super._();
 
-  /**
- * TODO({{dev_name}}): Add your environment variables here
- * example:
- * @override
- * String get apiUrl => 'https://api.example-prd.com';
- */
+  @override
+  String get jokesBackendBaseUrl => 'https://api.chucknorris.io';
 }

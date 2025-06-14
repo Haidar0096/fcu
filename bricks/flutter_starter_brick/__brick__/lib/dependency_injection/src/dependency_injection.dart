@@ -5,6 +5,9 @@ import 'package:{{proj_name}}/infrastructure/dependency_injection/dependency_inj
 import 'package:{{proj_name}}/infrastructure/environments/environments.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart' hide Environment;
+import 'package:{{proj_name}}/infrastructure/networking/http_client/http_client.dart';
+import 'package:{{proj_name}}/common/networking/networking.dart';
+import 'package:{{proj_name}}/common/variables/variables.dart';
 
 /// Initializes the dependency container.
 @InjectableInit(initializerName: r'$initInjectable', asExtension: false)
@@ -53,25 +56,18 @@ class GetItServiceProvider implements ServiceProvider {
 /// registered otherwise by annotations.
 @module
 abstract class RegisterModule {
-  // TODO(developer): add manually registered services here.
-  /*
-  // for example:
-  @Named(DependencyInjectionInstanceName.incrementValue)
-  int get incrementValue => 1;
-  */
+  @DIName(DependencyInjectionInstanceNames.jokesBackendHttpClient)
+  HttpClient createBackendHttpClient() => BackendHttpClient(
+    baseUrl: serviceProvider.get<EnvironmentVariables>().backendBaseUrl,
+    errorLogger: serviceProvider.get(),
+    appLogger: serviceProvider.get(),
+  );
 }
 
 final class DependencyInjectionInstanceNames {
   const DependencyInjectionInstanceNames._();
 
-// TODO(developer): Add instance names for your dependencies here.
-/*
-      // for example:
-      static const String incrementValue = 'increment_value';
-      // then use it somewhere using:
-      final myVariable = ServiceProvider.get(
-      instanceName: DependencyInjectionInstanceName.incrementValue,
-      );
-*/
+  /// Key used to inject the backend http client into the app.
+  static const String jokesBackendHttpClient = 'jokes_backend_http_client_di_key';
 }
 
