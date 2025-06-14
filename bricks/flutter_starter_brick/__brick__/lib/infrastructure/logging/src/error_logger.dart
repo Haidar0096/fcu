@@ -12,7 +12,9 @@ class ErrorLogger {
   void registerErrorHandlers() {
     FlutterError.onError = _handleFlutterError;
     PlatformDispatcher.instance.onError = _handlePlatformError;
-    _addIsolateErrorListener();
+    if (!kIsWeb) {
+      _addIsolateErrorListener();
+    }
   }
 
   Future<void> _handleFlutterError(FlutterErrorDetails errorDetails) async {

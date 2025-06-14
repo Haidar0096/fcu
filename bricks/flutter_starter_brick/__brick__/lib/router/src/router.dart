@@ -21,6 +21,9 @@ Page<T> _getPageByPlatform<T>({
   required Widget child,
   required LocalKey pageKey,
 }) {
+  if(kIsWeb) {
+    return NoTransitionPage(child: child);
+  }
   if (Platform.isAndroid) {
     return MaterialPage(child: child, key: pageKey);
   }
