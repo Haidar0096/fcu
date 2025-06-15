@@ -24,9 +24,9 @@ final class JokesLoaded extends JokesState {
 }
 
 final class JokesFailed extends JokesState {
-  JokesFailed(this.message);
+  JokesFailed(NetworkFailure failure) : uiFailure = UiNetworkFailure(failure);
 
-  final String message;
+  final UiNetworkFailure uiFailure;
 
   @override
   bool get loading => false;

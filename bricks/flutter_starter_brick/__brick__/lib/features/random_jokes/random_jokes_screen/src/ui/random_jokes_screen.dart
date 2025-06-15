@@ -16,10 +16,12 @@ class RandomJokesScreen extends StatelessWidget {
         case JokesInitial():
         case JokesLoading():
         case JokesLoaded():
-          // No action needed for these states.
+        // No action needed for these states.
           break;
         case JokesFailed():
-          context.showErrorSnackBar(text: state.message);
+          context.showErrorSnackBar(
+            text: state.uiFailure.getDisplayText(context),
+          );
       }
     },
     builder: (context, state) {

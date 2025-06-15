@@ -3,5 +3,10 @@
   "disconnected": "غير متصل",
   "oopsAnErrorHasOccurred": "عذرًا، حدث خطأ",
   "noValueSelected": "لم يتم اختيار قيمة",
-  "tellMeAJoke": "احكي لي نكتة"
+  "tellMeAJoke": "احكي لي نكتة",
+  "networkErrorMessage": "حدث خطأ في الشبكة.",
+  "serverErrorMessage": "حدث خطأ في الخادم.",
+  "timeoutErrorMessage": "انتهت مهلة الطلب.",
+  "requestCancelledMessage": "تم إلغاء الطلب.",
+  "unknownErrorMessage": "حدث خطأ غير متوقع."
 }

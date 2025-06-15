@@ -331,6 +331,8 @@ class NewProjectCommand extends Command<int> {
     final masonAddResult = await Process.run('mason', [
       'add',
       'flutter_starter_brick',
+      '--path',// todo remove this and the next line before publishing
+      '/Users/haidarmehsen/dev/projects/flutter/projects/flutter_cli_utils/bricks/flutter_starter_brick'
     ], workingDirectory: creationData.outputDirectory);
     if (masonAddResult.exitCode != 0) {
       throw Exception(

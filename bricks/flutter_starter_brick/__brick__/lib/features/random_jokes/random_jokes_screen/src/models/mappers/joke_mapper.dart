@@ -2,5 +2,5 @@ import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/mode
 import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/models/ui_models/ui_joke.dart';
 
 extension JokeDtoMapper on JokeDto {
-  UiJoke toUi() => UiJoke(id: id ?? '', content: value ?? '');
+  UiJoke toUiModel() => UiJoke(id: id ?? '', content: value ?? '');
 }

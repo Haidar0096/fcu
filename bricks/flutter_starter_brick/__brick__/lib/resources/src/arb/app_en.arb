@@ -3,5 +3,10 @@
   "disconnected": "Disconnected",
   "oopsAnErrorHasOccurred": "Oops, an error has occurred",
   "noValueSelected": "No value selected",
-  "tellMeAJoke": "Tell me a joke"
+  "tellMeAJoke": "Tell me a joke",
+  "networkErrorMessage": "A network error has occurred.",
+  "serverErrorMessage": "A server error has occurred.",
+  "timeoutErrorMessage": "Request has timed out.",
+  "requestCancelledMessage": "Request was cancelled.",
+  "unknownErrorMessage": "An unexpected error has occurred."
 }
