@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lia/features/random_jokes/random_jokes.dart';
+import 'package:{{proj_name}}/features/random_jokes/random_jokes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:{{proj_name}}/common/variables/variables.dart';
 import 'package:{{proj_name}}/features/error_screen/error_screen.dart';
@@ -36,7 +37,7 @@ Page<T> _getPageByPlatform<T>({
 
 @TypedGoRoute<_SplashScreenRoute>(path: _SplashScreenRoute.path)
 @immutable
-class _SplashScreenRoute extends GoRouteData {
+class _SplashScreenRoute extends GoRouteData with _$_SplashScreenRoute{
   const _SplashScreenRoute();
 
   static const String path = '/splash_screen';
@@ -56,7 +57,7 @@ class _SplashScreenRoute extends GoRouteData {
 
 @TypedGoRoute<_RandomJokesScreenRoute>(path: _RandomJokesScreenRoute.path)
 @immutable
-class _RandomJokesScreenRoute extends GoRouteData {
+class _RandomJokesScreenRoute extends GoRouteData with _$_RandomJokesScreenRoute {
   const _RandomJokesScreenRoute();
 
   static const String path = '/random_jokes_screen';
@@ -74,7 +75,7 @@ class _RandomJokesScreenRoute extends GoRouteData {
 
 @TypedGoRoute<_ErrorScreenRoute>(path: _ErrorScreenRoute.path)
 @immutable
-class _ErrorScreenRoute extends GoRouteData {
+class _ErrorScreenRoute extends GoRouteData  with _$_ErrorScreenRoute {
   const _ErrorScreenRoute({this.errorMessage});
 
   static const String path = '/error_screen';

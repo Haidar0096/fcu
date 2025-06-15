@@ -2,5 +2,6 @@
   "connected": "Connected",
   "disconnected": "Disconnected",
   "oopsAnErrorHasOccurred": "Oops, an error has occurred",
-  "noValueSelected": "No value selected"
+  "noValueSelected": "No value selected",
+  "tellMeAJoke": "Tell me a joke"
 }

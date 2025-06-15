@@ -26,8 +26,9 @@ Future<void> run(HookContext context) async {
         'very_good_analysis: ^7.0.0',
         'injectable_generator: ^2.7.0',
         'build_runner: ^2.4.15',
-        'go_router_builder: ^2.9.0',
+        'go_router_builder: ^3.0.0',
         'build_verify: ^3.1.0',
+        'json_serializable: ^6.9.5'
       ],
     ),
   );
@@ -50,12 +51,13 @@ Future<void> run(HookContext context) async {
         'android_id: ^0.4.0',
         'device_info_plus: ^11.4.0',
         'package_info_plus: ^8.3.0',
-        'go_router: ^15.1.2',
+        'go_router: ^15.2.0',
         'flutter_animate: ^4.5.2',
         'cached_network_image: ^3.4.1',
         'loading_animation_widget: ^1.3.0',
         'fconnectivity: ^0.5.0',
         'dio: ^5.8.0+1',
+        'json_annotation: ^4.9.0'
       ],
     ),
   );

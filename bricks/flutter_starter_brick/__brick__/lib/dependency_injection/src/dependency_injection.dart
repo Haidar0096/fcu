@@ -58,7 +58,7 @@ class GetItServiceProvider implements ServiceProvider {
 abstract class RegisterModule {
   @DIName(DependencyInjectionInstanceNames.jokesBackendHttpClient)
   HttpClient createBackendHttpClient() => BackendHttpClient(
-    baseUrl: serviceProvider.get<EnvironmentVariables>().backendBaseUrl,
+    baseUrl: serviceProvider.get<EnvironmentVariables>().jokesBackendBaseUrl,
     errorLogger: serviceProvider.get(),
     appLogger: serviceProvider.get(),
   );
