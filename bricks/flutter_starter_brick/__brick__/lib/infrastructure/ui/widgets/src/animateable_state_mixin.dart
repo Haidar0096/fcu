@@ -18,7 +18,9 @@ mixin AnimateableStateMixin<T extends StatefulWidget>
       duration: AnimationDefaults.animationDuration,
       reverseDuration: AnimationDefaults.animationDuration,
     );
-    animationController.addListener(() => setState(() {}));
+    animationController.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
