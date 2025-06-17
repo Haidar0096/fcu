@@ -1,7 +1,7 @@
 import 'package:fconnectivity/fconnectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:{{proj_name}}/common/widgets/src/root_blocs_provider.dart';
+import 'package:{{proj_name}}/shared/widgets/src/root_blocs_provider.dart';
 import 'package:{{proj_name}}/infrastructure/l10n/l10n.dart';
 import 'package:{{proj_name}}/infrastructure/ui/theme/theme.dart';
 import 'package:{{proj_name}}/infrastructure/ui/widgets/widgets.dart';

@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:{{proj_name}}/features/random_jokes/random_jokes.dart';
 import 'package:go_router/go_router.dart';
-import 'package:{{proj_name}}/common/variables/variables.dart';
+import 'package:{{proj_name}}/shared/variables/variables.dart';
 import 'package:{{proj_name}}/features/error_screen/error_screen.dart';
 import 'package:{{proj_name}}/features/splash_screen/splash_screen.dart';
 

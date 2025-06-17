@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:{{proj_name}}/common/widgets/widgets.dart';
+import 'package:{{proj_name}}/shared/widgets/widgets.dart';
 import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/blocs/jokes_cubit/jokes_cubit.dart';
 import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/ui/joke_card.dart';
 import 'package:{{proj_name}}/infrastructure/l10n/l10n.dart';

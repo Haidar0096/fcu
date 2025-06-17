@@ -6,8 +6,8 @@ import 'package:{{proj_name}}/infrastructure/environments/environments.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart' hide Environment;
 import 'package:{{proj_name}}/infrastructure/networking/http_client/http_client.dart';
-import 'package:{{proj_name}}/common/networking/networking.dart';
-import 'package:{{proj_name}}/common/variables/variables.dart';
+import 'package:{{proj_name}}/shared/networking/networking.dart';
+import 'package:{{proj_name}}/shared/variables/variables.dart';
 
 /// Initializes the dependency container.
 @InjectableInit(initializerName: r'$initInjectable', asExtension: false)

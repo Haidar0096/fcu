@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:{{proj_name}}/common/variables/variables.dart';
+import 'package:{{proj_name}}/shared/variables/variables.dart';
 import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
 import 'package:{{proj_name}}/infrastructure/ui/theme/theme.dart';
 import 'package:{{proj_name}}/infrastructure/ui/widgets/widgets.dart';

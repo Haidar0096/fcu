@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:{{proj_name}}/common/models/ui_models/src/displayable_ui_model.dart';
+import 'package:{{proj_name}}/shared/models/ui_models/src/displayable_ui_model.dart';
 import 'package:{{proj_name}}/infrastructure/l10n/l10n.dart';
 import 'package:{{proj_name}}/infrastructure/networking/http_client/http_client.dart';
 

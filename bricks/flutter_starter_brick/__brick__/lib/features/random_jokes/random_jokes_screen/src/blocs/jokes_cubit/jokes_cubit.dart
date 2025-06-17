@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:{{proj_name}}/common/models/ui_models/ui_models.dart';
+import 'package:{{proj_name}}/shared/models/ui_models/ui_models.dart';
 import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/apis/jokes_api.dart';
 import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/models/mappers/joke_mapper.dart';
 import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/models/ui_models/ui_joke.dart';
