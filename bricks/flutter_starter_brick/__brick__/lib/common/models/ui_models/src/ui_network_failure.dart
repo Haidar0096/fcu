@@ -4,12 +4,12 @@ import 'package:{{proj_name}}/infrastructure/l10n/l10n.dart';
 import 'package:{{proj_name}}/infrastructure/networking/http_client/http_client.dart';
 
 class UiNetworkFailure implements DisplayableUiModel {
-  UiNetworkFailure(this.failure);
+  UiNetworkFailure(this._failure);
 
-  final NetworkFailure failure;
+  final NetworkFailure _failure;
 
   @override
-  String getDisplayText(BuildContext context) => switch (failure) {
+  String getDisplayText(BuildContext context) => switch (_failure) {
     NetworkError() => context.appLocalizations.networkErrorMessage,
     ServerError() => context.appLocalizations.serverErrorMessage,
     TimeoutError() => context.appLocalizations.timeoutErrorMessage,
