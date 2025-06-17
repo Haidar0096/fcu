@@ -42,7 +42,7 @@ class _RootAppWidgetState extends State<RootAppWidget> {
             // InternetAccessCubitListener
             result = InternetAccessListener(
               onInternetAccessGained: (BuildContext context) {
-                // TODO(Haidar): handle connected state
+                // TODO({{dev_name}}): handle connected state
                 if (!_isFirstCapturedState) {
                   context.showSuccessSnackBar(
                     text: context.appLocalizations.connected,
@@ -51,7 +51,7 @@ class _RootAppWidgetState extends State<RootAppWidget> {
                 _isFirstCapturedState = false;
               },
               onInternetAccessLost: (BuildContext context) {
-                // TODO(Haidar): handle disconnected state
+                // TODO({{dev_name}}): handle disconnected state
                 context.showErrorSnackBar(
                   text: context.appLocalizations.disconnected,
                 );

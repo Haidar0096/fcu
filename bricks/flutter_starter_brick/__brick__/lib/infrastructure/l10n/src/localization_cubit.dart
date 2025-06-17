@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:{{proj_name}}/infrastructure/dependency_injection/dependency_injection.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
@@ -18,7 +19,10 @@ class LocalizationCubit extends HydratedCubit<Language> {
 
   @override
   Language? fromJson(Map<String, dynamic> json) =>
-      Language.values.firstWhere((l) => l.code == json['language_code']);
+      Language.values.firstWhereOrNull(
+            (l) => l.code == json['language_code'],
+      ) ??
+          Language.english;
 
   @override
   Map<String, dynamic>? toJson(Language state) => {'language_code': state.code};

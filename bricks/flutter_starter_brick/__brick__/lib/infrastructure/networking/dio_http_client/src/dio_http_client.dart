@@ -27,10 +27,11 @@ class DioHttpClient extends HttpClient {
     Object? body,
     bool Function(int? statusCode)? responseStatusCodeValidator,
   }) async {
-    assert(
-      additionalHeaders == null || replacementHeaders == null,
-      'Only one of additionalHeaders or replacementHeaders can be provided',
-    );
+    if (additionalHeaders != null && replacementHeaders != null) {
+      throw ArgumentError(
+        'Cannot provide both additionalHeaders and replacementHeaders',
+      );
+    }
 
     try {
       final headers = <String, dynamic>{..._client.options.headers};

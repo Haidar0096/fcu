@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
+import 'package:{{proj_name}}/common/variables/variables.dart';
+import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
 import 'package:{{proj_name}}/infrastructure/ui/theme/theme.dart';
 import 'package:{{proj_name}}/infrastructure/ui/widgets/widgets.dart';
-import 'package:{{proj_name}}/common/variables/variables.dart';
 
 const _loadingIndicatorSpacing = 24.0;
 
@@ -10,13 +11,15 @@ OverlayEntry? _loadingOverlay;
 void showGlobalLoader({String? loadingText, TextStyle? loadingTextStyle}) {
   final context = rootNavigatorKey.currentContext;
 
+  final appLogger = serviceProvider.get<AppLogger>();
+
   if (context == null) {
-    debugPrint('Tried to show loader using a null context');
+    appLogger.log('Tried to show loader using a null context');
     return;
   }
 
   if (Overlay.maybeOf(context) == null) {
-    debugPrint(
+    appLogger.log(
       'Tried to show loader on a context that is not attached to an'
       ' overlay',
     );

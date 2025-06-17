@@ -20,7 +20,7 @@ class AppLogger {
 
     sb.write(message);
 
-    // TODO(Haidar): Change the way the logs are printed if needed.
+    // TODO({{dev_name}}): Change the way the logs are printed if needed.
     if (kDebugMode) {
       print(sb);
     }

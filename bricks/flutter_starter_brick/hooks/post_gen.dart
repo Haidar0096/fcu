@@ -46,6 +46,7 @@ Future<void> run(HookContext context) async {
         'flutter_bloc: ^9.1.1',
         'bloc: ^9.0.0',
         'path_provider: ^2.1.5',
+        'collection: ^1.19.1',
         'intl:any',
         'nested: ^1.0.0',
         'android_id: ^0.4.0',

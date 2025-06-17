@@ -8,7 +8,8 @@ String buildApiErrorReportingMessageFromGeneralError({
   Object? body,
   Map<String, dynamic>? headers,
 }) {
-  // TODO(haidar): Check if we want to log the request data.
+  // TODO({{dev_name}}): Check if we want to log the request data.
+  // TODO({{dev_name}}): Filter sensitive data (auth tokens, passwords, PII) before logging
   final buffer =
       StringBuffer()
         ..writeln('Request failed with error: $error')
