@@ -31,7 +31,7 @@ String? validateNonEmptyText(String? text, {String? emptyValueErrorMessage}) {
 
   if (text == null) return errorMessage;
 
-  if (text.isEmpty) return errorMessage;
+  if (text.trim().isEmpty) return errorMessage;
 
   return null;
 }
