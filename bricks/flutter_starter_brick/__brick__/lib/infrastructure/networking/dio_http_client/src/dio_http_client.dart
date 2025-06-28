@@ -56,10 +56,19 @@ class DioHttpClient extends HttpClient {
     } on dio.DioException catch (dioException) {
       // Handle dio exceptions
       switch (dioException.type) {
-        // Check for network errors
+        // Check for timeout errors
         case dio.DioExceptionType.sendTimeout:
         case dio.DioExceptionType.receiveTimeout:
         case dio.DioExceptionType.connectionTimeout:
+          return Result.failure(
+            TimeoutError(
+              statusCode: dioException.response?.statusCode,
+              apiErrorDTO: serverErrorMessageParser?.call(
+                dioException.response?.data,
+              ),
+            ),
+          );
+        // Check for network errors
         case dio.DioExceptionType.connectionError:
         case dio.DioExceptionType.unknown
             when dioException.error is SocketException:
