@@ -4,8 +4,6 @@ import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
 import 'package:{{proj_name}}/infrastructure/ui/theme/theme.dart';
 import 'package:{{proj_name}}/infrastructure/ui/widgets/widgets.dart';
 
-const _loadingIndicatorSpacing = 24.0;
-
 OverlayEntry? _loadingOverlay;
 
 void showGlobalLoader({String? loadingText, TextStyle? loadingTextStyle}) {
@@ -45,7 +43,7 @@ void showGlobalLoader({String? loadingText, TextStyle? loadingTextStyle}) {
               shrinkWrap: true,
               children: [
                 const Center(child: LoaderWidget()),
-                const SizedBox(height: _loadingIndicatorSpacing),
+                VerticalSpacing.medium,
                 if (loadingText != null)
                   Center(
                     child: Text(loadingText, style: effectiveLoadingTextStyle),

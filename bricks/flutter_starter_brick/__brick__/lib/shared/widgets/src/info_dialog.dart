@@ -22,7 +22,7 @@ Future<T?> showInfoDialog<T>({
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 16),
+              VerticalSpacing.small,
               Flexible(
                 child: Text(
                   title,
@@ -31,7 +31,7 @@ Future<T?> showInfoDialog<T>({
                   ),
                 ),
               ),
-              const SizedBox(height: 25),
+              VerticalSpacing.medium,
               Flexible(
                 child: Text(
                   body,

@@ -37,7 +37,7 @@ class RandomJokesScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 JokeCard(joke: state.joke),
-                const SizedBox(height: 16),
+                VerticalSpacing.small,
                 fetchButton,
               ],
             ),

@@ -14,5 +14,6 @@ export 'src/loader_widget.dart';
 export 'src/root_screen_widget.dart';
 export 'src/scroll_controller_provider_mixin.dart';
 export 'src/snackbars.dart';
+export 'src/spacing.dart';
 export 'src/validateable_state_mixin.dart';
 export 'src/widgets_list_extensions.dart';
