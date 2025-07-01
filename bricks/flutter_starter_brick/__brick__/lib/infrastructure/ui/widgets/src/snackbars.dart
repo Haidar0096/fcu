@@ -122,7 +122,7 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showSuccessSnackBar({
 }) => showCustomSnackBar(
   context: context,
   text: text,
-  backgroundColor: successGreen,
+  backgroundColor: context.themeData.colorScheme.success,
   duration: duration,
   action: action,
 );

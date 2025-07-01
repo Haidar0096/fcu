@@ -220,7 +220,9 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
 
     final fillColor =
         widget.fillColor ??
-        (widget.enabled ? context.themeData.colorScheme.surface : inactiveGray);
+        (widget.enabled 
+            ? context.themeData.colorScheme.surface 
+            : context.themeData.colorScheme.onSurface.withValues(alpha: 0.12));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

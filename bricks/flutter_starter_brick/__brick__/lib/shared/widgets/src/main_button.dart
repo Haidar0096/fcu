@@ -26,7 +26,6 @@ class MainButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.themeData.colorScheme;
-    final textColor = _enabled ? black : white;
     return CustomElevatedButton(
       text: text,
       width: width,
@@ -34,24 +33,29 @@ class MainButton extends StatelessWidget {
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return inactiveGray;
+            return colorScheme.onSurface.withValues(alpha: 0.12);
           }
-          return yellow;
+          return colorScheme.primary;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return colorScheme.onSurface.withValues(alpha: 0.38);
+          }
+          return colorScheme.onPrimary;
         }),
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) return null;
-          return colorScheme.surface.withValues(alpha: 0.12);
+          return colorScheme.onPrimary.withValues(alpha: 0.12);
         }),
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               ThemeDefaults.buttonBorderRadius,
             ),
-            side: const BorderSide(color: Colors.transparent, width: 1.5),
+            side: BorderSide.none,
           ),
         ),
       ),
-      textStyle: TextStyle(color: textColor),
       onPressed: onPressed,
     );
   }

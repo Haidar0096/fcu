@@ -26,7 +26,6 @@ class SecondaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.themeData.colorScheme;
-    final textColor = _enabled ? colorScheme.inverseSurface : white;
     return CustomElevatedButton(
       text: text,
       width: width,
@@ -34,21 +33,27 @@ class SecondaryButton extends StatelessWidget {
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return inactiveGray;
+            return colorScheme.onSurface.withValues(alpha: 0.12);
           }
           return Colors.transparent;
         }),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return colorScheme.onSurface.withValues(alpha: 0.38);
+          }
+          return colorScheme.primary;
+        }),
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) return null;
-          return colorScheme.inverseSurface.withValues(alpha: 0.12);
+          return colorScheme.primary.withValues(alpha: 0.12);
         }),
         shape: WidgetStateProperty.resolveWith((states) {
           final borderSide = BorderSide(
             color:
                 states.contains(WidgetState.disabled)
-                    ? Colors.transparent
-                    : colorScheme.inverseSurface,
-            width: 1.5,
+                    ? colorScheme.onSurface.withValues(alpha: 0.12)
+                    : colorScheme.primary,
+            width: ThemeDefaults.borderWidth,
           );
           return RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
@@ -58,7 +63,6 @@ class SecondaryButton extends StatelessWidget {
           );
         }),
       ),
-      textStyle: TextStyle(color: textColor),
       onPressed: onPressed,
     );
   }

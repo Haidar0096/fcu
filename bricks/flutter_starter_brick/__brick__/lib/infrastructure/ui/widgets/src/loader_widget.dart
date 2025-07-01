@@ -10,6 +10,9 @@ class LoaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingAnimationWidget.fallingDot(color: yellow, size: 100);
+    return LoadingAnimationWidget.fallingDot(
+      color: context.themeData.colorScheme.primary,
+      size: 100,
+    );
   }
 }
