@@ -1,6 +1,6 @@
-import 'package:{{proj_name}}/infrastructure/ui/theme/src/theme_data/dark_theme_data.dart';
-import 'package:{{proj_name}}/infrastructure/ui/theme/src/theme_data/light_theme_data.dart';
 import 'package:flutter/material.dart';
+import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/dark_theme_data.dart';
+import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/light_theme_data.dart';
 
 sealed class {{proj_name.pascalCase()}}Theme {
   const {{proj_name.pascalCase()}}Theme();
