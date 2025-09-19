@@ -1,33 +1,30 @@
 part of 'jokes_cubit.dart';
 
+/// Base state for jokes feature
 sealed class JokesState {
-  bool get loading;
+  const JokesState();
 }
 
+/// Initial state before any joke is fetched
 final class JokesInitial extends JokesState {
-  @override
-  bool get loading => false;
+  const JokesInitial();
 }
 
+/// Loading state while fetching a joke
 final class JokesLoading extends JokesState {
-  @override
-  bool get loading => true;
+  const JokesLoading();
 }
 
+/// Success state with a loaded joke
 final class JokesLoaded extends JokesState {
-  JokesLoaded(this.joke);
+  const JokesLoaded(this.joke);
 
   final UiJoke joke;
-
-  @override
-  bool get loading => false;
 }
 
+/// Error state when joke fetching fails
 final class JokesFailed extends JokesState {
-  JokesFailed(NetworkFailure failure) : uiFailure = UiNetworkFailure(failure);
+  const JokesFailed(this.uiFailure);
 
   final UiNetworkFailure uiFailure;
-
-  @override
-  bool get loading => false;
 }
