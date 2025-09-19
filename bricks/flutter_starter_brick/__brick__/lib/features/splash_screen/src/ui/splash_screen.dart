@@ -17,17 +17,8 @@ class SplashScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => MultiBlocListener(
-    listeners: [
-      // Listen to AppMetaData and start splash timer when loaded
-      BlocListener<AppMetaDataCubit, AppMetaDataState>(
-        listener: _metaDataCubitListener,
-      ),
-      // Listen to SplashCubit states
-      BlocListener<SplashCubit, SplashState>(
-        listener: _splashCubitListener,
-      ),
-    ],
+  Widget build(BuildContext context) => BlocListener<AppMetaDataCubit, AppMetaDataState>(
+    listener: _metaDataCubitListener,
     child: RootScreenWidget(
       applySafeArea: false,
       body: Center(
@@ -75,22 +66,4 @@ class SplashScreen extends StatelessWidget {
         context.read<SplashCubit>().onMetadataLoaded();
     }
   }
-
-  Future<void> _splashCubitListener(
-    BuildContext context,
-    SplashState state,
-  ) async {
-    switch (state) {
-      case SplashInitial():
-        // Do nothing - initial state
-        break;
-      case SplashComplete():
-        // Splash screen is complete - router will handle navigation
-        break;
-      case SplashCriticalError():
-        // Critical error state - router will handle navigation to error screen
-        break;
-    }
-  }
-
 }
