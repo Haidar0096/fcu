@@ -1,10 +1,8 @@
 import 'dart:isolate';
 
-import 'package:{{proj_name}}/infrastructure/dependency_injection/dependency_injection.dart';
 import 'package:flutter/foundation.dart';
 
 /// A singleton class that handles error logging and reporting.
-@LazySingletonService()
 class ErrorLogger {
   const ErrorLogger();
 
