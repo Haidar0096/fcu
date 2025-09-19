@@ -26,8 +26,8 @@ final class SplashCubit extends Cubit<SplashState> with CubitUtils {
   }
 
 
-  /// Emits critical error state for unrecoverable errors
-  void emitCriticalError({String? errorMessage}) => emitIfNotClosed(
+  /// Called when app metadata loading fails - emits critical error state
+  void onMetadataLoadingFailed({String? errorMessage}) => emitIfNotClosed(
     SplashCriticalError(errorMessage: errorMessage),
   );
 
