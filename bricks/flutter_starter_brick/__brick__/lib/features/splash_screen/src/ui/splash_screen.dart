@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lia/features/splash_screen/src/blocs/splash_cubit/splash_cubit.dart';
-import 'package:lia/features/splash_screen/src/services/app_store_launcher.dart';
-import 'package:lia/features/splash_screen/src/ui/version_check_dialog.dart';
-import 'package:lia/features/subscription/subscription.dart';
-import 'package:lia/foundation/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
-import 'package:lia/foundation/l10n/l10n.dart';
-import 'package:lia/foundation/ui/theme/theme.dart';
-import 'package:lia/foundation/ui/widgets/widgets.dart';
+import 'package:{{proj_name}}/features/splash_screen/src/blocs/splash_cubit/splash_cubit.dart';
+import 'package:{{proj_name}}/foundation/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
+import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
+import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
+import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
 /// Initial loading screen shown when the app starts.
 ///
 /// This screen handles:
-/// - Version checking to ensure app is up to date
-/// - Emits completion state for router to handle navigation
+/// - App metadata initialization
+/// - Shows splash for 1.5 seconds then navigates to main screen
 class SplashScreen extends StatelessWidget {
   const SplashScreen({
     super.key,
@@ -22,17 +19,13 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MultiBlocListener(
     listeners: [
-      // Listen to AppMetaData and trigger version check when loaded
+      // Listen to AppMetaData and start splash timer when loaded
       BlocListener<AppMetaDataCubit, AppMetaDataState>(
         listener: _metaDataCubitListener,
       ),
       // Listen to SplashCubit states
       BlocListener<SplashCubit, SplashState>(
         listener: _splashCubitListener,
-      ),
-      // Listen to SubscriptionBloc for errors
-      BlocListener<SubscriptionBloc, SubscriptionState>(
-        listener: _subscriptionBlocListener,
       ),
     ],
     child: RootScreenWidget(
@@ -41,9 +34,9 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // LIA Text
+            // App Name
             Text(
-              'LIA',
+              '{{proj_name.upperCase()}}',
               style: context.typography?.title1.copyWith(
                 letterSpacing: 8,
               ),
@@ -75,11 +68,11 @@ class SplashScreen extends StatelessWidget {
       case AppMetaDataLoadingFailed():
         // Emit critical error state for metadata loading failure
         // This is unrecoverable and requires app restart
-        context.read<SplashCubit>().emitCriticalError(
+        context.read<SplashCubit>().onMetadataLoadingFailed(
           errorMessage: context.appLocalizations.criticalErrorMessage,
         );
-      case AppMetaDataLoaded(:final buildNumber):
-        context.read<SplashCubit>().checkVersion(buildNumber);
+      case AppMetaDataLoaded():
+        context.read<SplashCubit>().onMetadataLoaded();
     }
   }
 
@@ -91,92 +84,13 @@ class SplashScreen extends StatelessWidget {
       case SplashInitial():
         // Do nothing - initial state
         break;
-      case SplashVersionCheckComplete(:final isUpdateRequired):
-        if (isUpdateRequired) {
-          await _showForceUpdateDialog(context);
-        } else {
-          // No update required, complete splash screen
-          context.read<SplashCubit>().completeSplash();
-        }
       case SplashComplete():
         // Splash screen is complete - router will handle navigation
-        // based on auth state
         break;
-      case SplashVersionCheckError():
-        // Show version check error dialog
-        await _showVersionCheckErrorDialog(context);
       case SplashCriticalError():
         // Critical error state - router will handle navigation to error screen
         break;
     }
   }
 
-  Future<void> _subscriptionBlocListener(
-    BuildContext context,
-    SubscriptionState state,
-  ) async {
-    switch (state) {
-      case SubscriptionError():
-        // Show same connection error dialog as version check
-        await _showSubscriptionErrorDialog(context);
-      case SubscriptionInitial():
-      case SubscriptionLoading():
-      case SubscriptionLoaded():
-        // Do nothing for other states
-        break;
-    }
-  }
-
-  Future<void> _showForceUpdateDialog(BuildContext context) async {
-    await showUpdateRequiredDialog(
-      context: context,
-      onUpdate:
-          () => AppStoreLauncher.launchStore(
-            onLaunchFailed: () {
-              if (context.mounted) {
-                showErrorSnackBar(
-                  context: context,
-                  text: context.appLocalizations.updateLaunchFailedMessage,
-                );
-              }
-            },
-          ),
-    );
-  }
-
-  Future<void> _showVersionCheckErrorDialog(BuildContext context) async {
-    // Capture cubits before showing dialog
-    final splashCubit = context.read<SplashCubit>();
-    final appMetaDataCubit = context.read<AppMetaDataCubit>();
-
-    await showConnectionErrorDialog(
-      context: context,
-      onRetry: () {
-        final appMetaData = appMetaDataCubit.state;
-        switch (appMetaData) {
-          case AppMetaDataInitial():
-          case AppMetaDataLoading():
-          case AppMetaDataLoadingFailed():
-            // Can't retry without metadata
-            break;
-          case AppMetaDataLoaded(:final buildNumber):
-            splashCubit.checkVersion(buildNumber);
-        }
-      },
-    );
-  }
-
-  Future<void> _showSubscriptionErrorDialog(BuildContext context) async {
-    // Capture bloc before showing dialog
-    final subscriptionBloc = context.read<SubscriptionBloc>();
-
-    // Reuse the same connection error dialog as version check
-    await showConnectionErrorDialog(
-      context: context,
-      onRetry: () {
-        // Retry fetching subscription
-        subscriptionBloc.add(const FetchSubscription());
-      },
-    );
-  }
 }
