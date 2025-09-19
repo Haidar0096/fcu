@@ -8,7 +8,7 @@ import 'package:{{proj_name}}/foundation/ui/models/models.dart';
 part 'jokes_state.dart';
 
 /// Manages the state and logic for fetching random jokes
-final class JokesCubit extends Cubit<JokesState> with CubitUtils {
+class JokesCubit extends Cubit<JokesState> with CubitUtils {
   JokesCubit({
     required JokesApi jokesApi,
     required AppLogger appLogger,

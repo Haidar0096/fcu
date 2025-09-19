@@ -8,7 +8,7 @@ part 'splash_state.dart';
 
 /// Manages splash screen initialization flow
 /// Waits for app metadata to load, then shows splash for 1.5 seconds
-final class SplashCubit extends Cubit<SplashState> with CubitUtils {
+class SplashCubit extends Cubit<SplashState> with CubitUtils {
   SplashCubit({
     required AppLogger appLogger,
   }) : _appLogger = appLogger,

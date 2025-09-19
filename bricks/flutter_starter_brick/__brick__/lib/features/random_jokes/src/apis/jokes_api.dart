@@ -4,7 +4,7 @@ import 'package:{{proj_name}}/foundation/networking/http_client/http_client.dart
 import 'package:{{proj_name}}/foundation/networking/models/models.dart';
 
 /// API for random jokes operations
-final class JokesApi {
+class JokesApi {
   const JokesApi(
     this._httpClient,
   );
