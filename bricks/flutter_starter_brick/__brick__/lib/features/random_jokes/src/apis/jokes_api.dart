@@ -1,4 +1,4 @@
-import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/models/dtos/joke_dto.dart';
+import 'package:{{proj_name}}/features/random_jokes/src/models/dtos/joke_dto.dart';
 import 'package:{{proj_name}}/foundation/basic_types/basic_types.dart';
 import 'package:{{proj_name}}/foundation/networking/http_client/http_client.dart';
 import 'package:{{proj_name}}/foundation/networking/models/models.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/apis/jokes_api.dart';
-import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/models/ui_models/ui_joke.dart';
+import 'package:{{proj_name}}/features/random_jokes/src/apis/jokes_api.dart';
+import 'package:{{proj_name}}/features/random_jokes/src/models/ui_models/ui_joke.dart';
 import 'package:{{proj_name}}/foundation/blocs/bloc_utils/bloc_utils.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:{{proj_name}}/foundation/ui/models/models.dart';

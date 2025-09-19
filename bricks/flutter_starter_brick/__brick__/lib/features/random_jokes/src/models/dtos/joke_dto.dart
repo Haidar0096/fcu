@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/models/ui_models/ui_joke.dart';
+import 'package:{{proj_name}}/features/random_jokes/src/models/ui_models/ui_joke.dart';
 import 'package:{{proj_name}}/foundation/ui/mixins/mixins.dart';
 
 part 'joke_dto.g.dart';
