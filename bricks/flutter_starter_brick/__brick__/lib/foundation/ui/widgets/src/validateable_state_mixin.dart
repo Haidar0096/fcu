@@ -1,6 +1,7 @@
-import 'package:{{proj_name}}/infrastructure/ui/animations/animations.dart';
-import 'package:{{proj_name}}/infrastructure/ui/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:lia/foundation/ui/animations/animations.dart';
+import 'package:lia/foundation/ui/theme/theme.dart';
+import 'package:lia/foundation/ui/widgets/widgets.dart';
 
 /// State that handles the validation of a widget.
 /// - V is the type of the values that can be validated.
@@ -20,6 +21,11 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
   /// Whether the widget currently has a validation error.
   @protected
   bool get hasError => errorMessage != null;
+
+  /// Whether validation has been triggered at least once.
+  /// Used to determine if auto-validation should occur on value changes.
+  @protected
+  bool hasValidatedOnce = false;
 
   /// The validator to be used to validate the values of the widget.
   @protected
@@ -42,7 +48,10 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
     if (showErrorMessage) ...[
       SizeTransition(
         sizeFactor: animationController,
-        child: SizedBox(height: hasError ? 5 : 0),
+        child:
+            hasError
+                ? const Spacing.vertical(SpacingSize.xxSmall)
+                : const SizedBox.shrink(),
       ),
       SizeTransition(
         sizeFactor: animationController,
@@ -80,12 +89,19 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
   /// A function that validates the state of the widget and returns true
   /// if it is valid, or false otherwise.
   bool validate() {
+    hasValidatedOnce = true;
     final validatorFunction = validator;
     if (validatorFunction == null) return true;
 
     final validationMessage = validatorFunction(currentValue);
 
-    errorMessage = validationMessage;
+    // Only update state if the error message has changed
+    if (errorMessage != validationMessage) {
+      setState(() {
+        errorMessage = validationMessage;
+      });
+    }
+
     if (hasError) {
       animationController.forward();
     } else {
@@ -93,5 +109,14 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
     }
 
     return !hasError;
+  }
+
+  /// Internal validation method that only runs if validation has been
+  /// triggered at least once.
+  @protected
+  void autoValidate() {
+    if (hasValidatedOnce) {
+      validate();
+    }
   }
 }
