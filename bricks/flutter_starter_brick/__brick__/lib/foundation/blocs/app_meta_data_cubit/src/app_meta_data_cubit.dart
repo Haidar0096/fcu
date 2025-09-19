@@ -3,10 +3,9 @@ import 'dart:io';
 
 import 'package:android_id/android_id.dart';
 import 'package:bloc/bloc.dart';
-import 'package:{{proj_name}}/infrastructure/dependency_injection/dependency_injection.dart';
-import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:lia/foundation/logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 part 'app_meta_data_state.dart';
@@ -16,7 +15,6 @@ part 'app_meta_data_state.dart';
 /// This cubit handles the retrieval and storage of various device and
 /// application information, such as device ID, OS type and version,
 /// app version, and build number.
-@LazySingletonService()
 class AppMetaDataCubit extends Cubit<AppMetaDataState> {
   AppMetaDataCubit(this._logger, this._errorLogger)
     : super(const AppMetaDataInitial());
