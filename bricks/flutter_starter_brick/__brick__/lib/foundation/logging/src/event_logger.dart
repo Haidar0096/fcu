@@ -1,7 +1,4 @@
-import 'package:{{proj_name}}/infrastructure/dependency_injection/dependency_injection.dart';
-
 /// A singleton class that handles event logging.
-@LazySingletonService()
 class EventLogger {
   const EventLogger();
 
