@@ -1,28 +1,46 @@
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
-import 'package:{{proj_name}}/infrastructure/dependency_injection/dependency_injection.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:lia/foundation/logging/logging.dart';
 
 /// Manages the locale of the app.
-@LazySingletonService()
 class LocalizationCubit extends HydratedCubit<Language> {
-  // initially the locale is set to english
-  LocalizationCubit([@ignoreParameter Language? initialLanguage])
-    : super(initialLanguage ?? Language.english);
+  LocalizationCubit({
+    required AppLogger appLogger,
+    Language? initialLanguage,
+  }) : _appLogger = appLogger,
+       super(initialLanguage ?? Language.english);
+
+  final AppLogger _appLogger;
+  static const String _tag = 'LocalizationCubit';
 
   /// Sets the language to the given [language].
-  void setLanguage(Language language) => emit(language);
+  void setLanguage(Language language) {
+    _appLogger.log(
+      'Setting language to: ${language.displayName} (${language.code})',
+      tag: _tag,
+    );
+    emit(language);
+  }
 
   /// Sets the language to the next language in the list of languages.
-  void setNextLanguage() => emit(state.nextLanguage);
+  void setNextLanguage() {
+    final nextLanguage = state.nextLanguage;
+    _appLogger.log(
+      'Setting next language to: ${nextLanguage.displayName} '
+      '(${nextLanguage.code})',
+      tag: _tag,
+    );
+    emit(nextLanguage);
+  }
 
   @override
   Language? fromJson(Map<String, dynamic> json) =>
       Language.values.firstWhereOrNull(
-            (l) => l.code == json['language_code'],
+        (l) => l.code == json['language_code'],
       ) ??
-          Language.english;
+      Language.english;
 
   @override
   Map<String, dynamic>? toJson(Language state) => {'language_code': state.code};
@@ -30,8 +48,7 @@ class LocalizationCubit extends HydratedCubit<Language> {
 
 /// Instances of this type represent a language in the supported languages set.
 enum Language {
-  english(textDirection: TextDirection.ltr, displayName: 'English', code: 'en'),
-  arabic(textDirection: TextDirection.rtl, displayName: 'العربية', code: 'ar');
+  english(textDirection: TextDirection.ltr, displayName: 'English', code: 'en');
 
   const Language({
     required this.textDirection,
