@@ -34,5 +34,6 @@ class ThemeDefaults {
 
   // Component-specific defaults
   static const double scrollbarThickness = 10; // Scrollbar thumb thickness
+  static const double scrollbarThumbOpacity = 0.8; // Scrollbar thumb opacity for subtle appearance
   static const double checkboxBorderWidth = 1.5; // Checkbox border width (slightly thicker for visibility)
 }
