@@ -1,6 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:{{proj_name}}/foundation/networking/dio_http_client/src/request_data_sanitizer.dart';
 
+/// Builds a detailed error message from a [DioException] for logging purposes.
+///
+/// Sanitizes sensitive data like headers and request body before including
+/// them in the error message to prevent leaking secrets in logs.
 String buildApiErrorReportingMessageFromDioException(
   DioException dioException,
 ) {
