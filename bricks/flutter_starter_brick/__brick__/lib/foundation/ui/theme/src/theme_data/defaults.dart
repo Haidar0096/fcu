@@ -25,6 +25,7 @@ class ThemeDefaults {
   // Opacity values
   static const int disabledAlpha = 102; // ~0.4 opacity for custom widgets
   static const double buttonDisabledOverlayAlpha = 0.12; // Disabled/overlay opacity for buttons
+  static const double materialDisabledOpacity = 0.38; // Material Design standard for disabled states
 
   // Text size defaults
   static const double buttonTextSize = 16; // Standard button text size
@@ -32,4 +33,5 @@ class ThemeDefaults {
 
   // Component-specific defaults
   static const double scrollbarThickness = 10; // Scrollbar thumb thickness
+  static const double checkboxBorderWidth = 1.5; // Checkbox border width (slightly thicker for visibility)
 }
