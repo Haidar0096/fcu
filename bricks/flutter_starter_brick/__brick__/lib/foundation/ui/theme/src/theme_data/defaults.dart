@@ -27,6 +27,8 @@ class ThemeDefaults {
   static const double buttonDisabledOverlayAlpha = 0.12; // Disabled/overlay opacity for buttons
   static const double materialDisabledOpacity = 0.38; // Material Design standard for disabled states
   static const double textFieldEnabledBorderOpacity = 0.2; // Subtle border for enabled text fields
+  static const double textSelectionOpacity = 0.4; // Text selection highlight opacity
+  static const double scrimOpacity = 0.32; // Modal scrim/overlay opacity
 
   // Text size defaults
   static const double buttonTextSize = 16; // Standard button text size
