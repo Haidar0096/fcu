@@ -28,3 +28,13 @@ const Color mutedGray = Color(0xFF2A2A2A);
 
 // Outline colors
 const Color outlineGrey = Color(0xFF8A8F99);
+
+// Fixed palette colors (Material 3 tonal elevation - shared between themes)
+const Color primaryFixedDim = Color(0xFF8E9DE1);
+const Color onPrimaryFixedVariant = Color(0xFF24315D);
+const Color secondaryFixedDim = Color(0xFF5EABB2);
+const Color onSecondaryFixed = Color(0xFF002D31);
+const Color onSecondaryFixedVariant = Color(0xFF004D54);
+const Color tertiaryFixedDim = Color(0xFFFFC46F);
+const Color onTertiaryFixed = Color(0xFF302100);
+const Color onTertiaryFixedVariant = Color(0xFF6E4B00);
