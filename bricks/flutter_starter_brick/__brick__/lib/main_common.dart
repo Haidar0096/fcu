@@ -2,11 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:{{proj_name}}/app/app.dart';
+import 'package:{{proj_name}}/dependency_injection/dependency_injection.dart';
+import 'package:{{proj_name}}/foundation/environments/environments.dart';
+import 'package:{{proj_name}}/foundation/logging/logging.dart';
+import 'package:{{proj_name}}/foundation/ui/navigation/navigation.dart';
+import 'package:{{proj_name}}/foundation/ui/services/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:{{proj_name}}/shared/variables/variables.dart';
-import 'package:{{proj_name}}/shared/widgets/widgets.dart';
-import 'package:{{proj_name}}/infrastructure/environments/environments.dart';
-import 'package:{{proj_name}}/infrastructure/logging/logging.dart';
 
 Future<void> mainCommon(Environment env) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +21,14 @@ Future<void> mainCommon(Environment env) async {
   // Set app to fullscreen initially without any system bars
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
-  await serviceProvider.init(environment: env);
+  // Initialize the service provider
+  await ServiceLocator.init(environment: env);
+
+  // Initialize GlobalLoader singleton
+  GlobalLoader.init(
+    appLogger: serviceLocator.get<AppLogger>(),
+    rootNavigatorKey: rootNavigatorKey,
+  );
 
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory:
@@ -28,7 +37,7 @@ Future<void> mainCommon(Environment env) async {
             : HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
 
-  serviceProvider.get<ErrorLogger>().registerErrorHandlers();
+  serviceLocator.get<ErrorLogger>().registerErrorHandlers();
 
   runApp(const RootAppWidget());
 }
