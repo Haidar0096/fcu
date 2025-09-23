@@ -1,4 +1,7 @@
+# Install and run:
+# dart pub add flutter_launcher_icons
 # dart run flutter_launcher_icons
+
 flutter_launcher_icons:
 
   android: "launcher_icon"
