@@ -331,8 +331,6 @@ class NewProjectCommand extends Command<int> {
     final masonAddResult = await Process.run('mason', [
       'add',
       'flutter_starter_brick',
-      '--path',// todo remove this and the next line before publishing
-      '/Users/haidarmehsen/dev/projects/flutter/projects/flutter_cli_utils/bricks/flutter_starter_brick'
     ], workingDirectory: creationData.outputDirectory);
     if (masonAddResult.exitCode != 0) {
       throw Exception(
@@ -411,10 +409,11 @@ class NewProjectCommand extends Command<int> {
       creationData.projectDescription,
       '--org',
       creationData.organization,
-      if (!isPluginFfi) ...[
+      // iOS language is only supported for plugin templates
+      if (isPlugin && !isPluginFfi)
         '--ios-language=${creationData.iosLanguage}',
-        '--android-language=${creationData.androidLanguage}',
-      ],
+      // Android language is supported for app and plugin templates
+      if (!isPluginFfi) '--android-language=${creationData.androidLanguage}',
       '-t',
       creationData.template,
       if (isApp) '--empty',
