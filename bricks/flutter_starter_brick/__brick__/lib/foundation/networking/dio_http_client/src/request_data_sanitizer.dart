@@ -3,12 +3,12 @@ class RequestDataSanitizer {
   RequestDataSanitizer._();
 
   // TODO({{dev_name}}): Add any custom sensitive headers specific to your API
-  static const _sensitiveHeaders = {
+  static const Set<String> _sensitiveHeaders = {
     // 'authorization', // Example: Add your sensitive headers here
   };
 
   // TODO({{dev_name}}): Add any custom sensitive fields specific to your API
-  static const _sensitiveBodyFields = {
+  static const Set<String> _sensitiveBodyFields = {
     // 'password', // Example: Add your sensitive fields here
   };
 

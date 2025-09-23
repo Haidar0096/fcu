@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:{{proj_name}}/dependency_injection/src/instance_names.dart';
 import 'package:{{proj_name}}/features/random_jokes/random_jokes.dart';
+import 'package:{{proj_name}}/features/random_jokes/src/apis/jokes_api.dart';
 import 'package:{{proj_name}}/features/splash_screen/splash_screen.dart';
 import 'package:{{proj_name}}/foundation/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
 import 'package:{{proj_name}}/foundation/environment_variables/environment_variables.dart';
@@ -45,8 +46,8 @@ void registerInstances(GetIt getIt, {required Environment environment}) {
       ),
       instanceName: InstanceNames.publicBackendHttpClient.name,
     )
-    ..registerLazySingleton<RandomJokesApi>(
-      () => RandomJokesApi(
+    ..registerLazySingleton<JokesApi>(
+      () => JokesApi(
         getIt.get<HttpClient>(
           instanceName: InstanceNames.publicBackendHttpClient.name,
         ),

@@ -8,11 +8,18 @@ Future<void> run(HookContext context) async {
 
   Future<void> _executeCommand(
     String message,
-    Future<void> Function() fn,
+    Future<ProcessResult> Function() fn,
   ) async {
     progress = context.logger.progress(message);
-    await fn();
-    progress.complete();
+    final result = await fn();
+    if (result.exitCode != 0) {
+      progress.fail('Failed: ${result.stderr}');
+      context.logger.err('Command failed with exit code ${result.exitCode}');
+      context.logger.err('stdout: ${result.stdout}');
+      context.logger.err('stderr: ${result.stderr}');
+    } else {
+      progress.complete();
+    }
   }
 
   await _executeCommand(
@@ -23,11 +30,11 @@ Future<void> run(HookContext context) async {
         'pub',
         'add',
         '--dev',
-        'very_good_analysis: ^10.0.0',
-        'build_runner: ^2.8.0',
-        'go_router_builder: ^4.0.1',
-        'build_verify: ^3.1.1',
-        'json_serializable: ^6.11.1'
+        'very_good_analysis:^10.0.0',
+        'build_runner:^2.8.0',
+        'go_router_builder:^4.0.1',
+        'build_verify:^3.1.1',
+        'json_serializable:^6.11.1'
       ],
     ),
   );
@@ -39,20 +46,20 @@ Future<void> run(HookContext context) async {
       [
         'pub',
         'add',
-        'get_it: ^8.2.0',
-        'hydrated_bloc: ^10.1.1',
-        'flutter_bloc: ^9.1.1',
-        'bloc: ^9.0.0',
-        'path_provider: ^2.1.5',
-        'collection: ^1.19.1',
-        'android_id: ^0.4.0',
-        'device_info_plus: ^12.1.0',
-        'package_info_plus: ^9.0.0',
-        'go_router: ^16.2.2',
-        'flutter_animate: ^4.5.2',
-        'rxdart: ^0.28.0',
-        'dio: ^5.9.0',
-        'json_annotation: ^4.9.0'
+        'get_it:^8.2.0',
+        'hydrated_bloc:^10.1.1',
+        'flutter_bloc:^9.1.1',
+        'bloc:^9.0.0',
+        'path_provider:^2.1.5',
+        'collection:^1.19.1',
+        'android_id:^0.4.0',
+        'device_info_plus:^12.1.0',
+        'package_info_plus:^9.0.0',
+        'go_router:^16.2.2',
+        'flutter_animate:^4.5.2',
+        'rxdart:^0.28.0',
+        'dio:^5.9.0',
+        'json_annotation:^4.9.0'
       ],
     ),
   );
@@ -70,20 +77,25 @@ Future<void> run(HookContext context) async {
   await _executeCommand(
     'Adding internet permission to android manifest',
     () async {
-      final file = File('android/app/src/main/AndroidManifest.xml');
-      final document = XmlDocument.parse(await file.readAsString());
-      final manifestElement = document.findElements('manifest').first;
-      final internetPermission = XmlElement(
-        XmlName('uses-permission'),
-        [
-          XmlAttribute(
-            XmlName('android:name'),
-            'android.permission.INTERNET',
-          ),
-        ],
-      );
-      manifestElement.children.insert(0, internetPermission);
-      await file.writeAsString(document.toXmlString(pretty: true));
+      try {
+        final file = File('android/app/src/main/AndroidManifest.xml');
+        final document = XmlDocument.parse(await file.readAsString());
+        final manifestElement = document.findElements('manifest').first;
+        final internetPermission = XmlElement(
+          XmlName('uses-permission'),
+          [
+            XmlAttribute(
+              XmlName('android:name'),
+              'android.permission.INTERNET',
+            ),
+          ],
+        );
+        manifestElement.children.insert(0, internetPermission);
+        await file.writeAsString(document.toXmlString(pretty: true));
+        return ProcessResult(0, 0, 'Success', '');
+      } catch (e) {
+        return ProcessResult(0, 1, '', e.toString());
+      }
     },
   );
 

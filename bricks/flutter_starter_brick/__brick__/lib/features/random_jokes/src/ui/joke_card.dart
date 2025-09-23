@@ -14,10 +14,10 @@ class JokeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
-    margin: const EdgeInsets.all(Spacing.medium),
+    margin: EdgeInsets.all(SpacingSize.medium.value),
     elevation: 2,
     child: Padding(
-      padding: const EdgeInsets.all(Spacing.large),
+      padding: EdgeInsets.all(SpacingSize.large.value),
       child: Text(
         joke.content,
         style: context.typography?.body2,

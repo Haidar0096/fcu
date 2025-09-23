@@ -1,6 +1,8 @@
-# CLAUDE.md - Flutter CLI Utils Project Guide
+# CLAUDE.md
 
-This document provides comprehensive guidance for Claude Code when working with the Flutter CLI Utils project. It covers the complete project architecture, implementation patterns, and workflows.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+⚠️ **Version 4.0.0 Update**: Major architecture overhaul - migrated from `infrastructure/` to `foundation/` structure with cleaner organization and improved patterns.
 
 ## Project Overview
 
@@ -9,7 +11,6 @@ Flutter CLI Utils (`flutter_cli_utils`) is a command-line tool that generates pr
 ### Key Components
 1. **CLI Tool**: Command-line interface for project generation
 2. **Starter Brick**: Mason brick template providing a complete Flutter app architecture
-3. **Feature Brick**: Nested brick for adding new features to generated projects
 
 ## Architecture Overview
 
@@ -51,22 +52,22 @@ lib/
 │   │   ├── register_module.dart       # Manual registrations
 │   │   └── service_provider.dart      # DI abstraction
 │   └── dependency_injection.dart      # Public exports
-├── infrastructure/                     # Core utilities (abstract)
-│   ├── environments/                   # Environment definitions
-│   ├── l10n/                          # Localization setup
-│   ├── logging/                       # Logging abstraction
-│   ├── networking/                    # HTTP client, failures
-│   └── ui/                            # Themes, animations
-├── shared/                            # Project-specific shared code
-│   ├── blocs/                         # Shared Cubits
-│   ├── models/                        # Common models
-│   ├── networking/                    # HTTP implementation
-│   ├── variables/                     # Global variables
-│   └── widgets/                       # Reusable UI components
+├── foundation/                         # Core reusable modules
+│   ├── blocs/                         # Base cubits and utilities
+│   ├── environments/                   # Environment configuration
+│   ├── environment_variables/         # Environment-specific variables
+│   ├── extensions/                    # Dart extension methods
+│   ├── formatters/                    # Data formatters
+│   ├── l10n/                          # Localization infrastructure
+│   ├── logging/                       # AppLogger, ErrorLogger, EventLogger
+│   ├── models/                        # Shared DTOs and UI models
+│   ├── networking/                    # HTTP client, Result types
+│   ├── ui/                            # Themes, widgets, animations
+│   └── validators/                    # Form validators
 ├── features/                          # Feature modules
-│   ├── splash/                        # Splash screen
-│   ├── random_jokes/                  # Example feature
-│   └── error/                         # Error screen
+│   ├── splash_screen/                 # Splash with initialization
+│   ├── random_jokes/                  # Example feature with API
+│   └── error/                         # Global error screen
 ├── router/                            # Navigation setup
 └── resources/                         # Assets, translations
 ```
@@ -110,7 +111,14 @@ final class CancelError extends NetworkFailure {}
 final class UnknownError extends NetworkFailure {}
 ```
 
-### 3. UI Error Display Pattern
+### 3. Module Pattern
+
+Every module uses a consistent structure:
+- `src/` folder for private implementation
+- Barrel file for public exports
+- Only export what's actually needed by other modules
+
+### 4. UI Error Display Pattern
 
 Domain failures are wrapped in UI classes for presentation:
 
@@ -130,7 +138,7 @@ class UiNetworkFailure implements DisplayableUiModel {
 }
 ```
 
-### 4. Feature Structure Pattern
+### 5. Feature Structure Pattern
 
 Each feature follows this structure:
 
@@ -152,7 +160,7 @@ feature_name/
         └── feature_screen.dart
 ```
 
-### 5. Dependency Injection
+### 6. Dependency Injection
 
 Uses abstract ServiceProvider pattern over GetIt:
 
@@ -170,7 +178,7 @@ typedef SingletonService = Singleton;
 typedef LazySingletonService = LazySingleton;
 ```
 
-### 6. Environment System
+### 7. Environment System
 
 Three environments with sealed classes:
 
@@ -190,7 +198,7 @@ Each environment has its own:
 - API endpoints
 - DI registrations
 
-### 7. Navigation
+### 8. Navigation
 
 Type-safe routing with go_router:
 
@@ -219,6 +227,52 @@ class HomeRoute extends GoRouteData {
 - Generated routes using `go_router_builder`
 - Global navigator key accessible via `rootNavigatorKey`
 - Deep linking support out of the box
+
+## Common Development Commands
+
+### Build and Development
+```bash
+# Activate CLI locally for development
+sh -e scripts/activate.sh /path/to/project
+
+# Build version info (required after updating pubspec.yaml version)
+dart run build_runner build --delete-conflicting-outputs
+
+# Lint and analyze code
+dart analyze
+
+# Format code
+dart format .
+
+# Build executable
+dart compile exe bin/flutter_cli_utils.dart -o fcu
+
+# Run CLI directly without building
+dart run bin/flutter_cli_utils.dart [command] [options]
+```
+
+### Testing
+```bash
+# Run all tests (Note: test directory is currently empty)
+dart test
+
+# Test brick generation locally
+cd bricks/flutter_starter_brick
+mason make flutter_starter_brick --proj_name test_app --org_name com.test --dev_name developer --proj_desc "Test App"
+```
+
+### Mason Brick Commands
+```bash
+# Bundle brick for distribution
+cd bricks/flutter_starter_brick
+mason bundle -t universal
+
+# Clear mason cache if brick issues occur
+mason cache clear
+
+# Add brick locally for testing
+mason add flutter_starter_brick --path bricks/flutter_starter_brick
+```
 
 ## CLI Commands Reference
 
@@ -333,9 +387,18 @@ Uploads iOS builds to TestFlight using API key authentication.
 
 ### 1. Hardcoded Path Issue
 **File**: `lib/src/commands/new_project_command.dart`
-**Line**: 335
+**Lines**: 334-335
 **Issue**: Contains hardcoded path to brick location
 **TODO**: Must be removed before publishing to pub.dev
+
+```dart
+// Current (development):
+'--path',  // TODO remove this and the next line before publishing
+'/Users/haidarmehsen/dev/projects/flutter/projects/flutter_cli_utils/bricks/flutter_starter_brick'
+
+// Should be (for release):
+// Remove the --path flag and path entirely, let mason fetch from BrickHub
+```
 
 ### 2. App Configuration
 Generated apps are configured with:
@@ -345,26 +408,29 @@ Generated apps are configured with:
 - **Error handling**: Global error logger
 - **Linting**: very_good_analysis package
 
-### 3. Widget Library
-The starter brick includes 20+ custom widgets:
-- **Buttons**: MainButton, SecondaryButton
-- **Dialogs**: InfoDialog, custom bottom sheets
-- **Form Fields**: Various styled text fields
-- **Loaders**: GlobalLoader with different styles
-- **Images**: NetworkImageWithLoader
-- **Animations**: Extension methods for fade, scale, slide animations
-- **Wrappers**: RootScreen with safe area handling
+### 3. Logging Pattern
 
-### 2. Mason Variable System
+The generated app uses three specialized loggers:
+- **AppLogger**: Debug console logging (only in debug mode)
+- **ErrorLogger**: Production error reporting (Sentry, Crashlytics, etc.)
+- **EventLogger**: Analytics tracking
+
+**Key Rules**:
+- Network errors are logged ONLY in DioHttpClient
+- Cubits only log critical business errors (not network failures)
+- Never log in UI components
+- Always use both AppLogger and ErrorLogger for critical errors
+
+### 4. Mason Variable System
 The brick uses these variables:
 - `{{dev_name}}`: Developer name (used in TODO comments)
 - `{{proj_name}}`: Project name (with modifiers: `.snakeCase()`, `.pascalCase()`)
 - `{{org_name}}`: Organization identifier (e.g., com.example)
 - `{{proj_desc}}`: Project description
 
-### 3. Post-Generation Hook
+### 5. Post-Generation Hook
 The starter brick includes a `post_gen.dart` hook that automatically:
-- Adds 30+ dependencies (flutter_bloc, get_it, dio, go_router, etc.)
+- Adds 25+ dependencies (flutter_bloc, get_it, dio, go_router, etc.)
 - Adds dev dependencies (very_good_analysis, build_runner, mockito, etc.)
 - Adds internet permission to Android manifest
 - Runs `flutter clean` and `flutter pub get`
@@ -372,15 +438,14 @@ The starter brick includes a `post_gen.dart` hook that automatically:
 - Runs `flutter gen-l10n` for internationalization
 - Applies `dart fix --apply` and `dart format .`
 
-### 4. Code Generation Dependencies
+### 6. Code Generation Dependencies
 Generated apps use:
 - `json_serializable`: DTO serialization
 - `go_router_builder`: Type-safe routing
-- `injectable`: Dependency injection
 - `flutter_gen`: Asset generation
 
-### 5. Localization System
-- Supports English and Arabic out of the box
+### 7. Localization System
+- Supports English out of the box (Arabic structure ready)
 - ARB files in `resources/src/arb/`
 - Uses `flutter_localizations` package
 - Access via `context.appLocalizations.keyName`
@@ -404,8 +469,8 @@ Generated apps use:
 
 ### Modifying Error Handling
 
-1. Add new failure type to `infrastructure/networking/`
-2. Create corresponding UI wrapper in `shared/models/ui_models/`
+1. Add new failure type to `foundation/networking/models/`
+2. Create corresponding UI wrapper in `foundation/models/ui_models/`
 3. Add localized messages to ARB files
 4. Update state classes to use new failure types
 
@@ -455,6 +520,30 @@ Generated apps use:
    - Ensure ARB files are valid JSON
    - Run `flutter gen-l10n`
 
+## Version 4.0.0 Changes
+
+Major refactoring of the starter brick architecture:
+
+### Architecture Changes
+- **Migration**: `infrastructure/` → `foundation/` folder structure
+- **Module Pattern**: Consistent src + barrel file pattern throughout
+- **Simplified Widgets**: Removed complex/specific widgets, kept essentials
+- **Logger Optimization**: Removed duplicate logging, centralized in HTTP client
+- **Clean Separation**: Better organization of core vs app-specific code
+
+### Code Quality Improvements
+- Removed all hardcoded values to defaults classes
+- Fixed all import inconsistencies
+- Eliminated unused dependencies (~24MB reduction)
+- Streamlined localization (110 → 16 essential keys)
+- Enhanced documentation with comprehensive CLAUDE.md in generated projects
+
+### Development Experience
+- Clearer module boundaries with explicit exports
+- Better error handling patterns
+- Improved state management patterns
+- More maintainable codebase structure
+
 ## Future Enhancements
 
 1. Add comprehensive test coverage for CLI
@@ -470,14 +559,6 @@ Generated apps use:
 
 ## Additional Resources
 
-### Nested Feature Brick
-The starter brick includes a nested brick for generating new features:
-```bash
-# In generated project root
-mason make new_feature_brick --feature_name user_profile
-```
-
-This creates a complete feature structure following the established patterns.
 
 ### BLoC Utils
 The `CubitUtils` mixin provides safe state emission:
@@ -508,3 +589,19 @@ MyWidget().slideInFromBottom()
 
 ### Release Process
 For detailed release instructions for both the brick and CLI tool, see [RELEASE.md](./RELEASE.md)
+
+## Prerequisites and Dependencies
+
+### System Requirements
+
+- **Dart SDK**: 3.0.0 or higher
+- **Flutter SDK**: Required for generated projects
+- **Mason CLI**: Required for brick operations (`dart pub global activate mason_cli`)
+
+### CLI Development Dependencies
+
+- `args`: Command-line argument parsing
+- `cli_completion`: Shell completion support
+- `dcli`: Additional CLI utilities
+- `mason`: Brick template system
+- `build_runner`: Code generation (for version info)
