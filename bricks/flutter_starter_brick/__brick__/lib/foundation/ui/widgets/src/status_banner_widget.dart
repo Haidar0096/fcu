@@ -48,7 +48,7 @@ class StatusBannerWidget extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(StatusBannerDefaults.padding),
+        padding: EdgeInsets.all(SpacingSize.small.value),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -189,9 +189,8 @@ class _BannerColors {
 class StatusBannerDefaults {
   static const double horizontalMargin = 4;
   static const double verticalMargin = 8;
-  static const double padding = 16;
-  static const double iconSize = 18;
-  static const double loadingStrokeWidth = 2;
+  static const double iconSize = 18; // Intentionally smaller than ThemeDefaults.iconSize
+  static const double loadingStrokeWidth = 2; // Thinner than LoaderWidget for subtle appearance
   static const double shadowOpacity = 0.08;
   static const double shadowBlurRadius = 8;
   static const double shadowOffsetY = 2;
