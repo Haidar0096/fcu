@@ -1,12 +1,21 @@
 {
-  "connected": "Connected",
-  "disconnected": "Disconnected",
-  "oopsAnErrorHasOccurred": "Oops, an error has occurred",
-  "noValueSelected": "No value selected",
-  "tellMeAJoke": "Tell me a joke",
-  "networkErrorMessage": "A network error has occurred.",
-  "serverErrorMessage": "A server error has occurred.",
-  "timeoutErrorMessage": "Request has timed out.",
+  "@@locale": "en",
+  "networkErrorMessage": "Unable to connect. Please try again later.",
+  "serverErrorMessage": "Server error. Please try again later.",
+  "timeoutErrorMessage": "Request timed out. Please try again.",
   "requestCancelledMessage": "Request was cancelled.",
-  "unknownErrorMessage": "An unexpected error has occurred."
+  "unknownErrorMessage": "An unexpected error occurred. Please try again.",
+  "continueButton": "Continue",
+  "retry": "Retry",
+  "appTagline": "Your App Tagline",
+  "@appTagline": {
+    "description": "The app's tagline shown on splash screen"
+  },
+  "criticalErrorTitle": "Something went wrong",
+  "criticalErrorMessage": "A critical error occurred and the app cannot continue.",
+  "restartAppMessage": "Please close and restart the app to try again.",
+  "tellMeAJoke": "Tell me a joke",
+  "@tellMeAJoke": {
+    "description": "Button text to request a random joke"
+  }
 }
