@@ -1,6 +1,6 @@
 /// Parses backend error response and returns message and code.
 ({String? message, String? code})? backendErrorMessageParser(
-  dynamic response,
+  Object? response,
 ) => switch (response) {
   final Map<String, dynamic> map => (
     // Backend returns 'errorMessage' field, not 'message'

@@ -23,11 +23,11 @@ class RootAppWidget extends StatelessWidget {
                 debugShowCheckedModeBanner: false,
                 routerConfig: router,
                 theme: themeState.themeData,
-                builder: (context) => Scaffold(
+                builder: (context, child) => Scaffold(
                   resizeToAvoidBottomInset: false,
                   body: Overlay(
                     initialEntries: [
-                      OverlayEntry(builder: (context) => routerWidget!),
+                      OverlayEntry(builder: (context) => child!),
                     ],
                   ),
                 ),
