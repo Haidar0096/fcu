@@ -31,8 +31,8 @@ Future<void> run(HookContext context) async {
         'add',
         '--dev',
         'very_good_analysis:^10.0.0',
-        'build_runner:^2.8.0',
-        'go_router_builder:^4.0.1',
+        'build_runner:^2.7.1',
+        'go_router_builder:^3.0.0',
         'build_verify:^3.1.1',
         'json_serializable:^6.11.1'
       ],
