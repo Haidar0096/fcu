@@ -153,7 +153,7 @@ class _RandomJokesScreenRoute extends GoRouteData with _$_RandomJokesScreenRoute
       _getPageByPlatform<void>(
         pageKey: state.pageKey,
         child: BlocProvider(
-          create: (_) => serviceLocator.get<RandomJokesCubit>(),
+          create: (_) => serviceLocator.get<JokesCubit>(),
           child: const RandomJokesScreen(),
         ),
       );
