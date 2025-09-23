@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lia/foundation/ui/animations/animations.dart';
-import 'package:lia/foundation/ui/theme/theme.dart';
-import 'package:lia/foundation/ui/widgets/widgets.dart';
+import 'package:{{proj_name}}/foundation/ui/animations/animations.dart';
+import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
+import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
 /// State that handles the validation of a widget.
 /// - V is the type of the values that can be validated.
@@ -48,10 +48,9 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
     if (showErrorMessage) ...[
       SizeTransition(
         sizeFactor: animationController,
-        child:
-            hasError
-                ? const Spacing.vertical(SpacingSize.xxSmall)
-                : const SizedBox.shrink(),
+        child: hasError
+            ? const Spacing.vertical(SpacingSize.xxSmall)
+            : const SizedBox.shrink(),
       ),
       SizeTransition(
         sizeFactor: animationController,
@@ -60,8 +59,8 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
           opacity: hasError ? 1 : 0,
           child: Text(
             errorMessage ?? '',
-            style: context.typography?.error.copyWith(fontSize: 14),
-            maxLines: 2,
+            style: context.typography?.error.copyWith(fontSize: ValidateableStateMixinDefaults.errorFontSize),
+            maxLines: ValidateableStateMixinDefaults.errorMaxLines,
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -119,4 +118,9 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
       validate();
     }
   }
+}
+
+class ValidateableStateMixinDefaults {
+  static const double errorFontSize = 14;
+  static const int errorMaxLines = 2;
 }
