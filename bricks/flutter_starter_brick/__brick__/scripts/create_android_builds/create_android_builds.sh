@@ -2,13 +2,11 @@
 
 # This script builds Android APKs for all environments and architectures,
 # plus an AAB (App Bundle) for production release to Google Play.
-# It reads the android version name and code from a file called
-# versions present at the project root.
-# The output folder can be specified with the --output-dir parameter.
+# See README.md for detailed setup instructions.
 
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 VERSIONS_FILE="$PROJECT_ROOT/versions"
 
 # Initialize variables
