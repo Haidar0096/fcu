@@ -378,20 +378,6 @@ class NewProjectCommand extends Command<int> {
         '${masonMakeResult.stderr}',
       );
     }
-
-    // Add new_feature_brick
-    final masonAddNewFeatureBrickResult = await Process.run('mason', [
-      'add',
-      'new_feature_brick',
-      '--path',
-      './bricks/new_feature_brick/',
-    ], workingDirectory: creationData.outputDirectory);
-    if (masonAddNewFeatureBrickResult.exitCode != 0) {
-      throw Exception(
-        'Failed to run `mason add new_feature_brick` in project:\n'
-        '${masonAddNewFeatureBrickResult.stderr}',
-      );
-    }
   }
 
   void _logDryRunDetails(_FlutterProjectCreationData creationData) =>
@@ -423,10 +409,11 @@ class NewProjectCommand extends Command<int> {
       creationData.projectDescription,
       '--org',
       creationData.organization,
-      if (!isPluginFfi) ...[
+      // iOS language is only supported for plugin templates
+      if (isPlugin && !isPluginFfi)
         '--ios-language=${creationData.iosLanguage}',
-        '--android-language=${creationData.androidLanguage}',
-      ],
+      // Android language is supported for app and plugin templates
+      if (!isPluginFfi) '--android-language=${creationData.androidLanguage}',
       '-t',
       creationData.template,
       if (isApp) '--empty',

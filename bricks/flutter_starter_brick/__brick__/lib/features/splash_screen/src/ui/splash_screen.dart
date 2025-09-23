@@ -1,74 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:{{proj_name}}/common/variables/variables.dart';
-import 'package:{{proj_name}}/infrastructure/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
-import 'package:{{proj_name}}/infrastructure/ui/theme/theme.dart';
-import 'package:{{proj_name}}/infrastructure/ui/widgets/widgets.dart';
+import 'package:{{proj_name}}/features/splash_screen/src/blocs/splash_cubit/splash_cubit.dart';
+import 'package:{{proj_name}}/foundation/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
+import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
+import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
+import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
-class SplashScreen extends StatefulWidget {
+/// Initial loading screen shown when the app starts.
+///
+/// This screen handles:
+/// - App metadata initialization
+/// - Shows splash for 1.5 seconds then navigates to main screen
+class SplashScreen extends StatelessWidget {
   const SplashScreen({
-    required this.onShouldNavigateToHomeScreen,
-    required this.onShouldNavigateToErrorScreen,
     super.key,
   });
 
-  static const routeName = 'splash_screen';
-
-  final void Function() onShouldNavigateToHomeScreen;
-
-  final void Function() onShouldNavigateToErrorScreen;
-
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future<void>.delayed(
-      const Duration(milliseconds: 1500),
-    ).then((_) => serviceProvider.get<AppMetaDataCubit>().init());
-  }
-
-  Future<void> _enableEdgeToEdge() async {
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  }
-
-  @override
-  Widget build(BuildContext context) =>
-      BlocConsumer<AppMetaDataCubit, AppMetaDataState>(
-        listener: (context, appMetaDataState) async {
-          switch (appMetaDataState) {
-            case AppMetaDataInitial():
-            case AppMetaDataLoading():
-              // no action needed for these states
-              break;
-            case AppMetaDataLoaded():
-              await _enableEdgeToEdge();
-              widget.onShouldNavigateToHomeScreen();
-            case AppMetaDataLoadingFailed():
-              await _enableEdgeToEdge();
-              widget.onShouldNavigateToErrorScreen();
-          }
-        },
-        builder:
-            (context, appMetaDataState) => RootScreenWidget(
-              backgroundColor: context.themeData.colorScheme.surface,
-              applySafeArea: false,
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(30),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: const AspectRatio(
-                      aspectRatio: 2 / 1,
-                      child: FlutterLogo(),
-                    ),
-                  ),
-                ),
+  Widget build(BuildContext context) => BlocListener<AppMetaDataCubit, AppMetaDataState>(
+    listener: _metaDataCubitListener,
+    child: RootScreenWidget(
+      applySafeArea: false,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // App Name
+            Text(
+              '{{proj_name.upperCase()}}',
+              style: context.typography?.title1.copyWith(
+                letterSpacing: 8,
               ),
             ),
-      );
+            const Spacing.vertical(SpacingSize.xSmall),
+            Text(
+              context.appLocalizations.appTagline,
+              style: context.typography?.body4.copyWith(
+                color: context.themeData.colorScheme.onSurface.withValues(
+                  alpha: 0.7,
+                ),
+                letterSpacing: 2,
+              ),
+            ),
+            const Spacing.vertical(SpacingSize.large),
+            const LoaderWidget(size: 40),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  void _metaDataCubitListener(BuildContext context, AppMetaDataState state) {
+    switch (state) {
+      case AppMetaDataInitial():
+      case AppMetaDataLoading():
+        // Do nothing - waiting for metadata to load
+        break;
+      case AppMetaDataLoadingFailed():
+        // Emit critical error state for metadata loading failure
+        // This is unrecoverable and requires app restart
+        context.read<SplashCubit>().onMetadataLoadingFailed(
+          errorMessage: context.appLocalizations.criticalErrorMessage,
+        );
+      case AppMetaDataLoaded():
+        context.read<SplashCubit>().onMetadataLoaded();
+    }
+  }
 }

@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # This script builds the app in release mode and uploads it to TestFlight.
-# It reads the iOS version name and build number from a file called
-# versions present at the project root.
+# See README.md for detailed setup instructions.
 
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -40,8 +39,8 @@ fi
 api_key=$(cat "$API_KEY_FILE")
 issuer_id=$(cat "$ISSUER_ID_FILE")
 
-# Set the main Dart file
-main_file="lib/main.dart"
+# Set the main Dart file (production for TestFlight)
+main_file="lib/main_production.dart"
 
 # Build IPA
 echo "🚀 Building IPA for version $ios_version_name ($ios_build_number)..."

@@ -1,1 +1,1 @@
-export 'src/dependency_injection.dart';
+export 'src/service_locator.dart';

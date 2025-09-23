@@ -1,6 +1,15 @@
 {
-  "connected": "متصل",
-  "disconnected": "غير متصل",
-  "oopsAnErrorHasOccurred": "عذرًا، حدث خطأ",
-  "noValueSelected": "لم يتم اختيار قيمة"
+  "@@locale": "ar",
+  "networkErrorMessage": ".غير قادر على الاتصال، يرجى المحاولة مرة أخرى لاحقاً",
+  "serverErrorMessage": ".خطأ في الخادم، يرجى المحاولة مرة أخرى لاحقاً",
+  "timeoutErrorMessage": ".انتهت مهلة الطلب، يرجى المحاولة مرة أخرى",
+  "requestCancelledMessage": "تم إلغاء الطلب",
+  "unknownErrorMessage": ".حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى",
+  "continueButton": "متابعة",
+  "retry": "إعادة المحاولة",
+  "appTagline": "شعار التطبيق",
+  "criticalErrorTitle": ".حدث خطأ ما",
+  "criticalErrorMessage": ".حدث خطأ خطير ولا يمكن للتطبيق المتابعة",
+  "restartAppMessage": ".يرجى إغلاق التطبيق وإعادة تشغيله للمحاولة مرة أخرى",
+  "tellMeAJoke": ".أخبرني بنكتة"
 }
