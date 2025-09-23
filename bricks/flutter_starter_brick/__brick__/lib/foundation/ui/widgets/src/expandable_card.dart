@@ -131,10 +131,16 @@ class ExpandableCardState extends State<ExpandableCard>
         widget.child,
         SizeTransition(
           sizeFactor: _expandAnimation,
-          axisAlignment: -1,
+          axisAlignment: ExpandableCardDefaults.axisAlignment,
           child: widget.expandedChild,
         ),
       ],
     );
   }
+}
+
+class ExpandableCardDefaults {
+  static const Duration duration = Duration(milliseconds: 300);
+  static const Curve curve = Curves.easeInOut;
+  static const double axisAlignment = -1; // -1 = top, 0 = center, 1 = bottom
 }
