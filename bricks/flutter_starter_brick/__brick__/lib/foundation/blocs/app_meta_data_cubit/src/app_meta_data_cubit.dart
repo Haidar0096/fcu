@@ -5,7 +5,7 @@ import 'package:android_id/android_id.dart';
 import 'package:bloc/bloc.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:lia/foundation/logging/logging.dart';
+import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 part 'app_meta_data_state.dart';

@@ -2,36 +2,21 @@ import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:lia/foundation/logging/logging.dart';
 
 /// Manages the locale of the app.
 class LocalizationCubit extends HydratedCubit<Language> {
   LocalizationCubit({
-    required AppLogger appLogger,
     Language? initialLanguage,
-  }) : _appLogger = appLogger,
-       super(initialLanguage ?? Language.english);
-
-  final AppLogger _appLogger;
-  static const String _tag = 'LocalizationCubit';
+  }) : super(initialLanguage ?? Language.english);
 
   /// Sets the language to the given [language].
   void setLanguage(Language language) {
-    _appLogger.log(
-      'Setting language to: ${language.displayName} (${language.code})',
-      tag: _tag,
-    );
     emit(language);
   }
 
   /// Sets the language to the next language in the list of languages.
   void setNextLanguage() {
     final nextLanguage = state.nextLanguage;
-    _appLogger.log(
-      'Setting next language to: ${nextLanguage.displayName} '
-      '(${nextLanguage.code})',
-      tag: _tag,
-    );
     emit(nextLanguage);
   }
 

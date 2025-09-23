@@ -1,3 +1,4 @@
+
 # 0.1.0+1
 
 - Initial release.
@@ -59,3 +60,6 @@ some files and folders.
 
 # 3.2.2
 - Fixed a wrong import.
+
+# 4.0.0
+- Complete architecture overhaul

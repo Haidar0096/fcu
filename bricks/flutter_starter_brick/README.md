@@ -3,23 +3,97 @@
 [![Powered by Mason](https://img.shields.io/endpoint?url=https%3A%2F%2Ftinyurl.com%2Fmason-badge)](https://github.com/felangel/mason)
 
 A production-ready Flutter project starter template with clean architecture, comprehensive
-infrastructure, and best practices built-in.
+foundation modules, and best practices built-in.
 
 ## Features
 
-- [✓] **Clean Architecture**: Feature-based structure with clear separation of concerns
+### Architecture & Structure
+- [✓] **Clean Architecture**: Feature-based modular structure with clear separation of concerns
+- [✓] **Foundation Layer**: Reusable core modules (networking, UI, logging, etc.)
+- [✓] **Module Pattern**: Consistent src + barrel file pattern for encapsulation
 - [✓] **Multiple Environments**: Development, staging, and production configurations
-- [✓] **Comprehensive Networking**: Type-safe HTTP client, Result types, interceptors, error logging
-- [✓] **State Management**: BLoC pattern with Cubit, Hydrated BLoC, utility mixins
-- [✓] **Dependency Injection**: Abstract service provider with GetIt implementation
-- [✓] **Rich UI Components**: 20+ customizable widgets, theming system, animations
+
+### Development Experience
+- [✓] **Type Safety**: Sealed classes, Result types, exhaustive pattern matching
+- [✓] **State Management**: BLoC pattern with Cubit, Hydrated BLoC, race condition prevention
+- [✓] **Dependency Injection**: Abstract service provider pattern with GetIt
+- [✓] **Error Handling**: Result type pattern, no exceptions, user-friendly messages
+- [✓] **Logging System**: Structured logging with separation between debug, error, and analytics
+
+### Networking & Data
+- [✓] **HTTP Client**: Type-safe, Result-based, with proper error handling
+- [✓] **DTO Pattern**: Clean separation between API contracts and UI models
+- [✓] **Error Recovery**: Network failure handling with retry capabilities
+
+### UI & User Experience
+- [✓] **Rich UI Components**: 15+ customizable widgets following Material 3
+- [✓] **Theming System**: Light/dark themes with persistent preferences
 - [✓] **Internationalization**: Multi-language support with ARB files
-- [✓] **Error Handling**: Global boundaries, network errors, user-friendly messages
-- [✓] **Internet Connectivity**: Automatic detection and user feedback
-- [✓] **Developer Tools**: Feature generation brick, logging system
-- [✓] **Type Safety**: Sealed classes, Result types, compile-time safety
-- [✓] **Scripts**: APK build for all platforms, TestFlight upload
-- [✗] **GitHub Actions (Coming Soon)**: Release to GitHub, Google Play, TestFlight
+- [✓] **Responsive Design**: Adaptive layouts for different screen sizes
+- [✓] **Animations**: Pre-built animation utilities and extensions
+
+### Developer Tools
+- [✓] **CLAUDE.md Documentation**: Comprehensive architecture and pattern guide
+- [✓] **Build Scripts**: APK generation for all architectures and environments
+- [✓] **TestFlight Upload**: Automated iOS distribution script
+- [✗] **GitHub Actions (Coming Soon)**: CI/CD pipelines
+
+## Project Structure
+
+The generated project follows a clean, modular architecture:
+
+```
+lib/
+├── app/                      # Application root widget
+├── dependency_injection/     # Service registration
+├── features/                 # Feature modules
+│   ├── splash_screen/       # Splash with initialization
+│   ├── random_jokes/        # Example feature
+│   └── error/              # Error handling screen
+├── foundation/              # Core reusable modules
+│   ├── blocs/              # Base cubits and utilities
+│   ├── environments/       # Environment configuration
+│   ├── l10n/              # Localization
+│   ├── logging/           # AppLogger, ErrorLogger
+│   ├── networking/        # HTTP client, Result types
+│   ├── ui/                # Themes, widgets, animations
+│   └── validators/        # Form validators
+├── resources/              # Assets, fonts, translations
+├── router/                 # Type-safe navigation
+├── main_development.dart   # Dev entry point
+├── main_staging.dart       # Staging entry point
+├── main_production.dart    # Production entry point
+└── main_common.dart        # Shared initialization
+```
+
+## Key Patterns
+
+- **Result Type**: All async operations return `Result<Failure, Success>` - no exceptions
+- **DTO Pattern**: Clean separation between API DTOs and UI models
+- **Module Pattern**: Every module uses src/ for private implementation, barrel file for public API
+- **Sealed Classes**: Exhaustive pattern matching for states and errors
+- **Logger Pattern**: Centralized logging in HTTP client layer, no duplication
+
+## Getting Started
+
+1. Generate your project using the Flutter CLI Utils tool
+2. Run `flutter pub get` to install dependencies
+3. Run `dart run build_runner build --delete-conflicting-outputs` for code generation
+4. Choose your environment and run: `flutter run -t lib/main_development.dart`
+
+## Documentation
+
+Every generated project includes a comprehensive `CLAUDE.md` file that documents:
+- Architecture patterns and principles
+- Module structure and import rules
+- Coding patterns and best practices
+- Logger usage guidelines
+- Typography and theming system
+- State management patterns
+
+## Version History
+
+**4.0.0** - Complete architecture overhaul with foundation layer, improved patterns, and comprehensive documentation
 
 ## Support Me
 

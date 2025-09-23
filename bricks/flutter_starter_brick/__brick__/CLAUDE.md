@@ -24,6 +24,7 @@
    - [Sealed Class Patterns](#sealed-class-patterns)
    - [Bloc Architecture Pattern](#bloc-architecture-pattern)
    - [Operation Counter Pattern for Race Condition Prevention](#operation-counter-pattern-for-race-condition-prevention)
+   - [Logging Pattern](#logging-pattern)
    - [Resources Folder](#resources-folder)
 
 ---
@@ -717,6 +718,48 @@ Legend:
 - ✅ = New operation must increment the row operation's counter
 - ❌ = No conflict, no counter increment needed
 - impossible = Synchronous operations can't be in async gap
+
+### Logging Pattern
+
+The application uses three specialized loggers with clear separation of concerns:
+
+**Logger Types:**
+- **AppLogger**: Debug console logging (only active in debug mode)
+- **ErrorLogger**: Production error reporting (Sentry, Crashlytics, etc.)
+- **EventLogger**: Analytics tracking (currently unused in starter)
+
+**Logging Rules:**
+
+1. **Where to Log:**
+   - **HTTP Client Layer**: Logs ALL network errors with technical details (status codes, URLs, headers)
+   - **Cubit/Bloc Layer**: ONLY logs critical business errors that are NOT network-related
+   - **UI Layer**: NEVER log in UI components
+
+2. **What to Log:**
+   - **Normal Operations**: Don't log (e.g., successful API calls, theme changes)
+   - **Network Errors**: Logged automatically by DioHttpClient with both AppLogger and ErrorLogger
+   - **Critical Errors**: Log with both AppLogger and ErrorLogger including stack traces
+
+3. **How to Log Errors:**
+   ```dart
+   // For critical errors (non-network), always use both loggers:
+   try {
+     // Critical operation
+   } catch (error, stackTrace) {
+     _appLogger.log('Error description: $error', tag: _tag);
+     await _errorLogger.recordError(error: error, stackTrace: stackTrace);
+   }
+   ```
+
+4. **Avoid Double Logging:**
+   - Network errors are logged ONLY in DioHttpClient
+   - Cubits that call APIs should NOT log the network failures again
+   - Only log in cubits if handling non-network critical errors
+
+**Example Implementation:**
+- **AppMetaDataCubit**: Logs initialization errors (critical, non-network) ✅
+- **JokesCubit**: No logging for API failures (would double-log) ✅
+- **DioHttpClient**: Logs all HTTP errors with full details ✅
 
 ### Resources Folder
 

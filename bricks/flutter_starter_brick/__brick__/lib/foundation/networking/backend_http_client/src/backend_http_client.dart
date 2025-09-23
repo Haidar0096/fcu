@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:{{proj_name}}/foundation/networking/backend_http_client/src/backend_error_message_parser.dart';
-import 'package:{{proj_name}}/foundation/networking/dio_http_client/dio_http_client.dart';
+import 'package:{{proj_name}}/foundation/networking/dio_http_client/src/dio_http_client.dart';
 
 const Duration _defaultTimeout = Duration(seconds: 30);
 
@@ -33,12 +33,11 @@ final class BackendHttpClient extends DioHttpClient {
       ),
     );
 
-    // Get interceptors from factory if provided, add error logging interceptor
+    // Get interceptors from factory if provided
     final interceptors = interceptorsBuilder?.call(dio) ?? [];
-    dio.interceptors.addAll([
-      ...interceptors,
-      ErrorLoggerInterceptor(appLogger: appLogger, errorLogger: errorLogger),
-    ]);
+    if (interceptors.isNotEmpty) {
+      dio.interceptors.addAll(interceptors);
+    }
 
     return BackendHttpClient._(
       client: dio,

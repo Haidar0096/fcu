@@ -19,11 +19,11 @@ void registerInstances(GetIt getIt, {required Environment environment}) {
     ..registerLazySingleton<ErrorLogger>(() => const ErrorLogger())
     ..registerLazySingleton<EventLogger>(() => const EventLogger())
     ..registerLazySingleton<ThemeCubit>(
-      () => ThemeCubit(appLogger: getIt.get()),
+      () => ThemeCubit(),
       dispose: (bloc) => bloc.close(),
     )
     ..registerLazySingleton<LocalizationCubit>(
-      () => LocalizationCubit(appLogger: getIt.get()),
+      () => LocalizationCubit(),
       dispose: (bloc) => bloc.close(),
     )
     ..registerLazySingleton<AppMetaDataCubit>(
@@ -52,16 +52,13 @@ void registerInstances(GetIt getIt, {required Environment environment}) {
         ),
       ),
     )
-    ..registerFactory<RandomJokesCubit>(
-      () => RandomJokesCubit(
-        randomJokesApi: getIt.get(),
-        appLogger: getIt.get(),
+    ..registerFactory<JokesCubit>(
+      () => JokesCubit(
+        jokesApi: getIt.get(),
       ),
     )
     ..registerLazySingleton<SplashCubit>(
-      () => SplashCubit(
-        appLogger: getIt.get(),
-      ),
+      () => SplashCubit(),
       dispose: (bloc) => bloc.close(),
     );
 }
