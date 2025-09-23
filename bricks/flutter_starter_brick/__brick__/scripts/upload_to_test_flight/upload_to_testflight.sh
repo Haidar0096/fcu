@@ -40,8 +40,8 @@ fi
 api_key=$(cat "$API_KEY_FILE")
 issuer_id=$(cat "$ISSUER_ID_FILE")
 
-# Set the main Dart file
-main_file="lib/main.dart"
+# Set the main Dart file (production for TestFlight)
+main_file="lib/main_production.dart"
 
 # Build IPA
 echo "🚀 Building IPA for version $ios_version_name ($ios_build_number)..."
