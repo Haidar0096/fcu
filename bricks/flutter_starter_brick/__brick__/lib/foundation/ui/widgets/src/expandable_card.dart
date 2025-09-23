@@ -24,8 +24,8 @@ class ExpandableCard extends StatefulWidget {
     required this.expandedChild,
     this.onExpansionChanged,
     this.initiallyExpanded = false,
-    this.duration = const Duration(milliseconds: 300),
-    this.curve = Curves.easeInOut,
+    this.duration = ExpandableCardDefaults.duration,
+    this.curve = ExpandableCardDefaults.curve,
     super.key,
   });
 
