@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/ui/animations/animations.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
@@ -102,9 +104,9 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
     }
 
     if (hasError) {
-      animationController.forward();
+      unawaited(animationController.forward());
     } else {
-      animationController.reverse();
+      unawaited(animationController.reverse());
     }
 
     return !hasError;

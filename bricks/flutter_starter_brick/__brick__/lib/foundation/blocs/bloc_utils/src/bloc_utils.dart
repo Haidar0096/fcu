@@ -99,7 +99,7 @@ EventTransformer<E> throttle<E>(Duration duration) => (events, mapper) {
         // If can't process, event is silently dropped
       },
       handleDone: (sink) {
-        activeSubscription?.cancel();
+        unawaited(activeSubscription?.cancel());
         sink.close();
       },
     ),

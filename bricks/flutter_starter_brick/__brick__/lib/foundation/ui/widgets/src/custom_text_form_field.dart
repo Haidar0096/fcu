@@ -164,7 +164,8 @@ class CustomTextFormField extends StatefulWidget {
   /// Builds the text selection context menu.
   final EditableTextContextMenuBuilder? contextMenuBuilder;
 
-  /// Whether the InputDecorator is part of a dense form (i.e., uses less vertical space).
+  /// Whether the InputDecorator is part of a dense form
+  /// (i.e., uses less vertical space).
   final bool? isDense;
 
   /// Whether the decoration is collapsed (i.e., has no label).

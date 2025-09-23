@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 /// A card widget that can expand/collapse with smooth animations.
@@ -94,7 +96,7 @@ class ExpandableCardState extends State<ExpandableCard>
   /// Expands the card
   void expand() {
     if (!_isExpanded) {
-      _controller.forward();
+      unawaited(_controller.forward());
       setState(() {
         _isExpanded = true;
       });
@@ -105,7 +107,7 @@ class ExpandableCardState extends State<ExpandableCard>
   /// Collapses the card
   void collapse() {
     if (_isExpanded) {
-      _controller.reverse();
+      unawaited(_controller.reverse());
       setState(() {
         _isExpanded = false;
       });

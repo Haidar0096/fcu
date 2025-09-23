@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
@@ -26,7 +27,7 @@ class ErrorLogger {
 
   bool _handlePlatformError(Object error, StackTrace stackTrace) {
     debugPrint('Platform error: $error\n$stackTrace');
-    recordError(error: error, stackTrace: stackTrace);
+    unawaited(recordError(error: error, stackTrace: stackTrace));
     return true;
   }
 
@@ -39,7 +40,7 @@ class ErrorLogger {
                 ? StackTrace.fromString(errorData.elementAtOrNull(1) as String)
                 : null;
         debugPrint('Isolate error: $error\n$stackTrace');
-        recordError(error: error, stackTrace: stackTrace);
+        unawaited(recordError(error: error, stackTrace: stackTrace));
       }).sendPort,
     );
   }

@@ -23,23 +23,14 @@ class RootAppWidget extends StatelessWidget {
                 debugShowCheckedModeBanner: false,
                 routerConfig: router,
                 theme: themeState.themeData,
-                builder:
-                    (context, routerWidget) => Builder(
-                      builder: (context) {
-                        Widget result = Overlay(
-                          initialEntries: [
-                            OverlayEntry(builder: (context) => routerWidget!),
-                          ],
-                        );
-
-                        result = Scaffold(
-                          resizeToAvoidBottomInset: false,
-                          body: result,
-                        );
-
-                        return result;
-                      },
-                    ),
+                builder: (context) => Scaffold(
+                  resizeToAvoidBottomInset: false,
+                  body: Overlay(
+                    initialEntries: [
+                      OverlayEntry(builder: (context) => routerWidget!),
+                    ],
+                  ),
+                ),
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
                 locale: Locale.fromSubtags(

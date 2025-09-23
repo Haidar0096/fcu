@@ -15,7 +15,8 @@ sealed class NetworkFailure {
   /// Error message from the backend response or client-side error description
   final String? message;
 
-  /// Backend error code for programmatic error handling (e.g., 'USER_NOT_FOUND')
+  /// Backend error code for programmatic error handling
+  /// (e.g., 'USER_NOT_FOUND')
   final String? code;
 
   /// Returns true if this is a ServerError with unauthorized status code
