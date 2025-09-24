@@ -65,9 +65,24 @@ To release a new version of the Flutter CLI Utils tool:
 4. **Push to GitHub**
 
    ```bash
+   # If working on a feature branch
    git add .
    git commit -m "chore: release v1.0.0"
-   git push origin main
+   git push origin feature/release-v1.0.0
+   ```
+
+5. **Create and merge pull requests**
+
+   ```bash
+   # If on feature branch, first merge to development
+   gh pr create --base development --head feature/release-v1.0.0 --title "Release v1.0.0" --body "Release version 1.0.0 with updates"
+   gh pr merge --merge --delete-branch
+
+   # Then create PR from development to production
+   gh pr create --base production --head development --title "Release v1.0.0 to production" --body "Release version 1.0.0 with updates"
+
+   # After review, merge to production
+   gh pr merge --merge --delete-branch=false
    ```
 
    > **Note**: The CLI tool is currently distributed as source code on GitHub (not published to pub.dev)
