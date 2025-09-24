@@ -264,6 +264,10 @@ class NewProjectCommand extends Command<int> {
       '\n# Generated files',
       '**/dependency_injection.config.dart',
       '**/**.g.dart',
+      '**/**.freezed.dart',
+      '',
+      '# Claude scratchpad',
+      'claude_scratchpad/',
     ].join('\n');
     final addToGitIgnoreResult = await Process.run('bash', [
       '-c',
