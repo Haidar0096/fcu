@@ -68,3 +68,9 @@ some files and folders.
 - Added freezed generated files (*.freezed.dart) to .gitignore
 - Added claude_scratchpad/ folder to .gitignore for Claude development tracking
 - Added /android/.kotlin/ folder to .gitignore for Android Kotlin metadata
+
+# 4.0.2
+- Improved random jokes screen UI layout with button docked at bottom
+- Fixed layout overflow issues with long jokes using SingleChildScrollView
+- Simplified error state handling with cleaner conditional rendering
+- Added flutter_launcher_icons package to dev dependencies for app icon generation
