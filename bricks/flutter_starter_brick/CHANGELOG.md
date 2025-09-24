@@ -63,3 +63,8 @@ some files and folders.
 
 # 4.0.0
 - Complete architecture overhaul
+
+# 4.0.1
+- Added freezed generated files (*.freezed.dart) to .gitignore
+- Added claude_scratchpad/ folder to .gitignore for Claude development tracking
+- Added /android/.kotlin/ folder to .gitignore for Android Kotlin metadata

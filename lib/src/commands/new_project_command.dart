@@ -268,6 +268,9 @@ class NewProjectCommand extends Command<int> {
       '',
       '# Claude scratchpad',
       'claude_scratchpad/',
+      '',
+      '# Android Kotlin metadata',
+      '/android/.kotlin/',
     ].join('\n');
     final addToGitIgnoreResult = await Process.run('bash', [
       '-c',
