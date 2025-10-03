@@ -385,6 +385,9 @@ When using `copyWith` on Typography fields, **NEVER** override these properties 
 - ✅ **letterSpacing** - Layout/spacing adjustment
 - ✅ **height** - Line height adjustment
 - ✅ **backgroundColor** - Background highlight
+- ✅ Other visual/layout properties (shadows, wordSpacing, textBaseline, etc.)
+
+**The Rule:** Only override `copyWith` properties that don't change the semantic identity of the Typography style. The 4 forbidden properties (fontSize, fontWeight, fontFamily, fontStyle) define WHAT the style represents. All other properties are visual variations.
 
 **Example violations:**
 ```dart
