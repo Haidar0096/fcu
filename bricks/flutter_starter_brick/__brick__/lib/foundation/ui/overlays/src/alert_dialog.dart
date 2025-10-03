@@ -28,18 +28,11 @@ Future<void> showAlertDialog({
       top: 20,
       bottom: 12,
     ),
-    actionsPadding: const EdgeInsets.only(
-      left: 24,
-      right: 24,
-      bottom: 20,
-    ),
+    actionsPadding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (icon != null) ...[
-          icon,
-          const Spacing.vertical(SpacingSize.medium),
-        ],
+        if (icon != null) ...[icon, const Spacing.vertical(SpacingSize.medium)],
         Text(
           title,
           style: context.themeData.textTheme.headlineSmall,

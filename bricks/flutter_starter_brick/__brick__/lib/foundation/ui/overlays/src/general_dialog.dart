@@ -53,21 +53,23 @@ Future<T?> showCustomGeneralDialog<T>({
 }) async => showGeneralDialog(
   context: context,
   barrierColor: barrierColor ?? Colors.transparent,
-  pageBuilder: (context, animation, secondaryAnimation) => _CustomDialogContent(
-    content: content,
-    barrierDismissible: barrierDismissible,
-    backgroundColor: backgroundColor,
-    contentAlignment: contentAlignment,
-    onBarrierDismissed: onBarrierDismissed,
-    onAppLifecycleStateChanged: onAppLifecycleStateChanged,
-  ),
+  pageBuilder:
+      (context, animation, secondaryAnimation) => _CustomDialogContent(
+        content: content,
+        barrierDismissible: barrierDismissible,
+        backgroundColor: backgroundColor,
+        contentAlignment: contentAlignment,
+        onBarrierDismissed: onBarrierDismissed,
+        onAppLifecycleStateChanged: onAppLifecycleStateChanged,
+      ),
   transitionDuration: transitionDuration ?? AnimationDefaults.animationDuration,
-  transitionBuilder: (applyBlur || applyDim)
-      ? _createBlurDimTransitionBuilder(
-          applyBlur: applyBlur,
-          applyDim: applyDim,
-        )
-      : transitionBuilder ?? scaleTransitionBuilder,
+  transitionBuilder:
+      (applyBlur || applyDim)
+          ? _createBlurDimTransitionBuilder(
+            applyBlur: applyBlur,
+            applyDim: applyDim,
+          )
+          : transitionBuilder ?? scaleTransitionBuilder,
 );
 
 class _CustomDialogContent extends StatefulWidget {

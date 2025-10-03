@@ -4,10 +4,7 @@ import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 
 /// Custom radio button widget with proper styling
 class CustomRadioButton extends StatelessWidget {
-  const CustomRadioButton({
-    required this.isSelected,
-    super.key,
-  });
+  const CustomRadioButton({required this.isSelected, super.key});
 
   final bool isSelected;
 
@@ -20,9 +17,10 @@ class CustomRadioButton extends StatelessWidget {
     decoration: BoxDecoration(
       shape: BoxShape.circle,
       border: Border.all(
-        color: isSelected
-            ? context.themeData.colorScheme.primary
-            : context.themeData.colorScheme.outline,
+        color:
+            isSelected
+                ? context.themeData.colorScheme.primary
+                : context.themeData.colorScheme.outline,
         width: CustomRadioButtonDefaults.borderWidth,
       ),
     ),

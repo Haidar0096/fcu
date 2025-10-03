@@ -137,15 +137,14 @@ class _CriticalErrorScreenRoute extends GoRouteData
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
       _getPageByPlatform<void>(
         pageKey: state.pageKey,
-        child: CriticalErrorScreen(
-          errorMessage: errorMessage,
-        ),
+        child: CriticalErrorScreen(errorMessage: errorMessage),
       );
 }
 
 @TypedGoRoute<_RandomJokesScreenRoute>(path: RandomJokesRoutePath.path)
 @immutable
-class _RandomJokesScreenRoute extends GoRouteData with _$_RandomJokesScreenRoute {
+class _RandomJokesScreenRoute extends GoRouteData
+    with _$_RandomJokesScreenRoute {
   const _RandomJokesScreenRoute();
 
   @override

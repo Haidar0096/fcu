@@ -7,7 +7,9 @@ CheckboxThemeData checkboxThemeData(ColorScheme colorScheme) =>
       fillColor: WidgetStateProperty.resolveWith((states) {
         Color? color;
         if (states.contains(WidgetState.disabled)) {
-          color = colorScheme.onSurface.withValues(alpha: ThemeDefaults.materialDisabledOpacity);
+          color = colorScheme.onSurface.withValues(
+            alpha: ThemeDefaults.materialDisabledOpacity,
+          );
         } else if (states.contains(WidgetState.selected)) {
           color = colorScheme.primary;
         } else if (!states.contains(WidgetState.selected)) {
@@ -20,7 +22,9 @@ CheckboxThemeData checkboxThemeData(ColorScheme colorScheme) =>
         const width = ThemeDefaults.checkboxBorderWidth;
         if (states.contains(WidgetState.disabled)) {
           borderSide = BorderSide(
-            color: colorScheme.onSurface.withValues(alpha: ThemeDefaults.materialDisabledOpacity),
+            color: colorScheme.onSurface.withValues(
+              alpha: ThemeDefaults.materialDisabledOpacity,
+            ),
             width: width,
           );
         } else if (states.contains(WidgetState.selected)) {

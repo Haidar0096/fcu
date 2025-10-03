@@ -7,10 +7,7 @@ import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
 /// Global loader singleton for managing app-wide loading overlays.
 class GlobalLoader {
-  GlobalLoader._({
-    required this.appLogger,
-    required this.rootNavigatorKey,
-  });
+  GlobalLoader._({required this.appLogger, required this.rootNavigatorKey});
 
   static GlobalLoader? _instance;
 
@@ -74,10 +71,8 @@ class GlobalLoader {
       builder: (context) {
         final effectiveLoadingTextStyle =
             loadingTextStyle ??
-            context.typography?.body1.copyWith(
+            context.typography?.mediumBodyText.copyWith(
               color: context.themeData.colorScheme.onSurface,
-              fontWeight: FontWeight.w500,
-              height: 1.5,
             );
 
         return BlurWidget(

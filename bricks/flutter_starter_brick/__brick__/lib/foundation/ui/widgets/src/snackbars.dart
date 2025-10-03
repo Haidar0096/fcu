@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
-import 'package:{{proj_name}}/foundation/ui/widgets/src/snackbars.dart' as snackbars;
+import 'package:{{proj_name}}/foundation/ui/widgets/src/snackbars.dart'
+    as snackbars;
 import 'package:{{proj_name}}/foundation/ui/widgets/src/spacing.dart';
 
 final class SnackBarDefaults {
@@ -79,7 +80,7 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showCustomSnackBar({
                 text!,
                 style:
                     textStyle ??
-                    context.typography?.body6.copyWith(
+                    context.typography?.bodyText.copyWith(
                       color: context.themeData.colorScheme.onPrimary,
                     ),
                 textAlign: TextAlign.center,

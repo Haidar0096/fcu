@@ -26,8 +26,4 @@ enum Fonts {
   final String fontFamilyName;
   final FontStyle fontStyle;
   final FontWeight fontWeight;
-
-  static const Fonts defaultBodyFont = Fonts.montserratRegular;
-  static const Fonts defaultTitleFont = Fonts.montserratBold;
-  static const Fonts defaultErrorFont = Fonts.montserratItalic;
 }

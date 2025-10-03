@@ -7,9 +7,13 @@ const Color errorRed = Color(0xFFE74C3C);
 const Color successGreen = Color.fromARGB(255, 0, 225, 90);
 const Color inactiveGray = Color(0xFFCACACA);
 
-// Primary colors
+// Primary colors (specific)
 const Color primaryBlue = Color(0xFF3F5AAB);
 const Color primaryBlueContainer = Color(0xFFC6D1F5);
+
+// Primary colors (semantic - easy to change)
+const Color primary = primaryBlue;
+const Color primaryContainer = primaryBlueContainer;
 
 // Secondary colors
 const Color secondaryTeal = Color(0xFF0B8793);
@@ -28,6 +32,15 @@ const Color mutedGray = Color(0xFF2A2A2A);
 
 // Outline colors
 const Color outlineGrey = Color(0xFF8A8F99);
+
+// Gray shades
+const Color lightGray = Color(0xFFD2D7DB);
+
+// Text colors
+const Color dropdownTextColor = lightGray;
+
+// Border colors
+const Color textFieldBorderColor = lightGray;
 
 // Fixed palette colors (Material 3 tonal elevation - shared between themes)
 const Color primaryFixedDim = Color(0xFF8E9DE1);

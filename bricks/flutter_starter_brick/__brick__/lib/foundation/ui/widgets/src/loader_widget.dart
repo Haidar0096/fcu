@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 
 /// A simple loading widget that shows a circular progress indicator.
 class LoaderWidget extends StatelessWidget {
-  const LoaderWidget({
-    super.key,
-    this.size,
-    this.strokeWidth,
-    this.color,
-  });
+  const LoaderWidget({super.key, this.size, this.strokeWidth, this.color});
 
   /// The size of the circular progress indicator.
   final double? size;

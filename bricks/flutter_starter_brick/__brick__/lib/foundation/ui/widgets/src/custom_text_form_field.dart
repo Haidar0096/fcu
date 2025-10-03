@@ -256,11 +256,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
             textAlign: widget.textAlign,
             onTap: () => widget.focusNode?.requestFocus(),
             autofocus: widget.autofocus,
-            style:
-                widget.style ??
-                context.typography?.body5.copyWith(
-                  color: context.themeData.colorScheme.onSurface,
-                ),
+            style: widget.style ?? context.typography?.fieldInput,
             cursorHeight: widget.cursorHeight,
             cursorWidth: widget.cursorWidth,
             decoration:
@@ -273,11 +269,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                   suffixIcon: widget.suffixIcon,
                   suffixIconConstraints: suffixIconConstraints,
                   labelStyle:
-                      widget.labelStyle ??
-                      context.typography?.body4.copyWith(
-                        color: context.themeData.colorScheme.onSurface,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      widget.labelStyle ?? context.typography?.indicationText,
                   labelText: widget.labelText,
                   floatingLabelBehavior:
                       widget.floatingLabelBehavior ??
@@ -285,7 +277,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                   hintText: widget.hintText,
                   hintStyle:
                       widget.hintStyle ??
-                      context.typography?.body4.copyWith(
+                      context.typography?.bodyText.copyWith(
                         color: context.themeData.colorScheme.onSurface
                             .withValues(
                               alpha:
@@ -293,18 +285,26 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                             ),
                       ),
                   contentPadding: widget.contentPadding,
-                  enabledBorder: hasError
-                      ? context.themeData.inputDecorationTheme.errorBorder
-                      : context.themeData.inputDecorationTheme.enabledBorder,
+                  enabledBorder:
+                      hasError
+                          ? context.themeData.inputDecorationTheme.errorBorder
+                          : context
+                              .themeData
+                              .inputDecorationTheme
+                              .enabledBorder,
                   disabledBorder:
                       widget.disabledBorder ??
                       context.themeData.inputDecorationTheme.disabledBorder,
-                  focusedBorder: hasError
-                      ? context
-                            .themeData
-                            .inputDecorationTheme
-                            .focusedErrorBorder
-                      : context.themeData.inputDecorationTheme.focusedBorder,
+                  focusedBorder:
+                      hasError
+                          ? context
+                              .themeData
+                              .inputDecorationTheme
+                              .focusedErrorBorder
+                          : context
+                              .themeData
+                              .inputDecorationTheme
+                              .focusedBorder,
                 ),
             onChanged: (value) {
               widget.onChanged?.call(value);

@@ -15,10 +15,14 @@ OutlineInputBorder _buildTextFieldBorder({
 InputDecorationTheme inputDecorationTheme(ColorScheme colorScheme) =>
     InputDecorationTheme(
       enabledBorder: _buildTextFieldBorder(
-        color: colorScheme.onSurface.withValues(alpha: ThemeDefaults.textFieldEnabledBorderOpacity),
+        color: colorScheme.onSurface.withValues(
+          alpha: ThemeDefaults.textFieldEnabledBorderOpacity,
+        ),
       ),
       disabledBorder: _buildTextFieldBorder(
-        color: colorScheme.onSurface.withValues(alpha: ThemeDefaults.materialDisabledOpacity),
+        color: colorScheme.onSurface.withValues(
+          alpha: ThemeDefaults.materialDisabledOpacity,
+        ),
       ),
       focusedBorder: _buildTextFieldBorder(color: colorScheme.primary),
       errorBorder: _buildTextFieldBorder(color: colorScheme.error),

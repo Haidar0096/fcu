@@ -3,11 +3,7 @@ import 'package:{{proj_name}}/foundation/networking/http_client/src/status_codes
 
 @immutable
 sealed class NetworkFailure {
-  const NetworkFailure({
-    this.statusCode,
-    this.message,
-    this.code,
-  });
+  const NetworkFailure({this.statusCode, this.message, this.code});
 
   /// HTTP status code returned by the server (e.g., 404, 500)
   final int? statusCode;

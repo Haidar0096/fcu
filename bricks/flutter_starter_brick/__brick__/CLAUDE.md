@@ -287,38 +287,55 @@ implement `getDisplayText(BuildContext)` to provide their string representation.
 
 When using typography styles in the app, follow these guidelines to maintain consistency:
 
-**1. Use existing typography styles when they match your needs. Search the project to see if there
-is an already functionality matching what you need:**
+**1. Use existing typography styles when they match your needs:**
 ```dart
 // GOOD - Using typography as-is
 Text(
   'Welcome',
-  style: context.typography?.title1,
+  style: context.typography?.primaryTitle,
 )
 ```
 
-**2. Use copyWith only for minor variations (1-2 properties):**
+**2. Use copyWith when overriding dynamic or state-dependent properties:**
 ```dart
-// GOOD - Only override what's truly different
+// GOOD - Color depends on widget state
 Text(
-  'APP_NAME',
-  style: context.typography?.title1.copyWith(
-    letterSpacing: 8, // Special splash screen effect
+  'Link',
+  style: context.typography?.linkText.copyWith(
+    color: isEnabled ? primary : disabled, // State-dependent
   ),
 )
 
-// GOOD - Semantic variation of existing style
+// GOOD - Single property override
 Text(
   'Error: Invalid input',
-  style: context.typography?.body2.copyWith(
-    color: context.themeData.colorScheme.error,
+  style: context.typography?.bodyText.copyWith(
+    color: context.themeData.colorScheme.error, // Dynamic from theme
+  ),
+)
+
+// ACCEPTABLE - Properties depend on runtime state/context
+Text(
+  'Dynamic',
+  style: context.typography?.bodyText.copyWith(
+    fontWeight: isImportant ? FontWeight.w600 : FontWeight.w400,
+    height: isCompact ? 1.2 : 1.5,
   ),
 )
 ```
 
-**3. Create custom TextStyle for truly unique, one-off styles:**
+**3. Create new Typography style when reused with same static overrides:**
 ```dart
-// GOOD - Unique promotional style used in one place
+// If used in 2+ places with same static overrides, add to Typography:
+TextStyle get bannerText => Fonts.montserratMedium.textStyle(fontSize: 14);
+
+// Then use it:
+Text('Banner', style: context.typography?.bannerText)
+```
+
+**4. Inline TextStyle for truly unique one-off styles:**
+```dart
+// GOOD - Unique style, used once, 50%+ different properties
 Text(
   'Limited Time: 50% OFF',
   style: TextStyle(
@@ -326,65 +343,125 @@ Text(
     fontWeight: FontWeight.w800,
     color: AppColors.promotional,
     decoration: TextDecoration.underline,
+    letterSpacing: 2,
   ),
 )
 ```
 
-**4. Add to Typography class for reusable semantic styles:**
+**Decision Framework:**
+
+When you need a text style, ask:
+1. **Does existing style match?** → Use it directly
+2. **Need to override properties?**
+   - Only dynamic/state-dependent properties? → Use copyWith ✅
+   - Overriding 3+ static properties OR 50%+ of style? → Go to step 3
+3. **Will this style be reused (2+ places)?**
+   - Yes → Add new style to Typography class
+   - No → Inline new TextStyle
+
+**copyWith Guidelines:**
+
+Use copyWith **ONLY when** overriding properties that are:
+- **Dynamic/state-dependent**: Colors based on enabled/disabled state, values from widget state
+- **Runtime values**: User input, API data, theme-dependent colors
+- **Local context**: Values that Typography class cannot know about
+
+**Do NOT use copyWith when:**
+- Overriding **3+ static properties** (constant values like fontSize, fontWeight, height)
+- Overriding **50%+ of the style properties** (means it's a different style)
+- The same overrides are used in **2+ places** (extract to Typography instead)
+
+**CRITICAL: Semantic Meaning Preservation**
+
+When using `copyWith` on Typography fields, **NEVER** override these properties as they define the semantic identity of the style:
+- ❌ **fontSize** - Changing size changes what the style represents
+- ❌ **fontFamily** - Breaking the design system's font choice
+- ❌ **fontWeight** - Changes the style fundamentally (regular vs bold vs semibold)
+- ❌ **fontStyle** - Changes meaning (normal vs italic)
+
+**Acceptable to override** (visual variations that preserve semantic meaning):
+- ✅ **color** - Visual variation, doesn't change what it is
+- ✅ **decoration** - Adding underline, strikethrough, etc.
+- ✅ **letterSpacing** - Layout/spacing adjustment
+- ✅ **height** - Line height adjustment
+- ✅ **backgroundColor** - Background highlight
+
+**Example violations:**
 ```dart
-// In Typography class factory - for styles used in 2+ places
-caption: _bodyStyle(fontSize: 12, colorScheme: colorScheme).copyWith(
-  color: colorScheme.onSurfaceVariant,
-),
+// BAD - Changing fontSize breaks semantic meaning
+context.typography?.primaryTitle.copyWith(fontSize: 18) // NOT a primary title anymore!
+
+// BAD - Changing fontWeight breaks semantic meaning
+context.typography?.bodyText.copyWith(fontWeight: FontWeight.w600) // NOT body text anymore!
+
+// Solution: Create new style or use existing one
+context.typography?.mediumBodyText // Proper semantic style with w500
+```
+
+If you need different fontSize/fontWeight/fontStyle/fontFamily, you need a **different style** - either:
+1. Use an existing Typography field that matches
+2. Create a new Typography field
+3. Inline a custom TextStyle (if truly one-off)
+
+**Examples:**
+```dart
+// GOOD - Only dynamic property
+linkText.copyWith(color: isEnabled ? primary : disabled)
+
+// GOOD - Runtime/theme-dependent
+bodyText.copyWith(color: context.themeData.colorScheme.error)
+
+// ACCEPTABLE - All properties are state-dependent
+bodyText.copyWith(
+  fontWeight: isImportant ? FontWeight.w600 : FontWeight.w400,
+  height: isCompact ? 1.2 : 1.5,
+)
+
+// BAD - 3 static properties (fontWeight always w500, height always 1.5)
+bodyText.copyWith(
+  color: context.themeData.colorScheme.onSurface,
+  fontWeight: FontWeight.w500,  // STATIC
+  height: 1.5,                   // STATIC
+)
+// Solution: Create mediumBodyText style with w500 and height 1.5
+
+// BAD - Used in multiple places with same overrides
+bodyText.copyWith(fontWeight: FontWeight.w500) // Used in 5 files
+// Solution: Create medium14 or mediumBodyText style in Typography
 ```
 
 **What NOT to do:**
 ```dart
-// BAD - Using typography but overriding most properties
+// BAD - Overriding most properties
 Text(
   'Title',
-  style: context.typography?.title1.copyWith(
-    fontSize: 24,        // Different size
-    fontWeight: FontWeight.w600,  // Different weight
-    color: Colors.blue,  // Different color
+  style: context.typography?.primaryTitle.copyWith(
+    fontSize: 28,
+    fontWeight: FontWeight.w600,
+    color: Colors.blue,
   ),
 )
 // If you're changing 3+ properties, create a custom style instead
-
-// BAD - Redundantly overriding font weight on titles
-Text(
-  'Login',
-  style: context.typography?.title4.copyWith(
-    fontWeight: FontWeight.bold,  // Titles already use bold (w700)!
-  ),
-)
-
-// BAD - Overriding with the same value
-Text(
-  'Welcome',
-  style: context.typography?.title2.copyWith(
-    fontWeight: FontWeight.w700,  // title2 already has w700!
-  ),
-)
 ```
 
-**Important: Know your typography defaults:**
-- All title styles (title1-title7) use `Fonts.montserratBold` which has `fontWeight: FontWeight.w700`
-- All body styles (body1-body7) use `Fonts.montserratRegular` which has `fontWeight: FontWeight.w400`
-- Error style uses `Fonts.montserratItalic` with `fontWeight: FontWeight.w400` and `fontStyle: FontStyle.italic`
+**Typography System Architecture:**
 
-Never override a property with its existing value - this is redundant and indicates you don't understand the typography system.
+**Fonts (resources/fonts.dart):**
+- Enum defining all font files with family, weight, and style
+- Extension `textStyle` getter that creates base TextStyle (no fontSize/color)
+- Usage: `Fonts.montserratBold.textStyle.copyWith(fontSize: 24, color: red)`
 
-**What constitutes a "similar" style for copyWith:**
-- Same visual hierarchy (title vs body vs caption)
-- Same semantic purpose (heading vs content vs metadata)
-- Most properties match (80%+ of font family, size, weight)
+**Typography (foundation/ui/theme/typography.dart):**
+- ThemeExtension containing all app text styles as fields
+- Factory receives `ColorScheme` for theme-dependent colors
+- Static constants for theme component fonts (defaultButtonFont, etc.)
+- Styles named after design system tokens (primaryTitle, bodyText, etc.)
+- Add new styles as you discover design needs
 
-**Decision flow:**
-1. Check if an existing typography style matches your needs → Use it directly
-2. Need 1-2 properties different? → Use copyWith
-3. Used in multiple places with same variations? → Add to Typography class
-4. Truly unique and one-off? → Create custom TextStyle
+**Important:**
+- Uses **Montserrat** font family by default
+- All customization happens via `.textStyle.copyWith(...)` for consistency
+- Never override fontSize/fontWeight/fontStyle/fontFamily - use different Typography field instead
 
 ### Theme and UI Component Usage
 
@@ -774,21 +851,24 @@ Example usage:
 // Images - use typed enums instead of strings:
 Image.asset(PngImages.appIcon.path)
 
-// Typography - use context.typography extension:
+// Typography - use semantic named styles:
 Text(
-  'Welcome to {{proj_desc}}!',
-  style: context.typography?.title2.copyWith(
-    fontWeight: FontWeight.w700, // even can customize if needed
-  ),
+  'Welcome',
+  style: context.typography?.primaryTitle,
 )
 
-// Different text styles available:
-context.typography?.title1  // through title7
-context.typography?.body1   // through body7
-context.typography?.error   // for error messages
+Text(
+  'Body content',
+  style: context.typography?.bodyText,
+)
 
-// The Typography class automatically uses the correct fonts:
-// - Titles use Fonts.defaultTitleFont (montserratBold)
-// - Body text uses Fonts.defaultBodyFont (montserratRegular)
-// - Errors use Fonts.defaultErrorFont (montserratItalic)
+// Available styles (add more as you build screens):
+context.typography?.primaryTitle     // Titles (24px, Bold)
+context.typography?.indicationText   // Labels, hints (12px, Regular)
+context.typography?.fieldInput       // Text field input (14px, Regular)
+context.typography?.linkText         // Links (16px, Regular)
+context.typography?.smallLinkText    // Small links (12px, Regular)
+context.typography?.bodyText         // General body text (14px, Regular)
+context.typography?.mediumBodyText   // Medium body text (14px, w500, height 1.5)
+context.typography?.errorText        // Error messages (14px, Italic, theme error color)
 ```

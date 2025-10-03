@@ -143,10 +143,7 @@ class DioHttpClient extends HttpClient {
 
       final errorData = serverErrorMessageParser?.call(error);
       return Result.failure(
-        UnknownError(
-          message: errorData?.message,
-          code: errorData?.code,
-        ),
+        UnknownError(message: errorData?.message, code: errorData?.code),
       );
     }
   }

@@ -45,5 +45,6 @@ extension ThemeDataBuildContextExtension on BuildContext {
 }
 
 extension ThemeDataExtension on ThemeData {
-  Color get defaultScrim => colorScheme.scrim.withValues(alpha: ThemeDefaults.scrimOpacity);
+  Color get defaultScrim =>
+      colorScheme.scrim.withValues(alpha: ThemeDefaults.scrimOpacity);
 }
