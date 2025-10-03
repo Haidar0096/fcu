@@ -5,10 +5,7 @@ import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
 /// Card widget for displaying a joke
 class JokeCard extends StatelessWidget {
-  const JokeCard({
-    required this.joke,
-    super.key,
-  });
+  const JokeCard({required this.joke, super.key});
 
   final UiJoke joke;
 
@@ -20,7 +17,7 @@ class JokeCard extends StatelessWidget {
       padding: EdgeInsets.all(SpacingSize.large.value),
       child: Text(
         joke.content,
-        style: context.typography?.body2,
+        style: context.typography?.bodyText,
         textAlign: TextAlign.center,
       ),
     ),

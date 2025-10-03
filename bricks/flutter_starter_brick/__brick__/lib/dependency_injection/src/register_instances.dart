@@ -53,11 +53,7 @@ void registerInstances(GetIt getIt, {required Environment environment}) {
         ),
       ),
     )
-    ..registerFactory<JokesCubit>(
-      () => JokesCubit(
-        jokesApi: getIt.get(),
-      ),
-    )
+    ..registerFactory<JokesCubit>(() => JokesCubit(jokesApi: getIt.get()))
     ..registerLazySingleton<SplashCubit>(
       () => SplashCubit(),
       dispose: (bloc) => bloc.close(),

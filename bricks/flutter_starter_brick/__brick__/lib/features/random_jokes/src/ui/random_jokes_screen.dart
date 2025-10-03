@@ -18,40 +18,41 @@ class RandomJokesScreen extends StatelessWidget {
       );
 
       return RootScreenWidget(
-        body: state is JokesFailed
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  StatusBannerWidget(
-                    type: StatusBannerType.error,
-                    message: state.uiFailure.getDisplayText(context),
-                    actionText: context.appLocalizations.retry,
-                    onAction: () => context.read<JokesCubit>().fetchJoke(),
-                  ),
-                ],
-              )
-            : Column(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: switch (state) {
-                        JokesInitial() => const SizedBox.shrink(),
-                        JokesLoading() => const LoaderWidget(),
-                        JokesLoaded() => SingleChildScrollView(
-                          child: JokeCard(joke: state.joke),
-                        ),
-                        JokesFailed() =>
-                          const SizedBox.shrink(), // Never reached
-                      },
+        body:
+            state is JokesFailed
+                ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    StatusBannerWidget(
+                      type: StatusBannerType.error,
+                      message: state.uiFailure.getDisplayText(context),
+                      actionText: context.appLocalizations.retry,
+                      onAction: () => context.read<JokesCubit>().fetchJoke(),
                     ),
-                  ),
-                  // Button docked at bottom
-                  Padding(
-                    padding: EdgeInsets.all(SpacingSize.medium.value),
-                    child: fetchButton,
-                  ),
-                ],
-              ),
+                  ],
+                )
+                : Column(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: switch (state) {
+                          JokesInitial() => const SizedBox.shrink(),
+                          JokesLoading() => const LoaderWidget(),
+                          JokesLoaded() => SingleChildScrollView(
+                            child: JokeCard(joke: state.joke),
+                          ),
+                          JokesFailed() =>
+                            const SizedBox.shrink(), // Never reached
+                        },
+                      ),
+                    ),
+                    // Button docked at bottom
+                    Padding(
+                      padding: EdgeInsets.all(SpacingSize.medium.value),
+                      child: fetchButton,
+                    ),
+                  ],
+                ),
       );
     },
   );
