@@ -703,6 +703,12 @@ Future<void> _handleRename(event, emit) async {
 - If returning early for other reasons, must reset your own flag
 - Use `emitIfNotClosed` from BlocUtils after async gaps
 
+**State Emission Pattern:**
+- Always use the state constructor (e.g., `ChatState(...)`) when emitting state, never `state.copyWith(...)`
+- Explicitly specify ALL required fields in the constructor
+- For fields that should remain unchanged, use `state.fieldName` to preserve current values
+- This prevents accidentally preserving stale values and makes state changes explicit and visible
+
 **Consistency Within Features:**
 - If a feature has a main Bloc with repository, ALL its Cubits should use repositories too
 - Example: AuthenticationBloc has repository → LoginCubit, SignupCubit should too
@@ -727,7 +733,14 @@ class SomeBloc {
     final capturedCounter = _loadOperationCounter;
 
     // 2. Set loading flag (this operation now owns it)
-    emit(state.copyWith(isLoading: true));
+    emitIfNotClosed(
+      emit,
+      SomeState(
+        isLoading: true,
+        data: state.data,
+        // ... other fields
+      ),
+    );
 
     // 3. ASYNC GAP - perform operation
     final result = await repository.loadData();
@@ -740,10 +753,14 @@ class SomeBloc {
     }
 
     // 5. Safe to emit - this is still the current operation
-    emit(state.copyWith(
-      isLoading: false,
-      data: result,
-    ));
+    emitIfNotClosed(
+      emit,
+      SomeState(
+        isLoading: false,
+        data: result,
+        // ... other fields
+      ),
+    );
   }
 }
 ```
