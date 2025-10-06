@@ -6,6 +6,7 @@ export 'src/custom_text_form_field.dart';
 export 'src/destructive_button.dart';
 export 'src/dim_widget.dart';
 export 'src/expandable_card.dart';
+export 'src/invisible_validation_widget.dart';
 export 'src/loader_widget.dart';
 export 'src/main_button.dart';
 export 'src/png_image.dart';

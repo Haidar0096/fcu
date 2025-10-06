@@ -513,6 +513,57 @@ Padding(
 - Follow the patterns established in similar features
 - Maintain visual consistency across the app by reusing theme values
 
+### Spacing Strategy: Figma to Code Translation
+
+When translating designs from Figma to code, follow this systematic approach for spacing values:
+
+**Design System Principle:**
+- **Figma = Design exploration** - Designers can use any value (10px, 12px, 37px, etc.)
+- **Code = Systematic implementation** - Constrained to design system values for consistency
+
+**Our Spacing System** (`SpacingSize` enum in `foundation/ui/widgets/spacing.dart`):
+```dart
+xxSmall  = 4px   // Minimal gaps
+xSmall   = 8px   // Small gaps (base unit)
+small    = 16px  // Standard gaps
+medium   = 24px  // Medium gaps
+large    = 32px  // Large gaps
+xLarge   = 40px  // Extra large gaps
+xxLarge  = 48px  // Very large gaps
+xxxLarge = 64px  // Maximum gaps
+```
+
+**Translation Rules:**
+
+1. **Round to nearest available `SpacingSize` value**
+   - Acceptable tolerance: **±4px** (half of base 8px unit)
+   - Prioritize consistency over pixel-perfection
+
+2. **Example Translations:**
+   | Figma Value | Round To | SpacingSize | Difference |
+   |-------------|----------|-------------|------------|
+   | 6px | 8px | xSmall | +2px ✅ |
+   | 10px | 8px | xSmall | -2px ✅ |
+   | 12px | 16px | small | +4px ✅ |
+   | 20px | 16px | small | -4px ✅ |
+   | 28px | 24px | medium | -4px ✅ |
+   | 36px | 40px | xLarge | +4px ✅ |
+
+3. **Always use `Spacing.vertical()` or `Spacing.horizontal()` widgets:**
+   ```dart
+   // GOOD - Using design system
+   const Spacing.vertical(SpacingSize.small)
+
+   // BAD - Hardcoded spacing
+   const SizedBox(height: 16)
+   ```
+
+4. **When to add new spacing values:**
+   - **Only if** a specific value is used **20+ times** across the entire app
+   - **Only if** rounding creates obvious visual problems in user testing
+   - **Only if** designer explicitly requires it for accessibility/branding
+   - Otherwise, always round to existing values
+
 ### Sealed Class Patterns
 
 When working with sealed classes in Dart, always use switch statements for exhaustive pattern matching:
