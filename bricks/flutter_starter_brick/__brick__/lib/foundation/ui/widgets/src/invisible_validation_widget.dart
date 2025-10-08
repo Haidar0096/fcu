@@ -54,7 +54,7 @@ class InvisibleValidationWidgetState<T>
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: errorWidgets,
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: errorWidgets,
+  );
 }
