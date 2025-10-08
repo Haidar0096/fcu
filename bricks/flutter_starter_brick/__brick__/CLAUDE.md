@@ -287,12 +287,14 @@ implement `getDisplayText(BuildContext)` to provide their string representation.
 
 When using typography styles in the app, follow these guidelines to maintain consistency:
 
-**1. Use existing typography styles when they match your needs:**
+**1. ALWAYS provide colors explicitly - typography defines ONLY fonts:**
 ```dart
-// GOOD - Using typography as-is
+// GOOD - Always specify color explicitly
 Text(
   'Welcome',
-  style: context.typography?.primaryTitle,
+  style: context.typography?.primaryTitle.copyWith(
+    color: primaryTitleColor,
+  ),
 )
 ```
 
@@ -456,14 +458,17 @@ Text(
 
 **Typography (foundation/ui/theme/typography.dart):**
 - ThemeExtension containing all app text styles as fields
-- Factory receives `ColorScheme` for theme-dependent colors
+- **IMPORTANT**: Typography provides ONLY font properties (family, weight, size, height)
+- **Colors are NEVER included** - must be provided via `.copyWith(color: ...)` in UI code
 - Static constants for theme component fonts (defaultButtonFont, etc.)
-- Styles named after design system tokens (primaryTitle, bodyText, etc.)
-- Add new styles as you discover design needs
+- Styles named after Figma design tokens (primaryTitle, bodyText, etc.)
+- Each field has documentation specifying the font properties and suggested color to use
+- Add new styles as you discover them in Figma designs
 
 **Important:**
 - Uses **Montserrat** font family by default
-- All customization happens via `.textStyle.copyWith(...)` for consistency
+- Typography defines fonts, colors come from `foundation/ui/theme/colors.dart`
+- Always use `.copyWith(color: ...)` when applying typography styles
 - Never override fontSize/fontWeight/fontStyle/fontFamily - use different Typography field instead
 
 ### Theme and UI Component Usage
