@@ -256,7 +256,11 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
             textAlign: widget.textAlign,
             onTap: () => widget.focusNode?.requestFocus(),
             autofocus: widget.autofocus,
-            style: widget.style ?? context.typography?.fieldInput,
+            style:
+                widget.style ??
+                context.typography?.fieldInput.copyWith(
+                  color: context.themeData.colorScheme.onSurface,
+                ),
             cursorHeight: widget.cursorHeight,
             cursorWidth: widget.cursorWidth,
             decoration:
@@ -269,7 +273,10 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                   suffixIcon: widget.suffixIcon,
                   suffixIconConstraints: suffixIconConstraints,
                   labelStyle:
-                      widget.labelStyle ?? context.typography?.indicationText,
+                      widget.labelStyle ??
+                      context.typography?.indicationText.copyWith(
+                        color: context.themeData.colorScheme.onSurfaceVariant,
+                      ),
                   labelText: widget.labelText,
                   floatingLabelBehavior:
                       widget.floatingLabelBehavior ??

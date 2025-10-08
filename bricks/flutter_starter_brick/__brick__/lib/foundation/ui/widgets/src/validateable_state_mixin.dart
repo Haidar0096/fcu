@@ -62,7 +62,9 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
           opacity: hasError ? 1 : 0,
           child: Text(
             errorMessage ?? '',
-            style: context.typography?.errorText,
+            style: context.typography?.errorText.copyWith(
+              color: context.themeData.colorScheme.error,
+            ),
             maxLines: ValidateableStateMixinDefaults.errorMaxLines,
             overflow: TextOverflow.ellipsis,
           ),

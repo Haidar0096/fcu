@@ -36,7 +36,7 @@ ThemeData themeData(ColorScheme colorScheme) {
     textButtonTheme: textButtonThemeData(colorScheme),
     inputDecorationTheme: inputDecorationTheme(colorScheme),
     dropdownMenuTheme: dropdownMenuThemeData(colorScheme),
-    extensions: [Typography(colorScheme)],
+    extensions: [Typography()],
   );
 }
 

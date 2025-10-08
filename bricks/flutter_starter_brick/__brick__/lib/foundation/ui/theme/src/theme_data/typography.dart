@@ -7,12 +7,30 @@ import 'package:{{proj_name}}/resources/resources.dart';
 /// Each enum value corresponds to a specific font.
 extension FontExtension on Fonts {
   TextStyle get textStyle => TextStyle(
-        fontFamily: fontFamilyName,
-        fontStyle: fontStyle,
-        fontWeight: fontWeight,
-      );
+    fontFamily: fontFamilyName,
+    fontStyle: fontStyle,
+    fontWeight: fontWeight,
+  );
 }
 
+/// Typography system providing text styles with font properties only.
+///
+/// IMPORTANT: All typography styles define ONLY font-related properties
+/// (fontFamily, fontWeight, fontSize, fontStyle, height, letterSpacing).
+/// Colors are NEVER included in typography styles.
+///
+/// Always provide colors explicitly via .copyWith(color: ...) when using
+/// these styles in UI code.
+///
+/// Example:
+/// ```dart
+/// Text(
+///   'Title',
+///   style: context.typography?.primaryTitle.copyWith(
+///     color: primaryTitleColor,
+///   ),
+/// )
+/// ```
 final class Typography extends ThemeExtension<Typography> {
   const Typography._({
     required this.primaryTitle,
@@ -25,23 +43,20 @@ final class Typography extends ThemeExtension<Typography> {
     required this.errorText,
   });
 
-  factory Typography(ColorScheme colorScheme) => Typography._(
-        primaryTitle: Fonts.montserratBold.textStyle.copyWith(fontSize: 24),
-        indicationText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 12),
-        fieldInput: Fonts.montserratRegular.textStyle.copyWith(fontSize: 14),
-        linkText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 16),
-        smallLinkText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 12),
-        bodyText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 14),
-        mediumBodyText: Fonts.montserratRegular.textStyle.copyWith(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          height: 1.5,
-        ),
-        errorText: Typography.defaultErrorFont.textStyle.copyWith(
-          fontSize: 14,
-          color: colorScheme.error,
-        ),
-      );
+  factory Typography() => Typography._(
+    primaryTitle: Fonts.montserratBold.textStyle.copyWith(fontSize: 24),
+    indicationText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 12),
+    fieldInput: Fonts.montserratRegular.textStyle.copyWith(fontSize: 14),
+    linkText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 16),
+    smallLinkText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 12),
+    bodyText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 14),
+    mediumBodyText: Fonts.montserratRegular.textStyle.copyWith(
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      height: 1.5,
+    ),
+    errorText: Typography.defaultErrorFont.textStyle.copyWith(fontSize: 14),
+  );
 
   // Default fonts used by theme components
   static const Fonts defaultErrorFont = Fonts.montserratItalic;
@@ -49,13 +64,37 @@ final class Typography extends ThemeExtension<Typography> {
   static const Fonts defaultDropdownFont = Fonts.montserratRegular;
 
   // Figma-named styles (added as we build screens)
+
+  /// Primary screen titles (Montserrat Bold, 24px)
+  /// Color: Provide via copyWith (commonly a primary text color)
   final TextStyle primaryTitle;
+
+  /// Small labels and hints (Montserrat Regular, 12px)
+  /// Color: Provide via copyWith (commonly a secondary/muted color)
   final TextStyle indicationText;
+
+  /// Text field input text (Montserrat Regular, 14px)
+  /// Color: Provide via copyWith (commonly onSurface or secondary)
   final TextStyle fieldInput;
+
+  /// Link text (Montserrat Regular, 16px)
+  /// Color: Use theme.colorScheme.primary or custom color
   final TextStyle linkText;
+
+  /// Small link text (Montserrat Regular, 12px)
+  /// Color: Use theme.colorScheme.primary or custom color
   final TextStyle smallLinkText;
+
+  /// General body text (Montserrat Regular, 14px)
+  /// Color: Provide via copyWith (commonly secondary or onSurface)
   final TextStyle bodyText;
+
+  /// Medium body text (Montserrat Regular, 14px, w500, height 1.5)
+  /// Color: Provide via copyWith
   final TextStyle mediumBodyText;
+
+  /// Error text (Montserrat Italic, 14px)
+  /// Color: Use theme.colorScheme.error
   final TextStyle errorText;
 
   @override

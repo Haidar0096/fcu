@@ -39,7 +39,12 @@ Future<T?> showFormDialog<T>({
               top: DialogConstants.verticalPadding,
             ),
             child: Center(
-              child: Text(title, style: context.typography?.primaryTitle),
+              child: Text(
+                title,
+                style: context.typography?.primaryTitle.copyWith(
+                  color: context.themeData.colorScheme.onSurface,
+                ),
+              ),
             ),
           ),
           contentPadding: const EdgeInsets.symmetric(

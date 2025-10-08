@@ -33,7 +33,9 @@ class CriticalErrorScreen extends StatelessWidget {
             const Spacing.vertical(SpacingSize.medium),
             Text(
               context.appLocalizations.criticalErrorTitle,
-              style: context.typography?.primaryTitle,
+              style: context.typography?.primaryTitle.copyWith(
+                color: context.themeData.colorScheme.onSurface,
+              ),
               textAlign: TextAlign.center,
             ),
             const Spacing.vertical(SpacingSize.small),

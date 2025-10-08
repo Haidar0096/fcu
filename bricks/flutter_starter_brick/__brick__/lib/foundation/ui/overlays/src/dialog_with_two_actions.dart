@@ -31,7 +31,12 @@ Future<T?> showDialogWithTwoActions<T>({
     title: Padding(
       padding: const EdgeInsets.only(top: DialogConstants.verticalPadding),
       child: Center(
-        child: Text(title, style: context.typography?.primaryTitle),
+        child: Text(
+          title,
+          style: context.typography?.primaryTitle.copyWith(
+            color: context.themeData.colorScheme.onSurface,
+          ),
+        ),
       ),
     ),
     content: Padding(

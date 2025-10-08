@@ -28,6 +28,7 @@ class SplashScreen extends StatelessWidget {
                 Text(
                   '{{proj_name.upperCase()}}',
                   style: context.typography?.primaryTitle.copyWith(
+                    color: context.themeData.colorScheme.onSurface,
                     letterSpacing: 8,
                   ),
                 ),
