@@ -1,34 +1,5 @@
 # CLAUDE.md
 
-## Table of Contents
-
-1. [Architecture Overview](#architecture-overview)
-   - [Architecture Philosophy](#architecture-philosophy)
-   - [Module Structure Pattern](#module-structure-pattern)
-   - [Import Rules](#import-rules)
-2. [Project Structure](#project-structure)
-   - [Project Structure Overview](#project-structure-overview)
-   - [Features Folder](#features-folder)
-   - [Entry Points](#entry-points)
-     - [Main Files](#main-files)
-   - [Core Infrastructure](#core-infrastructure)
-     - [The App Folder](#the-app-folder)
-     - [Dependency Injection](#dependency-injection)
-   - [Shared Components](#shared-components)
-     - [Foundation Folder](#foundation-folder)
-       - [Foundation Modules](#foundation-modules)
-3. [Coding Patterns](#coding-patterns)
-   - [DTOs and UI Models](#dtos-and-ui-models)
-   - [Typography Usage Patterns](#typography-usage-patterns)
-   - [Theme and UI Component Usage](#theme-and-ui-component-usage)
-   - [Sealed Class Patterns](#sealed-class-patterns)
-   - [Bloc Architecture Pattern](#bloc-architecture-pattern)
-   - [Operation Counter Pattern for Race Condition Prevention](#operation-counter-pattern-for-race-condition-prevention)
-   - [Logging Pattern](#logging-pattern)
-   - [Resources Folder](#resources-folder)
-
----
-
 ## Architecture Overview
 
 ### Architecture Philosophy
@@ -234,8 +205,6 @@ Layered HTTP architecture: abstract HttpClient interface → DioHttpClient imple
 #### models/
 Inter-feature shared data structures organized by purpose: dtos/ (API communication), enums/ (shared enumerations), ui_models/ (UI representations). Feature-specific models stay in features.
 
-(See [DTOs and UI Models](#dtos-and-ui-models) in Coding Patterns section for detailed patterns)
-
 #### ui/
 Comprehensive UI foundation providing reusable components, Material 3 theming, common widgets, overlays, animations, and UI services. Contains pre-styled components that follow the app's design system.
 
@@ -256,6 +225,8 @@ The pattern enforces separation: DTOs arrive at the bloc layer but must be conve
 This keeps UI layer decoupled from API contracts.
 
 **DTO Construction Pattern**: Always construct request DTOs in the UI layer (forms/widgets) and pass them to cubits/blocs. Never reconstruct DTOs in the cubit - this maintains consistency and makes it clear where data transformation happens. The UI layer is responsible for gathering user input and packaging it into DTOs, while the cubit/bloc layer just forwards these DTOs to the appropriate APIs. Note that it's perfectly fine to use DTOs in the UI layer when they're being used to collect data (like LoginRequestDto, SignupRequestDto) - these are for data collection, not display. Only response DTOs that will be displayed need conversion to UI models.
+
+**User Input Handling**: Never call `.trim()` on user input from controllers. Let validators see the actual input - if invalid, validation should fail. For optional nullable String fields in DTOs, convert empty string to null: `text.isEmpty ? null : text`.
 
 **How to use UiConvertibleDtoMixin**:
 1. When creating a DTO that will be displayed in the UI, add `with UiConvertibleDtoMixin<YourUiModel>`
@@ -437,7 +408,7 @@ bodyText.copyWith(fontWeight: FontWeight.w500) // Used in 5 files
 
 **What NOT to do:**
 ```dart
-// BAD - Overriding most properties
+// BAD - Using typography but overriding most properties
 Text(
   'Title',
   style: context.typography?.primaryTitle.copyWith(
@@ -464,12 +435,7 @@ Text(
 - Styles named after Figma design tokens (primaryTitle, bodyText, etc.)
 - Each field has documentation specifying the font properties and suggested color to use
 - Add new styles as you discover them in Figma designs
-
-**Important:**
 - Uses **Montserrat** font family by default
-- Typography defines fonts, colors come from `foundation/ui/theme/colors.dart`
-- Always use `.copyWith(color: ...)` when applying typography styles
-- Never override fontSize/fontWeight/fontStyle/fontFamily - use different Typography field instead
 
 ### Theme and UI Component Usage
 
