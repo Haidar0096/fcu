@@ -55,7 +55,7 @@ get_build_cmd() {
     local target_server="$4"
     local main_file="lib/main_${target_server}.dart"
 
-    echo "flutter build apk --release \
+    echo "fvm flutter build apk --release \
 --target-platform=\"$target_platform\" \
 --build-name=\"$version\" \
 --build-number=\"$version_code\" \
@@ -105,7 +105,7 @@ echo ""
 echo "📦 Building AAB for production release..."
 echo "🚧 Building AAB version $version_formatted for Google Play Store"
 
-aab_build_cmd="flutter build appbundle --release \
+aab_build_cmd="fvm flutter build appbundle --release \
 --build-name=\"$version\" \
 --build-number=\"$version_code\" \
 -t \"lib/main_production.dart\""
