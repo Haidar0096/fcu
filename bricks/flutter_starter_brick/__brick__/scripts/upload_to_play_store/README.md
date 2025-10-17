@@ -36,6 +36,7 @@ platform :android do
     upload_to_play_store(
       aab: options[:aab],
       json_key: options[:json_key],
+      package_name: '{{org_name}}.{{proj_name}}',
       track: 'internal',
       skip_upload_metadata: true,
       skip_upload_images: true,
@@ -49,6 +50,7 @@ platform :android do
     upload_to_play_store(
       aab: options[:aab],
       json_key: options[:json_key],
+      package_name: '{{org_name}}.{{proj_name}}',
       track: 'beta',
       skip_upload_metadata: true,
       skip_upload_images: true,
@@ -62,6 +64,7 @@ platform :android do
     upload_to_play_store(
       aab: options[:aab],
       json_key: options[:json_key],
+      package_name: '{{org_name}}.{{proj_name}}',
       track: 'production',
       skip_upload_metadata: true,
       skip_upload_images: true,
