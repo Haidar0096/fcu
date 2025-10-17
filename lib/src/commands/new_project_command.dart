@@ -271,6 +271,11 @@ class NewProjectCommand extends Command<int> {
       '',
       '# Android Kotlin metadata',
       '/android/.kotlin/',
+      '',
+      '# Deployment secrets',
+      'scripts/upload_to_play_store/service_account_json_path',
+      'scripts/upload_to_test_flight/api_key_name',
+      'scripts/upload_to_test_flight/issuer_id',
     ].join('\n');
     final addToGitIgnoreResult = await Process.run('bash', [
       '-c',
