@@ -276,6 +276,10 @@ class NewProjectCommand extends Command<int> {
       'scripts/upload_to_play_store/service_account_json_path',
       'scripts/upload_to_test_flight/api_key_name',
       'scripts/upload_to_test_flight/issuer_id',
+      '',
+      '# Fastlane generated files',
+      'android/fastlane/report.xml',
+      'android/fastlane/README.md',
     ].join('\n');
     final addToGitIgnoreResult = await Process.run('bash', [
       '-c',
