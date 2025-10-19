@@ -19,7 +19,8 @@ Follow Apple's guide: [Creating API Keys for App Store Connect API](https://deve
 
 Summary:
 - Create a new key -> https://appstoreconnect.apple.com/access/integrations/api
-- Download the .p8 file and note the Key ID (key file name) and Issuer ID (from the API Keys page above).
+- Download the .p8 file and note the Key ID (key file name) and Issuer ID (from the API Keys page above)
+- Place the .p8 file at `~/.appstoreconnect/private_keys/AuthKey_<YOUR_KEY_ID>.p8`
 
 ### 2. Configure API Credentials
 
