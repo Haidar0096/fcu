@@ -40,6 +40,7 @@ class DioHttpClient extends HttpClient {
     Map<String, dynamic>? replacementHeaders,
     Object? body,
     bool Function(int? statusCode)? responseStatusCodeValidator,
+    ProgressCallback? onSendProgress,
   }) async {
     if (additionalHeaders != null && replacementHeaders != null) {
       throw ArgumentError(
@@ -64,6 +65,7 @@ class DioHttpClient extends HttpClient {
         queryParameters: queryParameters,
         data: body,
         options: options,
+        onSendProgress: onSendProgress,
       );
 
       return Result.success(successResponseMapper(response.toHttpResponse));
@@ -143,10 +145,7 @@ class DioHttpClient extends HttpClient {
 
       final errorData = serverErrorMessageParser?.call(error);
       return Result.failure(
-        UnknownError(
-          message: errorData?.message,
-          code: errorData?.code,
-        ),
+        UnknownError(message: errorData?.message, code: errorData?.code),
       );
     }
   }

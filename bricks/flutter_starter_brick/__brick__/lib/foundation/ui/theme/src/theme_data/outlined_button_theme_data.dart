@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Typography;
 import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/defaults.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/typography.dart';
 import 'package:{{proj_name}}/resources/resources.dart';
@@ -9,9 +9,12 @@ OutlinedButtonThemeData outlinedButtonThemeData(ColorScheme colorScheme) =>
         backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
         shape: WidgetStateProperty.resolveWith((states) {
           final borderSide = BorderSide(
-            color: states.contains(WidgetState.disabled)
-                ? colorScheme.onSurface.withValues(alpha: ThemeDefaults.buttonDisabledOverlayAlpha)
-                : colorScheme.primary,
+            color:
+                states.contains(WidgetState.disabled)
+                    ? colorScheme.onSurface.withValues(
+                      alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+                    )
+                    : colorScheme.primary,
             width: ThemeDefaults.borderWidth,
           );
           return RoundedRectangleBorder(
@@ -32,15 +35,21 @@ OutlinedButtonThemeData outlinedButtonThemeData(ColorScheme colorScheme) =>
         ),
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) return null;
-          return colorScheme.primary.withValues(alpha: ThemeDefaults.buttonDisabledOverlayAlpha);
+          return colorScheme.primary.withValues(
+            alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+          );
         }),
         elevation: const WidgetStatePropertyAll(0),
         textStyle: WidgetStateProperty.all(
-          Fonts.defaultTitleFont.textStyle(fontSize: ThemeDefaults.buttonTextSize),
+          Typography.defaultButtonFont.textStyle.copyWith(
+            fontSize: ThemeDefaults.buttonTextSize,
+          ),
         ),
         foregroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return colorScheme.onSurface.withValues(alpha: ThemeDefaults.materialDisabledOpacity);
+            return colorScheme.onSurface.withValues(
+              alpha: ThemeDefaults.materialDisabledOpacity,
+            );
           }
           return colorScheme.primary;
         }),

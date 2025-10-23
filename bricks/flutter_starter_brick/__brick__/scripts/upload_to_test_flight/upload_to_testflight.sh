@@ -44,7 +44,7 @@ main_file="lib/main_production.dart"
 
 # Build IPA
 echo "🚀 Building IPA for version $ios_version_name ($ios_build_number)..."
-flutter build ipa \
+fvm flutter build ipa \
     --release \
     --build-name="$ios_version_name" \
     --build-number="$ios_build_number" \

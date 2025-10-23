@@ -5,9 +5,8 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 /// Manages the locale of the app.
 class LocalizationCubit extends HydratedCubit<Language> {
-  LocalizationCubit({
-    Language? initialLanguage,
-  }) : super(initialLanguage ?? Language.english);
+  LocalizationCubit({Language? initialLanguage})
+    : super(initialLanguage ?? Language.english);
 
   /// Sets the language to the given [language].
   void setLanguage(Language language) {

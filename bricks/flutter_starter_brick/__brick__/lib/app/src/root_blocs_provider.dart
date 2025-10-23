@@ -34,15 +34,9 @@ class _RootBlocsProviderState extends State<RootBlocsProvider> {
   Widget build(BuildContext context) => MultiBlocProvider(
     providers: [
       // TODO({{dev_name}}): Add app-specific global blocs here
-      BlocProvider<LocalizationCubit>.value(
-        value: _localizationCubit,
-      ),
-      BlocProvider<ThemeCubit>.value(
-        value: _themeCubit,
-      ),
-      BlocProvider<AppMetaDataCubit>.value(
-        value: _appMetaDataCubit,
-      ),
+      BlocProvider<LocalizationCubit>.value(value: _localizationCubit),
+      BlocProvider<ThemeCubit>.value(value: _themeCubit),
+      BlocProvider<AppMetaDataCubit>.value(value: _appMetaDataCubit),
     ],
     child: Builder(builder: widget.builder),
   );

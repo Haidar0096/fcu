@@ -7,10 +7,7 @@ part 'joke_dto.g.dart';
 /// DTO for joke API response
 @JsonSerializable()
 final class JokeDto with UiConvertibleDtoMixin<UiJoke> {
-  const JokeDto({
-    required this.id,
-    required this.value,
-  });
+  const JokeDto({required this.id, required this.value});
 
   factory JokeDto.fromJson(Map<String, dynamic> json) =>
       _$JokeDtoFromJson(json);
@@ -24,8 +21,5 @@ final class JokeDto with UiConvertibleDtoMixin<UiJoke> {
   Map<String, dynamic> toJson() => _$JokeDtoToJson(this);
 
   @override
-  UiJoke toUiModel() => UiJoke(
-    id: id ?? '',
-    content: value ?? '',
-  );
+  UiJoke toUiModel() => UiJoke(id: id ?? '', content: value ?? '');
 }

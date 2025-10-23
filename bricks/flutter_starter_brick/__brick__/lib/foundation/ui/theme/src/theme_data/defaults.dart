@@ -12,23 +12,32 @@ class ThemeDefaults {
 
   // Semantic border radius values for specific use cases
   static const double buttonBorderRadius = borderRadiusSmall; // 8
-  static const double cardBorderRadius = 12; // Direct value since borderRadiusMedium was unused
+  static const double cardBorderRadius =
+      12; // Direct value since borderRadiusMedium was unused
   static const double bottomSheetBorderRadius = borderRadiusExtraLarge; // 20
 
   // Icon button defaults
   static const double iconSize = 24;
+  static const double smallIconSize = 20;
   static const double iconButtonSize = 48;
+  static const double smallIconButtonSize = 40;
 
   // Screen content padding defaults
   static const double screenContentHorizontalPadding = 24;
 
   // Opacity values
   static const int disabledAlpha = 102; // ~0.4 opacity for custom widgets
-  static const double buttonDisabledOverlayAlpha = 0.12; // Disabled/overlay opacity for buttons
-  static const double materialDisabledOpacity = 0.38; // Material Design standard for disabled states
-  static const double textFieldEnabledBorderOpacity = 0.2; // Subtle border for enabled text fields
-  static const double textSelectionOpacity = 0.4; // Text selection highlight opacity
+  static const double buttonDisabledOverlayAlpha =
+      0.12; // Disabled/overlay opacity for buttons
+  static const double materialDisabledOpacity =
+      0.38; // Material Design standard for disabled states
+  static const double textFieldEnabledBorderOpacity =
+      0.2; // Subtle border for enabled text fields
+  static const double textSelectionOpacity =
+      0.4; // Text selection highlight opacity
   static const double scrimOpacity = 0.32; // Modal scrim/overlay opacity
+  static const double borderAlpha = 0.3; // For subtle borders
+  static const double shadowAlpha = 0.08; // For subtle box shadows
 
   // Text size defaults
   static const double buttonTextSize = 16; // Standard button text size
@@ -36,6 +45,8 @@ class ThemeDefaults {
 
   // Component-specific defaults
   static const double scrollbarThickness = 10; // Scrollbar thumb thickness
-  static const double scrollbarThumbOpacity = 0.8; // Scrollbar thumb opacity for subtle appearance
-  static const double checkboxBorderWidth = 1.5; // Checkbox border width (slightly thicker for visibility)
+  static const double scrollbarThumbOpacity =
+      0.8; // Scrollbar thumb opacity for subtle appearance
+  static const double checkboxBorderWidth =
+      1.5; // Checkbox border width (slightly thicker for visibility)
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:{{proj_name}}/foundation/ui/mixins/mixins.dart';
 import 'package:{{proj_name}}/foundation/ui/services/services.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
-import 'package:{{proj_name}}/foundation/ui/widgets/src/validateable_state_mixin.dart';
 
 /// A customizable [TextFormField] with default styling and behavior.
 ///
@@ -258,7 +258,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
             autofocus: widget.autofocus,
             style:
                 widget.style ??
-                context.typography?.body5.copyWith(
+                context.typography?.fieldInput.copyWith(
                   color: context.themeData.colorScheme.onSurface,
                 ),
             cursorHeight: widget.cursorHeight,
@@ -274,9 +274,8 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                   suffixIconConstraints: suffixIconConstraints,
                   labelStyle:
                       widget.labelStyle ??
-                      context.typography?.body4.copyWith(
-                        color: context.themeData.colorScheme.onSurface,
-                        fontWeight: FontWeight.w500,
+                      context.typography?.indicationText.copyWith(
+                        color: context.themeData.colorScheme.onSurfaceVariant,
                       ),
                   labelText: widget.labelText,
                   floatingLabelBehavior:
@@ -285,7 +284,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                   hintText: widget.hintText,
                   hintStyle:
                       widget.hintStyle ??
-                      context.typography?.body4.copyWith(
+                      context.typography?.bodyText.copyWith(
                         color: context.themeData.colorScheme.onSurface
                             .withValues(
                               alpha:
@@ -293,18 +292,26 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                             ),
                       ),
                   contentPadding: widget.contentPadding,
-                  enabledBorder: hasError
-                      ? context.themeData.inputDecorationTheme.errorBorder
-                      : context.themeData.inputDecorationTheme.enabledBorder,
+                  enabledBorder:
+                      hasError
+                          ? context.themeData.inputDecorationTheme.errorBorder
+                          : context
+                              .themeData
+                              .inputDecorationTheme
+                              .enabledBorder,
                   disabledBorder:
                       widget.disabledBorder ??
                       context.themeData.inputDecorationTheme.disabledBorder,
-                  focusedBorder: hasError
-                      ? context
-                            .themeData
-                            .inputDecorationTheme
-                            .focusedErrorBorder
-                      : context.themeData.inputDecorationTheme.focusedBorder,
+                  focusedBorder:
+                      hasError
+                          ? context
+                              .themeData
+                              .inputDecorationTheme
+                              .focusedErrorBorder
+                          : context
+                              .themeData
+                              .inputDecorationTheme
+                              .focusedBorder,
                 ),
             onChanged: (value) {
               widget.onChanged?.call(value);

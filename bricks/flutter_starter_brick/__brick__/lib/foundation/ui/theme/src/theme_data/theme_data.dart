@@ -36,7 +36,7 @@ ThemeData themeData(ColorScheme colorScheme) {
     textButtonTheme: textButtonThemeData(colorScheme),
     inputDecorationTheme: inputDecorationTheme(colorScheme),
     dropdownMenuTheme: dropdownMenuThemeData(colorScheme),
-    extensions: [Typography(colorScheme)],
+    extensions: [Typography()],
   );
 }
 
@@ -45,5 +45,6 @@ extension ThemeDataBuildContextExtension on BuildContext {
 }
 
 extension ThemeDataExtension on ThemeData {
-  Color get defaultScrim => colorScheme.scrim.withValues(alpha: ThemeDefaults.scrimOpacity);
+  Color get defaultScrim =>
+      colorScheme.scrim.withValues(alpha: ThemeDefaults.scrimOpacity);
 }

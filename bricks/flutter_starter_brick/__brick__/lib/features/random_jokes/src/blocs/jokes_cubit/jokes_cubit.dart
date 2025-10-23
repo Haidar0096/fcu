@@ -8,10 +8,9 @@ part 'jokes_state.dart';
 
 /// Manages the state and logic for fetching random jokes
 class JokesCubit extends Cubit<JokesState> with CubitUtils {
-  JokesCubit({
-    required JokesApi jokesApi,
-  }) : _jokesApi = jokesApi,
-       super(const JokesInitial());
+  JokesCubit({required JokesApi jokesApi})
+    : _jokesApi = jokesApi,
+      super(const JokesInitial());
 
   final JokesApi _jokesApi;
 

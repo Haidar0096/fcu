@@ -11,10 +11,10 @@ const ColorScheme _colorScheme = ColorScheme(
   brightness: Brightness.light,
 
   /* === Brand colours === */
-  primary: primaryBlue,
-  surfaceTint: primaryBlue,
+  primary: primary,
+  surfaceTint: primary,
   onPrimary: white,
-  primaryContainer: primaryBlueContainer,
+  primaryContainer: primaryContainer,
   onPrimaryContainer: darkSurface,
 
   secondary: secondaryTeal,
@@ -38,7 +38,7 @@ const ColorScheme _colorScheme = ColorScheme(
   onSurface: darkSurface,
   onSurfaceVariant: Color(0xFF4E5866),
   inverseSurface: darkSurface,
-  inversePrimary: primaryBlue,
+  inversePrimary: primary,
   surfaceDim: lightSurface,
   surfaceBright: white,
   surfaceContainerLowest: white,
@@ -54,7 +54,7 @@ const ColorScheme _colorScheme = ColorScheme(
   scrim: black,
 
   /* === Fixed palette (Material 3 tonal elevation) === */
-  primaryFixed: primaryBlueContainer,
+  primaryFixed: primaryContainer,
   primaryFixedDim: primaryFixedDim,
   onPrimaryFixed: darkSurface,
   onPrimaryFixedVariant: onPrimaryFixedVariant,

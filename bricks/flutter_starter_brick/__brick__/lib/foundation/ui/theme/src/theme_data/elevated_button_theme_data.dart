@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Typography;
 import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/defaults.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/typography.dart';
 import 'package:{{proj_name}}/resources/resources.dart';
@@ -8,15 +8,20 @@ ElevatedButtonThemeData elevatedButtonThemeData(ColorScheme colorScheme) =>
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return colorScheme.onSurface.withValues(alpha: ThemeDefaults.buttonDisabledOverlayAlpha);
+            return colorScheme.onSurface.withValues(
+              alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+            );
           }
           return colorScheme.surface;
         }),
         shape: WidgetStateProperty.resolveWith((states) {
           final borderSide = BorderSide(
-            color: states.contains(WidgetState.disabled)
-                ? colorScheme.onSurface.withValues(alpha: ThemeDefaults.buttonDisabledOverlayAlpha)
-                : colorScheme.onSurface,
+            color:
+                states.contains(WidgetState.disabled)
+                    ? colorScheme.onSurface.withValues(
+                      alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+                    )
+                    : colorScheme.onSurface,
             width: ThemeDefaults.borderWidth,
           );
           return RoundedRectangleBorder(
@@ -37,15 +42,21 @@ ElevatedButtonThemeData elevatedButtonThemeData(ColorScheme colorScheme) =>
         ),
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) return null;
-          return colorScheme.primary.withValues(alpha: ThemeDefaults.buttonDisabledOverlayAlpha);
+          return colorScheme.primary.withValues(
+            alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+          );
         }),
         elevation: const WidgetStatePropertyAll(0),
         textStyle: WidgetStateProperty.all(
-          Fonts.defaultTitleFont.textStyle(fontSize: ThemeDefaults.buttonTextSize),
+          Typography.defaultButtonFont.textStyle.copyWith(
+            fontSize: ThemeDefaults.buttonTextSize,
+          ),
         ),
         foregroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return colorScheme.onSurface.withValues(alpha: ThemeDefaults.materialDisabledOpacity);
+            return colorScheme.onSurface.withValues(
+              alpha: ThemeDefaults.materialDisabledOpacity,
+            );
           }
           return colorScheme.primary;
         }),

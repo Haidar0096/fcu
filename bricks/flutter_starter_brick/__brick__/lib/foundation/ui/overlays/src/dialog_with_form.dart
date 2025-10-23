@@ -32,46 +32,52 @@ Future<T?> showFormDialog<T>({
   applyBlur: true,
   applyDim: true,
   content: StatefulBuilder(
-    builder: (context, setState) => AlertDialog(
-      title: Padding(
-        padding: const EdgeInsets.only(top: DialogConstants.verticalPadding),
-        child: Center(
-          child: Text(title, style: context.typography?.title6),
-        ),
-      ),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: DialogConstants.horizontalPadding,
-        vertical: DialogConstants.formVerticalPadding,
-      ),
-      content: SingleChildScrollView(
-        child: formBuilder(context, setState),
-      ),
-      actionsAlignment: MainAxisAlignment.center,
-      actionsPadding: const EdgeInsets.only(
-        left: DialogConstants.horizontalPadding,
-        right: DialogConstants.horizontalPadding,
-        bottom: DialogConstants.horizontalPadding,
-        top: DialogConstants.verticalPadding,
-      ),
-      actions: [
-        Row(
-          children: [
-            Expanded(
-              child: SecondaryButton(
-                text: leftButtonText.toUpperCase(),
-                onPressed: onLeftButtonPressed(setState),
+    builder:
+        (context, setState) => AlertDialog(
+          title: Padding(
+            padding: const EdgeInsets.only(
+              top: DialogConstants.verticalPadding,
+            ),
+            child: Center(
+              child: Text(
+                title,
+                style: context.typography?.primaryTitle.copyWith(
+                  color: context.themeData.colorScheme.onSurface,
+                ),
               ),
             ),
-            const SizedBox(width: DialogConstants.buttonSpacing),
-            Expanded(
-              child: MainButton(
-                text: rightButtonText.toUpperCase(),
-                onPressed: onRightButtonPressed(setState),
-              ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: DialogConstants.horizontalPadding,
+            vertical: DialogConstants.formVerticalPadding,
+          ),
+          content: SingleChildScrollView(child: formBuilder(context, setState)),
+          actionsAlignment: MainAxisAlignment.center,
+          actionsPadding: const EdgeInsets.only(
+            left: DialogConstants.horizontalPadding,
+            right: DialogConstants.horizontalPadding,
+            bottom: DialogConstants.horizontalPadding,
+            top: DialogConstants.verticalPadding,
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: SecondaryButton(
+                    text: leftButtonText.toUpperCase(),
+                    onPressed: onLeftButtonPressed(setState),
+                  ),
+                ),
+                const SizedBox(width: DialogConstants.buttonSpacing),
+                Expanded(
+                  child: MainButton(
+                    text: rightButtonText.toUpperCase(),
+                    onPressed: onRightButtonPressed(setState),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      ],
-    ),
   ),
 );
