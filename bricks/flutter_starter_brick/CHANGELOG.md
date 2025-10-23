@@ -74,3 +74,10 @@ some files and folders.
 - Fixed layout overflow issues with long jokes using SingleChildScrollView
 - Simplified error state handling with cleaner conditional rendering
 - Added flutter_launcher_icons package to dev dependencies for app icon generation
+
+# 4.0.3
+- Moved ValidateableStateMixin from foundation/ui/widgets to foundation/ui/mixins for better module organization
+- Refactored spacing system with complete 4-unit steps (4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64)
+- Renamed all spacing values to numeric pattern (spacing4, spacing8, spacing16, spacing24, spacing32, spacing40, spacing48, spacing64)
+- Simplified spacing usage by removing wrapper classes - use SizedBox directly with SpacingSize.spacingX.value
+- Fixed brick template variable name (project_name → proj_name) causing import generation issues

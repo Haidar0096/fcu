@@ -12,43 +12,43 @@ import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 /// - App metadata initialization
 /// - Shows splash for 1.5 seconds then navigates to main screen
 class SplashScreen extends StatelessWidget {
-  const SplashScreen({
-    super.key,
-  });
+  const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => BlocListener<AppMetaDataCubit, AppMetaDataState>(
-    listener: _metaDataCubitListener,
-    child: RootScreenWidget(
-      applySafeArea: false,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // App Name
-            Text(
-              '{{proj_name.upperCase()}}',
-              style: context.typography?.title1.copyWith(
-                letterSpacing: 8,
-              ),
-            ),
-            const Spacing.vertical(SpacingSize.xSmall),
-            Text(
-              context.appLocalizations.appTagline,
-              style: context.typography?.body4.copyWith(
-                color: context.themeData.colorScheme.onSurface.withValues(
-                  alpha: 0.7,
+  Widget build(BuildContext context) =>
+      BlocListener<AppMetaDataCubit, AppMetaDataState>(
+        listener: _metaDataCubitListener,
+        child: RootScreenWidget(
+          applySafeArea: false,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // App Name
+                Text(
+                  '{{proj_name.upperCase()}}',
+                  style: context.typography?.primaryTitle.copyWith(
+                    color: context.themeData.colorScheme.onSurface,
+                    letterSpacing: 8,
+                  ),
                 ),
-                letterSpacing: 2,
-              ),
+                SizedBox(height: SpacingSize.spacing8.value),
+                Text(
+                  context.appLocalizations.appTagline,
+                  style: context.typography?.bodyText.copyWith(
+                    color: context.themeData.colorScheme.onSurface.withValues(
+                      alpha: 0.7,
+                    ),
+                    letterSpacing: 2,
+                  ),
+                ),
+                SizedBox(height: SpacingSize.spacing32.value),
+                const LoaderWidget(size: 40),
+              ],
             ),
-            const Spacing.vertical(SpacingSize.large),
-            const LoaderWidget(size: 40),
-          ],
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
   void _metaDataCubitListener(BuildContext context, AppMetaDataState state) {
     switch (state) {

@@ -24,9 +24,10 @@ class SecondaryButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         minimumSize: width != null ? Size(width!, 0) : null,
         maximumSize: width != null ? Size(width!, double.infinity) : null,
-        foregroundColor: onPressed != null
-            ? context.themeData.colorScheme.primary
-            : theme?.foregroundColor?.resolve({WidgetState.disabled}),
+        foregroundColor:
+            onPressed != null
+                ? context.themeData.colorScheme.primary
+                : theme?.foregroundColor?.resolve({WidgetState.disabled}),
         textStyle: theme?.textStyle?.resolve({}),
       ),
       child: Text(
@@ -37,11 +38,7 @@ class SecondaryButton extends StatelessWidget {
     );
 
     if (height != null) {
-      return SizedBox(
-        width: width,
-        height: height,
-        child: button,
-      );
+      return SizedBox(width: width, height: height, child: button);
     }
 
     return button;

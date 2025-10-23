@@ -14,10 +14,11 @@ Future<T?> showCustomBottomSheet<T>({
   isDismissible: isDismissible,
   enableDrag: enableDrag,
   backgroundColor: backgroundColor,
-  builder: (BuildContext context) => _CustomBottomSheetContent(
-    content: content ?? const SizedBox(),
-    onAppLifecycleStateChanged: onAppLifecycleStateChanged,
-  ),
+  builder:
+      (BuildContext context) => _CustomBottomSheetContent(
+        content: content ?? const SizedBox(),
+        onAppLifecycleStateChanged: onAppLifecycleStateChanged,
+      ),
   shape: const RoundedRectangleBorder(
     borderRadius: BorderRadius.only(
       topLeft: Radius.circular(ThemeDefaults.bottomSheetBorderRadius),

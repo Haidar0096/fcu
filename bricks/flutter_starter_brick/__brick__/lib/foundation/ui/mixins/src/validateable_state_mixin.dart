@@ -50,9 +50,10 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
     if (showErrorMessage) ...[
       SizeTransition(
         sizeFactor: animationController,
-        child: hasError
-            ? const Spacing.vertical(SpacingSize.xxSmall)
-            : const SizedBox.shrink(),
+        child:
+            hasError
+                ? SizedBox(height: SpacingSize.spacing4.value)
+                : const SizedBox.shrink(),
       ),
       SizeTransition(
         sizeFactor: animationController,
@@ -61,7 +62,9 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
           opacity: hasError ? 1 : 0,
           child: Text(
             errorMessage ?? '',
-            style: context.typography?.error.copyWith(fontSize: ValidateableStateMixinDefaults.errorFontSize),
+            style: context.typography?.errorText.copyWith(
+              color: context.themeData.colorScheme.error,
+            ),
             maxLines: ValidateableStateMixinDefaults.errorMaxLines,
             overflow: TextOverflow.ellipsis,
           ),

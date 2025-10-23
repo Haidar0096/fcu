@@ -10,17 +10,14 @@ part 'splash_state.dart';
 class SplashCubit extends Cubit<SplashState> with CubitUtils {
   SplashCubit() : super(const SplashInitial());
 
-
   /// Called when app metadata is loaded - starts splash timer
   void onMetadataLoaded() {
     _startSplashTimer();
   }
 
-
   /// Called when app metadata loading fails - emits critical error state
-  void onMetadataLoadingFailed({String? errorMessage}) => emitIfNotClosed(
-    SplashCriticalError(errorMessage: errorMessage),
-  );
+  void onMetadataLoadingFailed({String? errorMessage}) =>
+      emitIfNotClosed(SplashCriticalError(errorMessage: errorMessage));
 
   /// Starts 1.5 second timer before completing splash
   void _startSplashTimer() {

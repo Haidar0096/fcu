@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Typography;
+import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/colors.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/defaults.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/typography.dart';
 import 'package:{{proj_name}}/resources/resources.dart';
@@ -8,15 +9,17 @@ DropdownMenuThemeData dropdownMenuThemeData(ColorScheme colorScheme) =>
       inputDecorationTheme: InputDecorationTheme(
         enabledBorder: _buildDropdownMenuBorder(color: colorScheme.outline),
         disabledBorder: _buildDropdownMenuBorder(
-          color: colorScheme.outline.withValues(alpha: ThemeDefaults.materialDisabledOpacity),
+          color: colorScheme.outline.withValues(
+            alpha: ThemeDefaults.materialDisabledOpacity,
+          ),
         ),
         focusedBorder: _buildDropdownMenuBorder(color: colorScheme.primary),
         errorBorder: _buildDropdownMenuBorder(color: colorScheme.error),
         focusedErrorBorder: _buildDropdownMenuBorder(color: colorScheme.error),
       ),
-      textStyle: Fonts.defaultBodyFont.textStyle(
-        fontSize: ThemeDefaults.dropdownTextSize,
-        color: colorScheme.onSurface,
+      textStyle: Typography.defaultDropdownFont.textStyle.copyWith(
+        fontSize: 14,
+        color: dropdownTextColor,
       ),
       menuStyle: MenuStyle(
         backgroundColor: WidgetStatePropertyAll(colorScheme.surface),

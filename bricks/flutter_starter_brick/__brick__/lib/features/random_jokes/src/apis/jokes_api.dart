@@ -5,9 +5,7 @@ import 'package:{{proj_name}}/foundation/networking/models/models.dart';
 
 /// API for random jokes operations
 class JokesApi {
-  const JokesApi(
-    this._httpClient,
-  );
+  const JokesApi(this._httpClient);
 
   final HttpClient _httpClient;
 
@@ -16,7 +14,8 @@ class JokesApi {
       _httpClient.request(
         path: '/jokes/random',
         method: 'GET',
-        successResponseMapper: (response) =>
-            JokeDto.fromJson(response.data as Map<String, dynamic>),
+        successResponseMapper:
+            (response) =>
+                JokeDto.fromJson(response.data as Map<String, dynamic>),
       );
 }

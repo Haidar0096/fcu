@@ -11,10 +11,7 @@ import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 /// - App metadata loading failure
 /// - Critical initialization failures
 class CriticalErrorScreen extends StatelessWidget {
-  const CriticalErrorScreen({
-    this.errorMessage,
-    super.key,
-  });
+  const CriticalErrorScreen({this.errorMessage, super.key});
 
   final String? errorMessage;
 
@@ -33,18 +30,20 @@ class CriticalErrorScreen extends StatelessWidget {
               size: 64,
               color: context.themeData.colorScheme.error,
             ),
-            const Spacing.vertical(SpacingSize.medium),
+            SizedBox(height: SpacingSize.spacing24.value),
             Text(
               context.appLocalizations.criticalErrorTitle,
-              style: context.typography?.title4,
+              style: context.typography?.primaryTitle.copyWith(
+                color: context.themeData.colorScheme.onSurface,
+              ),
               textAlign: TextAlign.center,
             ),
-            const Spacing.vertical(SpacingSize.small),
+            SizedBox(height: SpacingSize.spacing16.value),
             Text(
               errorMessage ??
                   '${context.appLocalizations.criticalErrorMessage} '
                       '${context.appLocalizations.restartAppMessage}',
-              style: context.typography?.body4.copyWith(
+              style: context.typography?.bodyText.copyWith(
                 color: context.themeData.colorScheme.onSurface.withValues(
                   alpha: 0.8,
                 ),
