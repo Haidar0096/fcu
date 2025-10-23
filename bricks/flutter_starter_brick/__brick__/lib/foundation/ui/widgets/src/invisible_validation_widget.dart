@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:{{project_name.snakeCase()}}/foundation/ui/widgets/src/validateable_state_mixin.dart';
+import 'package:{{project_name.snakeCase()}}/foundation/ui/mixins/mixins.dart';
 
 /// An invisible widget that provides validation support for non-form-field
 /// components.

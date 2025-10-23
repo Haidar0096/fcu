@@ -16,4 +16,3 @@ export 'src/sliding_banner.dart';
 export 'src/snackbars.dart';
 export 'src/spacing.dart';
 export 'src/status_banner_widget.dart';
-export 'src/validateable_state_mixin.dart';

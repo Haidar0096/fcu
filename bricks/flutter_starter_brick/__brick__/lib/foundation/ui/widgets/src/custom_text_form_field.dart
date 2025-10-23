@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:{{proj_name}}/foundation/ui/mixins/mixins.dart';
 import 'package:{{proj_name}}/foundation/ui/services/services.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
-import 'package:{{proj_name}}/foundation/ui/widgets/src/validateable_state_mixin.dart';
 
 /// A customizable [TextFormField] with default styling and behavior.
 ///
