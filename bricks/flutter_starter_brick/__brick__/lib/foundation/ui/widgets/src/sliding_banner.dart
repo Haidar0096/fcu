@@ -240,10 +240,10 @@ class _SlidingBannerWidgetState extends State<_SlidingBannerWidget>
               opacity: _fadeAnimation,
               child: Container(
                 padding: EdgeInsets.only(
-                  top: topPadding + SpacingSize.xSmall.value,
-                  left: SpacingSize.small.value,
-                  right: SpacingSize.small.value,
-                  bottom: SpacingSize.xSmall.value,
+                  top: topPadding + SpacingSize.spacing8.value,
+                  left: SpacingSize.spacing16.value,
+                  right: SpacingSize.spacing16.value,
+                  bottom: SpacingSize.spacing8.value,
                 ),
                 child: StatusBannerWidget(
                   type: widget.type,

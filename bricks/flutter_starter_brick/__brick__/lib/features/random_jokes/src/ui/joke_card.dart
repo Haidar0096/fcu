@@ -11,10 +11,10 @@ class JokeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
-    margin: EdgeInsets.all(SpacingSize.medium.value),
+    margin: EdgeInsets.all(SpacingSize.spacing24.value),
     elevation: 2,
     child: Padding(
-      padding: EdgeInsets.all(SpacingSize.large.value),
+      padding: EdgeInsets.all(SpacingSize.spacing32.value),
       child: Text(
         joke.content,
         style: context.typography?.bodyText,

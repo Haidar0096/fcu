@@ -67,8 +67,8 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showCustomSnackBar({
               ),
               alignment: Alignment.center,
               padding: EdgeInsets.symmetric(
-                vertical: SpacingSize.xxSmall.value,
-                horizontal: SpacingSize.large.value,
+                vertical: SpacingSize.spacing4.value,
+                horizontal: SpacingSize.spacing32.value,
               ),
               decoration: BoxDecoration(
                 color: backgroundColor,

@@ -82,7 +82,7 @@ class GlobalLoader {
                 shrinkWrap: true,
                 children: [
                   const Center(child: LoaderWidget()),
-                  const Spacing.vertical(SpacingSize.medium),
+                  SizedBox(height: SpacingSize.spacing24.value),
                   if (loadingText != null)
                     Center(
                       child: Text(

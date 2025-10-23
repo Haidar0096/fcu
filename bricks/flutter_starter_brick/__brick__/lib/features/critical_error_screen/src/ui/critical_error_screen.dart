@@ -30,7 +30,7 @@ class CriticalErrorScreen extends StatelessWidget {
               size: 64,
               color: context.themeData.colorScheme.error,
             ),
-            const Spacing.vertical(SpacingSize.medium),
+            SizedBox(height: SpacingSize.spacing24.value),
             Text(
               context.appLocalizations.criticalErrorTitle,
               style: context.typography?.primaryTitle.copyWith(
@@ -38,7 +38,7 @@ class CriticalErrorScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const Spacing.vertical(SpacingSize.small),
+            SizedBox(height: SpacingSize.spacing16.value),
             Text(
               errorMessage ??
                   '${context.appLocalizations.criticalErrorMessage} '

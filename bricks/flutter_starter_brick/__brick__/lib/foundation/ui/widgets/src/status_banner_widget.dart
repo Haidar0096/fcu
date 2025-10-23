@@ -34,8 +34,8 @@ class StatusBannerWidget extends StatelessWidget {
 
     final banner = Container(
       margin: EdgeInsets.symmetric(
-        horizontal: SpacingSize.xxSmall.value,
-        vertical: SpacingSize.xSmall.value,
+        horizontal: SpacingSize.spacing4.value,
+        vertical: SpacingSize.spacing8.value,
       ),
       decoration: BoxDecoration(
         color: colors.backgroundColor,
@@ -46,15 +46,15 @@ class StatusBannerWidget extends StatelessWidget {
             color: context.themeData.colorScheme.onSurface.withValues(
               alpha: ThemeDefaults.shadowAlpha,
             ),
-            blurRadius: SpacingSize.xSmall.value,
-            offset: Offset(0, SpacingSize.xxSmall.value / 2),
+            blurRadius: SpacingSize.spacing8.value,
+            offset: Offset(0, SpacingSize.spacing4.value / 2),
           ),
         ],
       ),
       child: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.all(SpacingSize.small.value),
+            padding: EdgeInsets.all(SpacingSize.spacing16.value),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -77,7 +77,7 @@ class StatusBannerWidget extends StatelessWidget {
                         color: colors.iconColor,
                         size: ThemeDefaults.smallIconSize - 2,
                       ),
-                    const Spacing.horizontal(SpacingSize.small),
+                    SizedBox(width: SpacingSize.spacing16.value),
                     // Message text
                     Expanded(
                       child: Text(
@@ -89,12 +89,12 @@ class StatusBannerWidget extends StatelessWidget {
                     ),
                     // Add padding if dismiss button is shown to prevent overlap
                     if (onDismiss != null)
-                      SizedBox(width: SpacingSize.medium.value),
+                      SizedBox(width: SpacingSize.spacing24.value),
                   ],
                 ),
                 // Action button for interactive banners
                 if (onAction != null) ...[
-                  const Spacing.vertical(SpacingSize.small),
+                  SizedBox(height: SpacingSize.spacing16.value),
                   SizedBox(
                     width: double.infinity,
                     child: MainButton(
@@ -112,7 +112,7 @@ class StatusBannerWidget extends StatelessWidget {
           if (onDismiss != null)
             Positioned(
               top: 0,
-              right: SpacingSize.xSmall.value,
+              right: SpacingSize.spacing8.value,
               bottom: 0,
               child: Center(
                 child: Material(
@@ -123,10 +123,10 @@ class StatusBannerWidget extends StatelessWidget {
                       ThemeDefaults.cardBorderRadius,
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(SpacingSize.xxSmall.value),
+                      padding: EdgeInsets.all(SpacingSize.spacing4.value),
                       child: Icon(
                         Icons.close,
-                        size: SpacingSize.small.value,
+                        size: SpacingSize.spacing16.value,
                         color: colors.textColor,
                       ),
                     ),

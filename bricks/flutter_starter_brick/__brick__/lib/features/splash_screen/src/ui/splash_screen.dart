@@ -32,7 +32,7 @@ class SplashScreen extends StatelessWidget {
                     letterSpacing: 8,
                   ),
                 ),
-                const Spacing.vertical(SpacingSize.xSmall),
+                SizedBox(height: SpacingSize.spacing8.value),
                 Text(
                   context.appLocalizations.appTagline,
                   style: context.typography?.bodyText.copyWith(
@@ -42,7 +42,7 @@ class SplashScreen extends StatelessWidget {
                     letterSpacing: 2,
                   ),
                 ),
-                const Spacing.vertical(SpacingSize.large),
+                SizedBox(height: SpacingSize.spacing32.value),
                 const LoaderWidget(size: 40),
               ],
             ),

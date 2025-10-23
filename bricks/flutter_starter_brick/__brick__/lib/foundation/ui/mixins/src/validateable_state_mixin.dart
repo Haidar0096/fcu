@@ -52,7 +52,7 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
         sizeFactor: animationController,
         child:
             hasError
-                ? const Spacing.vertical(SpacingSize.xxSmall)
+                ? SizedBox(height: SpacingSize.spacing4.value)
                 : const SizedBox.shrink(),
       ),
       SizeTransition(

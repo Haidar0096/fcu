@@ -48,7 +48,7 @@ class RandomJokesScreen extends StatelessWidget {
                     ),
                     // Button docked at bottom
                     Padding(
-                      padding: EdgeInsets.all(SpacingSize.medium.value),
+                      padding: EdgeInsets.all(SpacingSize.spacing24.value),
                       child: fetchButton,
                     ),
                   ],
