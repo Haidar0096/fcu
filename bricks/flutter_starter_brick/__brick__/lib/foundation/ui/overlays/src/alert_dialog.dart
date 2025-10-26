@@ -32,7 +32,10 @@ Future<void> showAlertDialog({
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (icon != null) ...[icon, SizedBox(height: SpacingSize.spacing24.value)],
+        if (icon != null) ...[
+          icon,
+          SizedBox(height: SpacingSize.spacing24.value),
+        ],
         Text(
           title,
           style: context.themeData.textTheme.headlineSmall,
