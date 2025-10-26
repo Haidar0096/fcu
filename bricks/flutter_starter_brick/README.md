@@ -91,10 +91,6 @@ Every generated project includes a comprehensive `CLAUDE.md` file that documents
 - Typography and theming system
 - State management patterns
 
-## Version History
-
-**4.0.0** - Complete architecture overhaul with foundation layer, improved patterns, and comprehensive documentation
-
 ## Support Me
 
 It is really hard and time-consuming to maintain and update open-source projects, so if you like my

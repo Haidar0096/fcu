@@ -75,6 +75,9 @@ some files and folders.
 - Simplified error state handling with cleaner conditional rendering
 - Added flutter_launcher_icons package to dev dependencies for app icon generation
 
+# 4.0.4
+- Removed version history section from README for cleaner documentation
+
 # 4.0.3
 - Moved ValidateableStateMixin from foundation/ui/widgets to foundation/ui/mixins for better module organization
 - Refactored spacing system with complete 4-unit steps (4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64)
