@@ -48,6 +48,8 @@ class CustomTextFormField extends StatefulWidget {
     this.suffixIconConstraints,
     this.inputFormatters,
     this.maxLines = CustomTextFormFieldDefaults.maxLines,
+    this.minLines,
+    this.maxLength,
     this.contextMenuBuilder,
     this.isDense,
     this.isCollapsed,
@@ -161,6 +163,13 @@ class CustomTextFormField extends StatefulWidget {
   /// The maximum number of lines for the text to span, wrapping if necessary.
   final int maxLines;
 
+  /// The minimum number of lines to occupy when the content is shorter.
+  /// Expands from minLines to maxLines as user types.
+  final int? minLines;
+
+  /// The maximum number of characters allowed in the text field.
+  final int? maxLength;
+
   /// Builds the text selection context menu.
   final EditableTextContextMenuBuilder? contextMenuBuilder;
 
@@ -246,6 +255,8 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
             scrollPadding: widget.scrollPadding,
             cursorColor: widget.cursorColor,
             maxLines: widget.maxLines,
+            minLines: widget.minLines,
+            maxLength: widget.maxLength,
             enabled: widget.enabled,
             focusNode: widget.focusNode,
             keyboardType: widget.keyboardType,
@@ -348,4 +359,7 @@ class CustomTextFormFieldDefaults {
     vertical: 12,
   );
   static const TextInputAction textInputAction = TextInputAction.next;
+
+  /// Default maximum character limit for input fields across the app
+  static const int defaultMaxInputFieldChars = 500;
 }

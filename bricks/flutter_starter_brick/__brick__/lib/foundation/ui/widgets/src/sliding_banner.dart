@@ -39,13 +39,8 @@ class SlidingBanner {
       return;
     }
 
-    // Animate out existing banner if present
-    if (_currentKey != null &&
-        _currentKey!.currentState != null &&
-        _currentKey!.currentState!.mounted) {
-      await _currentKey!.currentState!._dismiss();
-    } else {
-      // Fallback to immediate hide if no animation possible
+    // Hide existing banner if present (don't wait for animation)
+    if (_currentEntry != null) {
       hide();
     }
 
