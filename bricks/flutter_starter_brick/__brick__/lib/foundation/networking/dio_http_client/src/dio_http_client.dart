@@ -170,6 +170,7 @@ class DioHttpClient extends HttpClient {
           ..writeln('  Status Code: ${dioException.response?.statusCode}')
           ..writeln('  Response Data: ${dioException.response?.data}')
           ..writeln('  Request Method: ${dioException.requestOptions.method}')
+          ..writeln('  Request Full Path: ${dioException.requestOptions.uri}')
           ..writeln('  Request Headers: $sanitizedHeaders')
           ..writeln('  Request Data: $sanitizedData');
 

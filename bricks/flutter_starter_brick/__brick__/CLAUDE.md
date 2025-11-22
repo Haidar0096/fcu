@@ -45,7 +45,7 @@ breaking external code.
 | resources/            | Nothing (leaf folder)                                     |
 | foundation/           | resources/, other foundation subfolders (through barrels) |
 | features/         | foundation/, resources/ (through barrels)                 |
-| router/               | features/, foundation/, resources/ (through barrels)  |
+| router/               | features/, foundation/, resources/, dependency_injection/ (through barrels)  |
 | dependency_injection/ | Any folder (including src/ for registration)              |
 | app/                  | Any folder (through barrels)                              |
 | main_development.dart | foundation/ (for Environment), main_common.dart           |
@@ -100,6 +100,9 @@ Features cannot import from each other directly. Communication happens through:
 - Shared models in `foundation/models/` for common DTOs
 - Dependency injection callbacks set up in `dependency_injection/`
 - Global blocs (Authentication, Subscription) available app-wide
+
+**Cross-Feature Reuse:**
+If DTO/UI model/enum from Feature A is needed in Feature B: move it to `foundation/models/` first, update imports in Feature A, then use in Feature B. Features must never import from each other unless allowed by the import rules table. If you find a feature being imported by many others, and you are moving alot of its models to foundation, consider moving the whole feature to foundation instead, and adding back its models to its own src/ if.
 
 ### Entry Points
 

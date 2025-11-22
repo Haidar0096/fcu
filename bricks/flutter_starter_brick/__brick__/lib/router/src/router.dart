@@ -109,10 +109,10 @@ Page<T> _getPageByPlatform<T>({
   return MaterialPage(child: child, key: pageKey);
 }
 
-@TypedGoRoute<_SplashScreenRoute>(path: SplashRoutePath.path)
+@TypedGoRoute<SplashScreenRoute>(path: SplashRoutePath.path)
 @immutable
-class _SplashScreenRoute extends GoRouteData with _$_SplashScreenRoute {
-  const _SplashScreenRoute();
+class SplashScreenRoute extends GoRouteData with $SplashScreenRoute {
+  const SplashScreenRoute();
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
@@ -125,12 +125,11 @@ class _SplashScreenRoute extends GoRouteData with _$_SplashScreenRoute {
       );
 }
 
-@TypedGoRoute<_CriticalErrorScreenRoute>(path: CriticalErrorRoutePath.path)
+@TypedGoRoute<CriticalErrorScreenRoute>(path: CriticalErrorRoutePath.path)
 @immutable
-class _CriticalErrorScreenRoute extends GoRouteData
-    with _$_CriticalErrorScreenRoute {
-  const _CriticalErrorScreenRoute({this.errorMessage});
-
+class CriticalErrorScreenRoute extends GoRouteData
+    with $CriticalErrorScreenRoute {
+  const CriticalErrorScreenRoute({this.errorMessage});
   final String? errorMessage;
 
   @override
@@ -141,12 +140,10 @@ class _CriticalErrorScreenRoute extends GoRouteData
       );
 }
 
-@TypedGoRoute<_RandomJokesScreenRoute>(path: RandomJokesRoutePath.path)
+@TypedGoRoute<RandomJokesScreenRoute>(path: RandomJokesRoutePath.path)
 @immutable
-class _RandomJokesScreenRoute extends GoRouteData
-    with _$_RandomJokesScreenRoute {
-  const _RandomJokesScreenRoute();
-
+class RandomJokesScreenRoute extends GoRouteData with $RandomJokesScreenRoute {
+  const RandomJokesScreenRoute();
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
       _getPageByPlatform<void>(
