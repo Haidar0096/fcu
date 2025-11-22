@@ -86,3 +86,7 @@ some files and folders.
 
 # 4.0.5
 - Dependency updates and minor code cleanup and refactoring. No architectural changes.
+
+# 4.0.6
+- Added architecture lint rules analyzer plugin for enforcing architecture boundaries
+- Configured generated projects to use the plugin automatically via git reference
