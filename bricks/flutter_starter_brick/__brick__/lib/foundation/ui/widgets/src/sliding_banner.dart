@@ -21,7 +21,6 @@ class SlidingBanner {
   static OverlayEntry? _currentEntry;
   static Timer? _dismissTimer;
   static String? _currentMessage;
-  static GlobalKey<_SlidingBannerWidgetState>? _currentKey;
 
   /// Shows a sliding banner with the specified configuration.
   static Future<void> show({
@@ -51,7 +50,6 @@ class SlidingBanner {
 
     // Create a global key to access the widget's dismiss method
     final widgetKey = GlobalKey<_SlidingBannerWidgetState>();
-    _currentKey = widgetKey;
 
     _currentEntry = OverlayEntry(
       builder:
@@ -144,7 +142,6 @@ class SlidingBanner {
     _currentEntry?.remove();
     _currentEntry = null;
     _currentMessage = null;
-    _currentKey = null;
   }
 }
 
