@@ -107,11 +107,13 @@ class _NoSrcImportsVisitor extends SimpleAstVisitor<void> {
 
     // Extract the module path from both current file and import
     // Module = everything before /src/ (e.g., "foundation/clipboard" or "features/auth")
+    // Use non-greedy matching (*?) to stop at the FIRST /src/ encountered
+    // (handles nested src folders like features/x/src/blocs/y/src/)
     final currentModuleMatch = RegExp(
-      r'lib/([^/]+(?:/[^/]+)*)/src/',
+      r'lib/([^/]+(?:/[^/]+)*?)/src/',
     ).firstMatch(currentFilePath);
     final importModuleMatch = RegExp(
-      r'^([^/]+(?:/[^/]+)*)/src/',
+      r'^([^/]+(?:/[^/]+)*?)/src/',
     ).firstMatch(importPath);
 
     // If we can't determine modules, be conservative and don't report
