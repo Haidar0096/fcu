@@ -2,6 +2,11 @@
 
 - Initial release.
 
+# 4.1.0
+- Enhanced SplashScreen navigation and removed unused router constants
+- Added CancelToken support to DioHttpClient and HttpClient; removed obsolete architecture lint rule tests
+- Improved regex for module path extraction in NoSrcImportsRule for better nested src/ folder handling
+
 # 0.3.0
 
 - Exported the base_request_handler file from the api folder.

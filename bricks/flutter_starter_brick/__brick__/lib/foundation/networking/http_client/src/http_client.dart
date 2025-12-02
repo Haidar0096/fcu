@@ -1,4 +1,5 @@
 import 'package:{{proj_name}}/foundation/basic_types/basic_types.dart';
+import 'package:{{proj_name}}/foundation/networking/cancel_token/cancel_token.dart';
 import 'package:{{proj_name}}/foundation/networking/http_client/src/http_response.dart';
 import 'package:{{proj_name}}/foundation/networking/models/models.dart';
 
@@ -26,5 +27,6 @@ abstract class HttpClient {
     Object? body,
     bool Function(int? statusCode)? responseStatusCodeValidator,
     ProgressCallback? onSendProgress,
+    CancelToken? cancelToken,
   });
 }

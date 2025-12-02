@@ -3,6 +3,7 @@ import 'dart:io' hide HttpResponse;
 import 'package:dio/dio.dart' as dio;
 import 'package:{{proj_name}}/foundation/basic_types/basic_types.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
+import 'package:{{proj_name}}/foundation/networking/cancel_token/cancel_token.dart';
 import 'package:{{proj_name}}/foundation/networking/dio_http_client/src/request_data_sanitizer.dart';
 import 'package:{{proj_name}}/foundation/networking/http_client/http_client.dart';
 import 'package:{{proj_name}}/foundation/networking/models/models.dart';
@@ -41,6 +42,7 @@ class DioHttpClient extends HttpClient {
     Object? body,
     bool Function(int? statusCode)? responseStatusCodeValidator,
     ProgressCallback? onSendProgress,
+    CancelToken? cancelToken,
   }) async {
     if (additionalHeaders != null && replacementHeaders != null) {
       throw ArgumentError(
@@ -60,12 +62,21 @@ class DioHttpClient extends HttpClient {
         validateStatus: responseStatusCodeValidator,
       );
 
+      // Extract Dio's CancelToken from our wrapper
+      if (cancelToken != null && cancelToken is! DioCancelToken) {
+        throw ArgumentError(
+          'DioHttpClient requires DioCancelToken implementation',
+        );
+      }
+      final dioCancelToken = (cancelToken as DioCancelToken?)?.dioToken;
+
       final response = await _client.request<dynamic>(
         path,
         queryParameters: queryParameters,
         data: body,
         options: options,
         onSendProgress: onSendProgress,
+        cancelToken: dioCancelToken,
       );
 
       return Result.success(successResponseMapper(response.toHttpResponse));
