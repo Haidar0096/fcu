@@ -9,8 +9,7 @@ import 'package:{{proj_name}}/foundation/environment_variables/environment_varia
 import 'package:{{proj_name}}/foundation/environments/environments.dart';
 import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
-import 'package:{{proj_name}}/foundation/networking/backend_http_client/backend_http_client.dart';
-import 'package:{{proj_name}}/foundation/networking/http_client/http_client.dart';
+import 'package:{{proj_name}}/foundation/networking/networking.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 
 void registerInstances(GetIt getIt, {required Environment environment}) {

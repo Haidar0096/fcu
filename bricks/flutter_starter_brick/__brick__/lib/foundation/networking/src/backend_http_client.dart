@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
-import 'package:{{proj_name}}/foundation/networking/backend_http_client/src/backend_error_message_parser.dart';
-import 'package:{{proj_name}}/foundation/networking/dio_http_client/src/dio_http_client.dart';
+import 'package:{{proj_name}}/foundation/networking/src/backend_error_message_parser.dart';
+import 'package:{{proj_name}}/foundation/networking/src/dio_http_client.dart';
 
 const Duration _defaultTimeout = Duration(seconds: 30);
 

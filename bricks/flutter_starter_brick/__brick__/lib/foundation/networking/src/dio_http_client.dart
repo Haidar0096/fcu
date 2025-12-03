@@ -3,10 +3,10 @@ import 'dart:io' hide HttpResponse;
 import 'package:dio/dio.dart' as dio;
 import 'package:{{proj_name}}/foundation/basic_types/basic_types.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
-import 'package:{{proj_name}}/foundation/networking/cancel_token/cancel_token.dart';
-import 'package:{{proj_name}}/foundation/networking/dio_http_client/src/request_data_sanitizer.dart';
-import 'package:{{proj_name}}/foundation/networking/http_client/http_client.dart';
-import 'package:{{proj_name}}/foundation/networking/models/models.dart';
+import 'package:{{proj_name}}/foundation/networking/src/cancel_token.dart';
+import 'package:{{proj_name}}/foundation/networking/src/http_client.dart';
+import 'package:{{proj_name}}/foundation/networking/src/network_failure.dart';
+import 'package:{{proj_name}}/foundation/networking/src/request_data_sanitizer.dart';
 
 /// An implementation of [HttpClient] that uses the Dio package for making
 /// HTTP requests. The dio object can be provided to the constructor to allow

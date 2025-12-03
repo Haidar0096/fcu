@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:{{proj_name}}/foundation/networking/http_client/src/status_codes.dart';
+import 'package:{{proj_name}}/foundation/networking/src/status_codes.dart';
 
 @immutable
 sealed class NetworkFailure {
