@@ -27,7 +27,8 @@ class NoFeatureCrossImportsRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'no_feature_cross_imports',
     'Features cannot import from other features.',
-    correctionMessage: 'Move shared code to foundation/ instead.',
+    correctionMessage:
+        'Move shared code to foundation/ or to a shared/ folder within the parent feature.',
   );
 
   /// Creates an instance of [NoFeatureCrossImportsRule].
@@ -69,21 +70,35 @@ class _NoFeatureCrossImportsVisitor extends SimpleAstVisitor<void> {
     final filePath = currentUnit.file.path;
 
     // Check if current file is in a feature folder
-    final featureMatch = RegExp(r'lib/features/([^/]+)/').firstMatch(filePath);
+    // Extract the FULL feature path (everything between features/ and /src/ or end)
+    // This handles nested features like features/parent/sub_feature/
+    final featureMatch = RegExp(
+      r'lib/features/([^/]+(?:/[^/]+)*?)(?:/src/|/[^/]+\.dart|$)',
+    ).firstMatch(filePath);
     if (featureMatch == null) return; // Not in a feature folder
 
     final currentFeature = featureMatch.group(1)!;
 
     // Check if importing from any features/ folder
+    // Extract the FULL feature path from the import
     final importMatch = RegExp(
-      r'package:.+?/features/([^/]+)/',
+      r'package:.+?/features/([^/]+(?:/[^/]+)*?)(?:/src/|/[^/]+\.dart|$)',
     ).firstMatch(uri);
     if (importMatch == null) return; // Not importing from features
 
     final importedFeature = importMatch.group(1)!;
 
-    // Report if importing from a different feature
+    // Allow imports from shared/ folder within the same parent feature
+    final currentParent = currentFeature.split('/').first;
+    final importedParent = importedFeature.split('/').first;
+    final isImportingFromShared = importedFeature.split('/').contains('shared');
+
+    // Report if importing from a different feature (unless it's shared/ within same parent)
     if (currentFeature != importedFeature) {
+      // Allow if importing from shared/ within same parent feature
+      if (isImportingFromShared && currentParent == importedParent) {
+        return; // Allowed
+      }
       rule.reportAtNode(node);
     }
   }
