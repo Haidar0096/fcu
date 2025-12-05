@@ -33,7 +33,7 @@ flutter_cli_utils/
 │   └── flutter_starter_brick/          # Main project template
 ├── scripts/
 │   └── activate.sh                     # Local development activation
-└── test/                               # Tests (currently empty)
+└── test/                               # CLI tests (currently empty)
 ```
 
 ### Generated App Architecture
@@ -725,6 +725,13 @@ Text(context.appLocalizations.welcomeMessage)
 - Test command parsing and validation
 - Mock external processes (flutter, mason)
 - Verify error handling and exit codes
+
+### Architecture Lint Rules Testing
+- 28 comprehensive tests covering all 7 rules
+- Uses `analyzer_testing` package (v0.1.7+)
+- Run with `dart test` in `packages/architecture_lint_rules/`
+- Tests verify both violations and allowed cases
+- Each rule has dedicated test file
 
 ### Generated App Testing
 - Unit tests for Cubits with mocked APIs

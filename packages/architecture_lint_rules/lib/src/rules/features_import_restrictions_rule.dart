@@ -26,7 +26,7 @@ class FeaturesImportRestrictionsRule extends AnalysisRule {
   /// Diagnostic code for this rule.
   static const LintCode code = LintCode(
     'features_import_restrictions',
-    'features/ can only import from foundation/ and resources/.',
+    'features/ can only import from foundation/, resources/, fake_data/, or features/.',
   );
 
   /// Creates an instance of [FeaturesImportRestrictionsRule].

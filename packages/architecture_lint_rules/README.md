@@ -262,11 +262,24 @@ If the plugin isn't working:
 
 ### Running Tests
 
+The plugin has comprehensive test coverage with 28 tests covering all 7 rules.
+
 ```bash
 cd packages/architecture_lint_rules
 dart pub get
 dart test
 ```
+
+**Test Coverage:**
+- `no_feature_cross_imports_rule_test.dart` - Feature isolation tests
+- `no_src_imports_rule_test.dart` - Barrel file enforcement tests
+- `resources_cannot_import_rule_test.dart` - Resources isolation tests
+- `foundation_import_restrictions_rule_test.dart` - Foundation boundary tests
+- `features_import_restrictions_rule_test.dart` - Feature boundary tests
+- `router_import_restrictions_rule_test.dart` - Router boundary tests
+- `main_environment_files_import_restrictions_rule_test.dart` - Entry point restriction tests
+
+All tests use the `analyzer_testing` package for robust, maintainable testing.
 
 ### Local Development
 
