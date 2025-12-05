@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
-import 'package:{{proj_name}}/foundation/networking/models/models.dart';
+import 'package:{{proj_name}}/foundation/networking/networking.dart';
 import 'package:{{proj_name}}/foundation/ui/mixins/mixins.dart';
 
 @immutable
