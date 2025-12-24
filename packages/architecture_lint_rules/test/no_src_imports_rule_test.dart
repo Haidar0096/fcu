@@ -101,4 +101,26 @@ var x = AuthCubit();
       '$testPackageLibPath/dependency_injection/src/injection.dart',
     );
   }
+
+  Future<void> test_sameModuleSrcImport_threeLevelDeep_allowed() async {
+    // Test case for 3-level deep modules like foundation/models/ui_models
+    // Mirrors the Solvit structure that was reported as false flag
+    newFile(
+      '$testPackageLibPath/foundation/models/ui_models/src/ui_question_and_answer.dart',
+      'class UiQuestionAndAnswer {}',
+    );
+
+    newFile(
+      '$testPackageLibPath/foundation/models/ui_models/src/ui_patient_portal_appointment.dart',
+      r'''
+import 'package:test/foundation/models/ui_models/src/ui_question_and_answer.dart';
+
+var x = UiQuestionAndAnswer();
+''',
+    );
+
+    await assertNoDiagnosticsInFile(
+      '$testPackageLibPath/foundation/models/ui_models/src/ui_patient_portal_appointment.dart',
+    );
+  }
 }
