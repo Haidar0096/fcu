@@ -33,7 +33,7 @@ foundation modules, and best practices built-in.
 - [✓] **Animations**: Pre-built animation utilities and extensions
 
 ### Developer Tools
-- [✓] **CLAUDE.md Documentation**: Comprehensive architecture and pattern guide
+- [✓] **IAI.md Documentation**: Comprehensive architecture and pattern guide
 - [✓] **Build Scripts**: APK generation for all architectures and environments
 - [✓] **TestFlight Upload**: Automated iOS distribution script
 - [✗] **GitHub Actions (Coming Soon)**: CI/CD pipelines
@@ -83,7 +83,7 @@ lib/
 
 ## Documentation
 
-Every generated project includes a comprehensive `CLAUDE.md` file that documents:
+Every generated project includes a comprehensive `IAI.md` file that documents:
 - Architecture patterns and principles
 - Module structure and import rules
 - Coding patterns and best practices

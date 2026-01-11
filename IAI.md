@@ -1,6 +1,6 @@
-# CLAUDE.md
+# IAI.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to the IAI system when working with code in this repository.
 
 ⚠️ **Version 4.0.0 Update**: Major architecture overhaul - migrated from `infrastructure/` to `foundation/` structure with cleaner organization and improved patterns.
 
@@ -788,7 +788,7 @@ Major refactoring of the starter brick architecture:
 - Fixed all import inconsistencies
 - Eliminated unused dependencies (~24MB reduction)
 - Streamlined localization (110 → 16 essential keys)
-- Enhanced documentation with comprehensive CLAUDE.md in generated projects
+- Enhanced documentation with comprehensive IAI.md in generated projects
 
 ### Development Experience
 - Clearer module boundaries with explicit exports

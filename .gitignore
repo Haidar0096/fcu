@@ -20,5 +20,5 @@ coverage/
 # Macos related
 .DS_Store
 
-# Claude related
-claude_scratchpad/
+# IAI related
+iai_scratchpad/
