@@ -2,6 +2,35 @@
 
 # This script builds the app in release mode and uploads it to TestFlight.
 # See README.md for detailed setup instructions.
+#
+# Usage:
+#   ./upload_to_testflight.sh dev   # builds main_development.dart
+#   ./upload_to_testflight.sh prod  # builds main_production.dart
+
+# Check for flavor argument
+if [[ -z "$1" ]]; then
+    echo "❌ Usage: $0 <dev|prod>"
+    echo "   dev  - builds lib/main_development.dart"
+    echo "   prod - builds lib/main_production.dart"
+    exit 1
+fi
+
+FLAVOR="$1"
+
+# Set main file based on flavor
+case "$FLAVOR" in
+    dev)
+        main_file="lib/main_development.dart"
+        ;;
+    prod)
+        main_file="lib/main_production.dart"
+        ;;
+    *)
+        echo "❌ Invalid flavor: $FLAVOR"
+        echo "   Valid options: dev, prod"
+        exit 1
+        ;;
+esac
 
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -39,11 +68,8 @@ fi
 api_key=$(cat "$API_KEY_FILE")
 issuer_id=$(cat "$ISSUER_ID_FILE")
 
-# Set the main Dart file (production for TestFlight)
-main_file="lib/main_production.dart"
-
 # Build IPA
-echo "🚀 Building IPA for version $ios_version_name ($ios_build_number)..."
+echo "🚀 Building IPA for version $ios_version_name ($ios_build_number) [$FLAVOR]..."
 fvm flutter build ipa \
     --release \
     --build-name="$ios_version_name" \

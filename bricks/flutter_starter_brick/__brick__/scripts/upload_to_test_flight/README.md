@@ -38,7 +38,11 @@ echo "YOUR_ISSUER_ID" > issuer_id
 Run from project root:
 
 ```bash
-./scripts/upload_to_test_flight/upload_to_testflight.sh
+# For development flavor (main_development.dart)
+./scripts/upload_to_test_flight/upload_to_testflight.sh dev
+
+# For production flavor (main_production.dart)
+./scripts/upload_to_test_flight/upload_to_testflight.sh prod
 ```
 
 ## Output
@@ -50,5 +54,4 @@ Run from project root:
 ## Notes
 
 - Uses `fvm` for consistent Flutter SDK versions
-- Builds from `lib/main_production.dart` entry point
 - Requires .p8 API key file installed in Keychain or accessible to `xcrun altool`

@@ -8,74 +8,17 @@ Builds and uploads Android AAB to Google Play Internal Testing track.
 - `versions` file at project root with:
   - `android_version_name` (e.g., "1.2.2")
   - `android_build_number` (e.g., 26)
-- `android/fastlane/Fastfile` with deployment lane definitions
 - `service_account_json_path` file in this directory with absolute path to Google Play service account JSON
 
 ## Setup (One-time)
 
-### 1. Install Fastlane
-
-Run from anywhere (global install):
+### 1. Install Python Dependencies
 
 ```bash
-gem install fastlane
+pip install google-auth google-api-python-client
 ```
 
-### 2. Setup Fastlane Configuration
-
-Create `android/fastlane/Fastfile` with deployment lanes:
-
-```ruby
-# Fastfile for Android deployment
-
-default_platform(:android)
-
-platform :android do
-  desc "Deploy to Google Play Internal Testing"
-  lane :internal do |options|
-    upload_to_play_store(
-      aab: options[:aab],
-      json_key: options[:json_key],
-      package_name: '{{org_name}}.{{proj_name}}',
-      track: 'internal',
-      skip_upload_metadata: true,
-      skip_upload_images: true,
-      skip_upload_screenshots: true,
-      skip_upload_changelogs: true
-    )
-  end
-
-  desc "Deploy to Google Play Beta"
-  lane :beta do |options|
-    upload_to_play_store(
-      aab: options[:aab],
-      json_key: options[:json_key],
-      package_name: '{{org_name}}.{{proj_name}}',
-      track: 'beta',
-      skip_upload_metadata: true,
-      skip_upload_images: true,
-      skip_upload_screenshots: true,
-      skip_upload_changelogs: true
-    )
-  end
-
-  desc "Deploy to Google Play Production"
-  lane :production do |options|
-    upload_to_play_store(
-      aab: options[:aab],
-      json_key: options[:json_key],
-      package_name: '{{org_name}}.{{proj_name}}',
-      track: 'production',
-      skip_upload_metadata: true,
-      skip_upload_images: true,
-      skip_upload_screenshots: true,
-      skip_upload_changelogs: true
-    )
-  end
-end
-```
-
-### 3. Create Google Play Service Account
+### 2. Create Google Play Service Account
 
 Follow the Fastlane guide: [Collect your Google credentials](https://docs.fastlane.tools/getting-started/android/setup/#collect-your-google-credentials)
 
@@ -84,7 +27,7 @@ Summary:
 - Download JSON key file
 - Grant permissions in Play Console (Release to testing tracks)
 
-### 4. Configure Service Account Path
+### 3. Configure Service Account Path
 
 Create `service_account_json_path` file in this directory:
 
@@ -99,7 +42,11 @@ echo "/path/to/your/google-play-service-account.json" > service_account_json_pat
 Run from project root:
 
 ```bash
-./scripts/upload_to_play_store/upload_to_playstore.sh
+# For development flavor (main_development.dart)
+./scripts/upload_to_play_store/upload_to_playstore.sh dev
+
+# For production flavor (main_production.dart)
+./scripts/upload_to_play_store/upload_to_playstore.sh prod
 ```
 
 ## Output
@@ -111,5 +58,5 @@ Run from project root:
 ## Notes
 
 - Uses `fvm` for consistent Flutter SDK versions
-- Builds from `lib/main_production.dart` entry point
+- Package name is extracted automatically from `android/app/build.gradle.kts`
 - First upload must be done manually via Play Console web interface

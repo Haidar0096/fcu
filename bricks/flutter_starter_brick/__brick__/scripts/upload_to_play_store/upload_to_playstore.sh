@@ -3,6 +3,35 @@
 # This script builds the app in release mode and uploads it to Google Play Internal Testing.
 # It reads the Android version name and build number from a file called
 # versions present at the project root.
+#
+# Usage:
+#   ./upload_to_playstore.sh dev   # builds main_development.dart
+#   ./upload_to_playstore.sh prod  # builds main_production.dart
+
+# Check for flavor argument
+if [[ -z "$1" ]]; then
+    echo "❌ Usage: $0 <dev|prod>"
+    echo "   dev  - builds lib/main_development.dart"
+    echo "   prod - builds lib/main_production.dart"
+    exit 1
+fi
+
+FLAVOR="$1"
+
+# Set main file based on flavor
+case "$FLAVOR" in
+    dev)
+        main_file="lib/main_development.dart"
+        ;;
+    prod)
+        main_file="lib/main_production.dart"
+        ;;
+    *)
+        echo "❌ Invalid flavor: $FLAVOR"
+        echo "   Valid options: dev, prod"
+        exit 1
+        ;;
+esac
 
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -40,11 +69,8 @@ if [[ ! -f "$service_account_json" ]]; then
     exit 1
 fi
 
-# Set the main Dart file (production for Play Store)
-main_file="lib/main_production.dart"
-
 # Build AAB
-echo "🚀 Building AAB for version $android_version_name ($android_build_number)..."
+echo "🚀 Building AAB for version $android_version_name ($android_build_number) [$FLAVOR]..."
 fvm flutter build appbundle \
     --release \
     --build-name="$android_version_name" \
@@ -62,17 +88,29 @@ if [[ ! -f "$aab_path" ]]; then
     exit 1
 fi
 
-# Check if fastlane is installed
-if ! command -v fastlane &> /dev/null; then
-    echo "❌ Fastlane not found. Please install it:"
-    echo "   gem install fastlane"
+# Check if required Python packages are installed
+if ! python3 -c "import google.oauth2, googleapiclient" 2>/dev/null; then
+    echo "❌ Required Python packages not found. Please install them:"
+    echo "   pip install google-auth google-api-python-client"
     exit 1
 fi
 
-# Upload to Play Store Internal Testing using Fastlane
+# Extract package name from build.gradle.kts
+package_name=$(grep 'applicationId' "$ANDROID_DIR/app/build.gradle.kts" | sed 's/.*"\(.*\)".*/\1/')
+
+if [[ -z "$package_name" ]]; then
+    echo "❌ Could not extract applicationId from build.gradle.kts"
+    exit 1
+fi
+
+# Upload to Play Store Internal Testing using Python script
+# (No fastlane required - uses Google Play Developer API directly)
 echo "📤 Uploading $aab_path to Google Play Internal Testing..."
-cd "$ANDROID_DIR" && \
-fastlane internal aab:"$aab_path" json_key:"$service_account_json" || {
+echo "   Package: $package_name"
+python3 "$SCRIPT_DIR/upload_to_playstore.py" \
+    "$aab_path" \
+    "$service_account_json" \
+    "$package_name" || {
     echo "❌ Upload failed"
     exit 1
 }
