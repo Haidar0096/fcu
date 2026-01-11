@@ -70,7 +70,7 @@ some files and folders.
 
 # 4.0.1
 - Added freezed generated files (*.freezed.dart) to .gitignore
-- Added claude_scratchpad/ folder to .gitignore for Claude development tracking
+- Added iai_scratchpad/ folder to .gitignore for AI development tracking
 - Added /android/.kotlin/ folder to .gitignore for Android Kotlin metadata
 
 # 4.0.2

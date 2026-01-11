@@ -305,4 +305,4 @@ BSD-3-Clause - See LICENSE file for details.
 
 - [Flutter CLI Utils](https://github.com/Haidar0096/fcu)
 - [Dart Analyzer Plugins Documentation](https://dart.dev/tools/analyzer-plugins)
-- [FCU Architecture Guide](https://github.com/Haidar0096/fcu/blob/production/CLAUDE.md)
+- [FCU Architecture Guide](https://github.com/Haidar0096/fcu/blob/production/IAI.md)

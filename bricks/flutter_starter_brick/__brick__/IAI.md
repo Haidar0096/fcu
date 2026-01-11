@@ -1,4 +1,4 @@
-# CLAUDE.md
+# IAI.md
 
 ## Architecture Overview
 

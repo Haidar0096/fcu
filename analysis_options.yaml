@@ -2,7 +2,7 @@ include: package:very_good_analysis/analysis_options.7.0.0.yaml
 
 analyzer:
   exclude:
-    - claude_scratchpad/**
+    - iai_scratchpad/**
 
 linter:
   rules:
