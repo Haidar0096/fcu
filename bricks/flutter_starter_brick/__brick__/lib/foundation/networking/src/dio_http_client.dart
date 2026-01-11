@@ -1,12 +1,15 @@
 import 'dart:io' hide HttpResponse;
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart' as dio;
 import 'package:{{proj_name}}/foundation/basic_types/basic_types.dart';
+import 'package:{{proj_name}}/foundation/extensions/extensions.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:{{proj_name}}/foundation/networking/src/cancel_token.dart';
+import 'package:{{proj_name}}/foundation/networking/src/dio_error_message_builder.dart';
 import 'package:{{proj_name}}/foundation/networking/src/http_client.dart';
+import 'package:{{proj_name}}/foundation/networking/src/http_response.dart';
 import 'package:{{proj_name}}/foundation/networking/src/network_failure.dart';
-import 'package:{{proj_name}}/foundation/networking/src/request_data_sanitizer.dart';
 
 /// An implementation of [HttpClient] that uses the Dio package for making
 /// HTTP requests. The dio object can be provided to the constructor to allow
@@ -32,7 +35,188 @@ class DioHttpClient extends HttpClient {
   serverErrorMessageParser;
 
   @override
-  Future<Result<NetworkFailure, S>> request<S>({
+  Future<Result<NetworkFailure, S>> get<S>({
+    required String path,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  }) => _request(
+    path: path,
+    method: 'GET',
+    successResponseMapper: successResponseMapper,
+    queryParameters: queryParameters,
+    additionalHeaders: additionalHeaders,
+    replacementHeaders: replacementHeaders,
+    responseStatusCodeValidator: responseStatusCodeValidator,
+    cancelToken: cancelToken,
+  );
+
+  @override
+  Future<Result<NetworkFailure, S>> post<S>({
+    required String path,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    Object? body,
+    bool isMultipart = false,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  }) => _request(
+    path: path,
+    method: 'POST',
+    successResponseMapper: successResponseMapper,
+    body: body,
+    isMultipart: isMultipart,
+    queryParameters: queryParameters,
+    additionalHeaders: additionalHeaders,
+    replacementHeaders: replacementHeaders,
+    responseStatusCodeValidator: responseStatusCodeValidator,
+    cancelToken: cancelToken,
+  );
+
+  @override
+  Future<Result<NetworkFailure, S>> put<S>({
+    required String path,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    Object? body,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  }) => _request(
+    path: path,
+    method: 'PUT',
+    successResponseMapper: successResponseMapper,
+    body: body,
+    queryParameters: queryParameters,
+    additionalHeaders: additionalHeaders,
+    replacementHeaders: replacementHeaders,
+    responseStatusCodeValidator: responseStatusCodeValidator,
+    cancelToken: cancelToken,
+  );
+
+  @override
+  Future<Result<NetworkFailure, S>> patch<S>({
+    required String path,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    Object? body,
+    bool isMultipart = false,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  }) => _request(
+    path: path,
+    method: 'PATCH',
+    successResponseMapper: successResponseMapper,
+    body: body,
+    isMultipart: isMultipart,
+    queryParameters: queryParameters,
+    additionalHeaders: additionalHeaders,
+    replacementHeaders: replacementHeaders,
+    responseStatusCodeValidator: responseStatusCodeValidator,
+    cancelToken: cancelToken,
+  );
+
+  @override
+  Future<Result<NetworkFailure, S>> delete<S>({
+    required String path,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  }) => _request(
+    path: path,
+    method: 'DELETE',
+    successResponseMapper: successResponseMapper,
+    queryParameters: queryParameters,
+    additionalHeaders: additionalHeaders,
+    replacementHeaders: replacementHeaders,
+    responseStatusCodeValidator: responseStatusCodeValidator,
+    cancelToken: cancelToken,
+  );
+
+  @override
+  Future<Result<NetworkFailure, S>> uploadFile<S>({
+    required String path,
+    required String filePath,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    String fieldName = 'file',
+    Map<String, dynamic>? additionalFields,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    ProgressCallback? onSendProgress,
+    CancelToken? cancelToken,
+  }) async {
+    final fileName = filePath.baseName;
+
+    final formData = dio.FormData.fromMap({
+      fieldName: await dio.MultipartFile.fromFile(filePath, filename: fileName),
+      ...?additionalFields,
+    });
+
+    return _request(
+      path: path,
+      method: 'POST',
+      body: formData,
+      successResponseMapper: successResponseMapper,
+      queryParameters: queryParameters,
+      additionalHeaders: additionalHeaders,
+      replacementHeaders: replacementHeaders,
+      responseStatusCodeValidator: responseStatusCodeValidator,
+      onSendProgress: onSendProgress,
+      cancelToken: cancelToken,
+    );
+  }
+
+  @override
+  Future<Result<NetworkFailure, S>> uploadBytes<S>({
+    required String path,
+    required Uint8List bytes,
+    required String filename,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    String fieldName = 'file',
+    Map<String, dynamic>? additionalFields,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    ProgressCallback? onSendProgress,
+    CancelToken? cancelToken,
+  }) {
+    final formData = dio.FormData.fromMap({
+      fieldName: dio.MultipartFile.fromBytes(bytes, filename: filename),
+      ...?additionalFields,
+    });
+
+    return _request(
+      path: path,
+      method: 'POST',
+      body: formData,
+      successResponseMapper: successResponseMapper,
+      queryParameters: queryParameters,
+      additionalHeaders: additionalHeaders,
+      replacementHeaders: replacementHeaders,
+      responseStatusCodeValidator: responseStatusCodeValidator,
+      onSendProgress: onSendProgress,
+      cancelToken: cancelToken,
+    );
+  }
+
+  /// Internal request method that handles all HTTP requests.
+  ///
+  /// All public methods delegate to this method.
+  Future<Result<NetworkFailure, S>> _request<S>({
     required String path,
     required String method,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
@@ -40,6 +224,7 @@ class DioHttpClient extends HttpClient {
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
     Object? body,
+    bool isMultipart = false,
     bool Function(int? statusCode)? responseStatusCodeValidator,
     ProgressCallback? onSendProgress,
     CancelToken? cancelToken,
@@ -55,6 +240,11 @@ class DioHttpClient extends HttpClient {
       if (additionalHeaders != null) {
         headers.addAll(additionalHeaders);
       }
+
+      // Convert body to FormData if multipart is requested
+      final requestBody = isMultipart && body != null
+          ? dio.FormData.fromMap(body as Map<String, dynamic>)
+          : body;
 
       final options = dio.Options(
         headers: replacementHeaders ?? headers,
@@ -73,7 +263,7 @@ class DioHttpClient extends HttpClient {
       final response = await _client.request<dynamic>(
         path,
         queryParameters: queryParameters,
-        data: body,
+        data: requestBody,
         options: options,
         onSendProgress: onSendProgress,
         cancelToken: dioCancelToken,
@@ -82,7 +272,7 @@ class DioHttpClient extends HttpClient {
       return Result.success(successResponseMapper(response.toHttpResponse));
     } on dio.DioException catch (dioException) {
       // Log detailed error information before converting to NetworkFailure
-      final errorDetails = _buildDetailedErrorMessage(dioException, path);
+      final errorDetails = buildDetailedErrorMessage(dioException, path);
       _appLogger?.log(errorDetails, tag: _tag);
       await _errorLogger?.recordError(
         error: errorDetails,
@@ -159,37 +349,6 @@ class DioHttpClient extends HttpClient {
         UnknownError(message: errorData?.message, code: errorData?.code),
       );
     }
-  }
-
-  /// Builds a detailed error message from a DioException for logging
-  String _buildDetailedErrorMessage(
-    dio.DioException dioException,
-    String path,
-  ) {
-    final sanitizedHeaders = RequestDataSanitizer.sanitizeHeaders(
-      dioException.requestOptions.headers,
-    );
-    final sanitizedData = RequestDataSanitizer.sanitizeBody(
-      dioException.requestOptions.data,
-    );
-
-    final buffer =
-        StringBuffer()
-          ..writeln('DioException for $path:')
-          ..writeln('  Type: ${dioException.type}')
-          ..writeln('  Message: ${dioException.message}')
-          ..writeln('  Status Code: ${dioException.response?.statusCode}')
-          ..writeln('  Response Data: ${dioException.response?.data}')
-          ..writeln('  Request Method: ${dioException.requestOptions.method}')
-          ..writeln('  Request Full Path: ${dioException.requestOptions.uri}')
-          ..writeln('  Request Headers: $sanitizedHeaders')
-          ..writeln('  Request Data: $sanitizedData');
-
-    if (dioException.error != null) {
-      buffer.writeln('  Underlying Error: ${dioException.error}');
-    }
-
-    return buffer.toString();
   }
 }
 

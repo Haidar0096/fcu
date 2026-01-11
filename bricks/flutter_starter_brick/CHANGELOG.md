@@ -92,6 +92,14 @@ some files and folders.
 # 4.0.5
 - Dependency updates and minor code cleanup and refactoring. No architectural changes.
 
+# 4.1.1
+- Updated upload scripts to support flavor-based builds for development and production.
+- Updated HTTP client methods and added error message builder.
+- Enhanced random joke fetching.
+- Added test for three-level deep same module src imports.
+- Enhanced NoFeatureCrossImportsRule to allow shared imports within the same parent feature.
+- Added comprehensive test suite and fixed nested features detection.
+
 # 4.0.6
 - Added architecture lint rules analyzer plugin for enforcing architecture boundaries
 - Configured generated projects to use the plugin automatically via git reference

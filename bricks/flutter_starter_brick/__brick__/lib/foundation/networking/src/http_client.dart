@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:{{proj_name}}/foundation/basic_types/basic_types.dart';
 import 'package:{{proj_name}}/foundation/networking/src/cancel_token.dart';
 import 'package:{{proj_name}}/foundation/networking/src/http_response.dart';
@@ -14,17 +16,167 @@ import 'package:{{proj_name}}/foundation/networking/src/network_failure.dart';
 typedef ProgressCallback = void Function(int count, int total);
 
 /// An interface specifying the contract for making HTTP requests.
-// ignore: one_member_abstracts
 abstract class HttpClient {
-  /// - S is the returned success result's data type.
-  Future<Result<NetworkFailure, S>> request<S>({
+  /// Makes a GET request to the specified [path].
+  ///
+  /// - [path]: The URL path for the request.
+  /// - [successResponseMapper]: A function to map the successful response.
+  /// - [queryParameters]: Optional query parameters to append to the URL.
+  /// - [additionalHeaders]: Headers to add to the default headers.
+  /// - [replacementHeaders]: Headers to replace the default headers entirely.
+  /// - [responseStatusCodeValidator]: Custom status code validation function.
+  /// - [cancelToken]: Token to cancel the request.
+  Future<Result<NetworkFailure, S>> get<S>({
     required String path,
-    required String method,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  });
+
+  /// Makes a POST request to the specified [path].
+  ///
+  /// - [path]: The URL path for the request.
+  /// - [successResponseMapper]: A function to map the successful response.
+  /// - [body]: Optional request body (will be JSON encoded if Map).
+  /// - [isMultipart]: If true, converts Map body to multipart/form-data.
+  /// - [queryParameters]: Optional query parameters to append to the URL.
+  /// - [additionalHeaders]: Headers to add to the default headers.
+  /// - [replacementHeaders]: Headers to replace the default headers entirely.
+  /// - [responseStatusCodeValidator]: Custom status code validation function.
+  /// - [cancelToken]: Token to cancel the request.
+  Future<Result<NetworkFailure, S>> post<S>({
+    required String path,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
     Object? body,
+    bool isMultipart = false,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  });
+
+  /// Makes a PUT request to the specified [path].
+  ///
+  /// - [path]: The URL path for the request.
+  /// - [successResponseMapper]: A function to map the successful response.
+  /// - [body]: Optional request body (will be JSON encoded if Map).
+  /// - [queryParameters]: Optional query parameters to append to the URL.
+  /// - [additionalHeaders]: Headers to add to the default headers.
+  /// - [replacementHeaders]: Headers to replace the default headers entirely.
+  /// - [responseStatusCodeValidator]: Custom status code validation function.
+  /// - [cancelToken]: Token to cancel the request.
+  Future<Result<NetworkFailure, S>> put<S>({
+    required String path,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    Object? body,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  });
+
+  /// Makes a PATCH request to the specified [path].
+  ///
+  /// - [path]: The URL path for the request.
+  /// - [successResponseMapper]: A function to map the successful response.
+  /// - [body]: Optional request body (will be JSON encoded if Map).
+  /// - [isMultipart]: If true, converts Map body to multipart/form-data.
+  /// - [queryParameters]: Optional query parameters to append to the URL.
+  /// - [additionalHeaders]: Headers to add to the default headers.
+  /// - [replacementHeaders]: Headers to replace the default headers entirely.
+  /// - [responseStatusCodeValidator]: Custom status code validation function.
+  /// - [cancelToken]: Token to cancel the request.
+  Future<Result<NetworkFailure, S>> patch<S>({
+    required String path,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    Object? body,
+    bool isMultipart = false,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  });
+
+  /// Makes a DELETE request to the specified [path].
+  ///
+  /// - [path]: The URL path for the request.
+  /// - [successResponseMapper]: A function to map the successful response.
+  /// - [queryParameters]: Optional query parameters to append to the URL.
+  /// - [additionalHeaders]: Headers to add to the default headers.
+  /// - [replacementHeaders]: Headers to replace the default headers entirely.
+  /// - [responseStatusCodeValidator]: Custom status code validation function.
+  /// - [cancelToken]: Token to cancel the request.
+  Future<Result<NetworkFailure, S>> delete<S>({
+    required String path,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    CancelToken? cancelToken,
+  });
+
+  /// Uploads a file from the file system to the specified [path].
+  ///
+  /// Uses multipart/form-data encoding to send the file.
+  ///
+  /// - [path]: The URL path for the upload.
+  /// - [filePath]: The local file system path to the file to upload.
+  /// - [successResponseMapper]: A function to map the successful response.
+  /// - [fieldName]: The form field name for the file (defaults to 'file').
+  /// - [additionalFields]: Additional form fields to include in the request.
+  /// - [queryParameters]: Optional query parameters to append to the URL.
+  /// - [additionalHeaders]: Headers to add to the default headers.
+  /// - [replacementHeaders]: Headers to replace the default headers entirely.
+  /// - [responseStatusCodeValidator]: Custom status code validation function.
+  /// - [onSendProgress]: Callback for upload progress tracking.
+  /// - [cancelToken]: Token to cancel the upload.
+  Future<Result<NetworkFailure, S>> uploadFile<S>({
+    required String path,
+    required String filePath,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    String fieldName = 'file',
+    Map<String, dynamic>? additionalFields,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
+    bool Function(int? statusCode)? responseStatusCodeValidator,
+    ProgressCallback? onSendProgress,
+    CancelToken? cancelToken,
+  });
+
+  /// Uploads bytes (in-memory data) to the specified [path].
+  ///
+  /// Uses multipart/form-data encoding to send the bytes as a file.
+  ///
+  /// - [path]: The URL path for the upload.
+  /// - [bytes]: The bytes to upload.
+  /// - [filename]: The filename to use for the uploaded bytes.
+  /// - [successResponseMapper]: A function to map the successful response.
+  /// - [fieldName]: The form field name for the file (defaults to 'file').
+  /// - [additionalFields]: Additional form fields to include in the request.
+  /// - [queryParameters]: Optional query parameters to append to the URL.
+  /// - [additionalHeaders]: Headers to add to the default headers.
+  /// - [replacementHeaders]: Headers to replace the default headers entirely.
+  /// - [responseStatusCodeValidator]: Custom status code validation function.
+  /// - [onSendProgress]: Callback for upload progress tracking.
+  /// - [cancelToken]: Token to cancel the upload.
+  Future<Result<NetworkFailure, S>> uploadBytes<S>({
+    required String path,
+    required Uint8List bytes,
+    required String filename,
+    required S Function(HttpResponse<dynamic> response) successResponseMapper,
+    String fieldName = 'file',
+    Map<String, dynamic>? additionalFields,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? additionalHeaders,
+    Map<String, dynamic>? replacementHeaders,
     bool Function(int? statusCode)? responseStatusCodeValidator,
     ProgressCallback? onSendProgress,
     CancelToken? cancelToken,

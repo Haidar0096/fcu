@@ -52,6 +52,7 @@ Future<void> run(HookContext context) async {
         'flutter_bloc:^9.1.1',
         'bloc:^9.0.0',
         'path_provider:^2.1.5',
+        'path:^1.9.1',
         'collection:^1.19.1',
         'android_id:^0.4.0',
         'device_info_plus:^12.1.0',

@@ -9,12 +9,9 @@ class JokesApi {
   final HttpClient _httpClient;
 
   /// Fetches a random joke from the API
-  Future<Result<NetworkFailure, JokeDto>> fetchRandomJoke() =>
-      _httpClient.request(
-        path: '/jokes/random',
-        method: 'GET',
-        successResponseMapper:
-            (response) =>
-                JokeDto.fromJson(response.data as Map<String, dynamic>),
-      );
+  Future<Result<NetworkFailure, JokeDto>> fetchRandomJoke() => _httpClient.get(
+    path: '/jokes/random',
+    successResponseMapper: (response) =>
+        JokeDto.fromJson(response.data as Map<String, dynamic>),
+  );
 }
