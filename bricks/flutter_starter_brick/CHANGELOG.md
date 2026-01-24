@@ -1,3 +1,6 @@
+# 4.1.4
+- Minor formatting updates
+
 # 4.1.3
 - Downgraded json_serializable to ^6.11.1 to fix dependency conflict with flutter_test
 - Added error throwing in post_gen.dart to fail fast on command errors
