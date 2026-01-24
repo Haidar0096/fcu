@@ -23,9 +23,8 @@ final GoRouter router = GoRouter(
     final currentPath = state.matchedLocation;
 
     // Get current route type - handle unknown routes
-    final RoutePath currentRoute;
     try {
-      currentRoute = RoutePath.fromPath(currentPath);
+      RoutePath.fromPath(currentPath);
     } catch (e) {
       // Unknown/invalid route path - show error screen
       return CriticalErrorRoutePath.path;
@@ -34,6 +33,7 @@ final GoRouter router = GoRouter(
     // TODO({{dev_name}}): Add auth guard here when authentication is 
     // implemented
     // Example:
+    // final currentRoute = RoutePath.fromPath(currentPath);
     // final authBloc = serviceLocator.tryGet<AuthenticationBloc>();
     // if (authBloc == null) return null;
     // final authState = authBloc.state;
