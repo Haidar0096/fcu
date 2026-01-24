@@ -3,9 +3,6 @@ enum Environment {
   /// The development environment.
   development('development'),
 
-  /// The staging environment.
-  staging('staging'),
-
   /// The production environment.
   production('production');
 
