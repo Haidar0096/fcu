@@ -49,7 +49,6 @@ breaking external code.
 | dependency_injection/ | Any folder (including src/ for registration)              |
 | app/                  | Any folder (through barrels)                              |
 | main_development.dart | foundation/ (for Environment), main_common.dart           |
-| main_staging.dart     | foundation/ (for Environment), main_common.dart           |
 | main_production.dart  | foundation/ (for Environment), main_common.dart           |
 | main_common.dart      | Any folder (through barrels)                              |
 
@@ -108,14 +107,13 @@ If DTO/UI model/enum from Feature A is needed in Feature B: move it to `foundati
 
 #### Main Files
 
-We have four main files at the lib level:
+We have three main files at the lib level:
 
 - `main_development.dart`
-- `main_staging.dart`
 - `main_production.dart`
 - `main_common.dart`
 
-The three environment-specific main files (dev, staging, prod) are incredibly simple - they each
+The two environment-specific main files (dev, prod) are incredibly simple - they each
 just contain a main() function that calls the mainCommon() function from main_common.dart, passing
 the appropriate environment. That's it. They're just thin wrappers that select the environment.
 
@@ -125,7 +123,7 @@ This separation means we can have different entry points for different environme
 all the initialization logic in one place.
 
 To run the app in a specific environment, we use:
-`flutter run -t lib/main_development.dart` (or main_staging.dart, main_production.dart)
+`flutter run -t lib/main_development.dart` (or main_production.dart)
 
 ### Core Infrastructure
 
@@ -185,10 +183,10 @@ Provides the Result type - a sealed class for handling operations that can fail.
 Base bloc/cubit classes and utilities for state management. Provides mixins for safe state emission and common bloc patterns.
 
 #### environment_variables/
-Environment-specific configuration via EnvironmentVariables sealed class. Each environment (dev, staging, prod) provides appropriate values for backend URLs, API keys, etc. Registered in DI container based on current environment.
+Environment-specific configuration via EnvironmentVariables sealed class. Each environment (dev, prod) provides appropriate values for backend URLs, API keys, etc. Registered in DI container based on current environment.
 
 #### environments/
-Defines Environment enum (development, staging, production) used by main_*.dart entry points for environment-specific app configuration.
+Defines Environment enum (development, production) used by main_*.dart entry points for environment-specific app configuration.
 
 #### extensions/
 App-agnostic Dart extension methods. Domain-specific extensions belong elsewhere.

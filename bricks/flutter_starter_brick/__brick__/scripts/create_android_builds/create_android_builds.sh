@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# This script builds Android APKs for all environments and architectures,
-# plus an AAB (App Bundle) for production release to Google Play.
-# See README.md for detailed setup instructions.
+# This script builds the app in release mode for different servers and copies each output into
+# a specified output folder. It reads the android version name and code from a file called
+# versions present at the project root.
+# The output folder can be specified with the --output-dir parameter.
 
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -11,7 +12,7 @@ VERSIONS_FILE="$PROJECT_ROOT/versions"
 
 # Initialize variables
 output_path=""
-servers=("development" "staging" "production")
+servers=("development" "production")
 platforms=("android-arm" "android-arm64" "android-x64")
 
 # Function to exit with error message

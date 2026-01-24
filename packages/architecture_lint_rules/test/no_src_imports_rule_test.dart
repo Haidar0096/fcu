@@ -104,7 +104,7 @@ var x = AuthCubit();
 
   Future<void> test_sameModuleSrcImport_threeLevelDeep_allowed() async {
     // Test case for 3-level deep modules like foundation/models/ui_models
-    // Mirrors the Solvit structure that was reported as false flag
+    // Tests nested src/ folder handling that was previously reported as false flag
     newFile(
       '$testPackageLibPath/foundation/models/ui_models/src/ui_question_and_answer.dart',
       'class UiQuestionAndAnswer {}',

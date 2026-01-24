@@ -1,3 +1,13 @@
+# 4.2.0
+- Removed staging environment (main_staging.dart, StagingEnvironmentVariables, Environment.staging)
+- Removed fastlane configuration (using direct API scripts instead)
+- Added web build scripts (scripts/build_web/)
+- Updated release scripts with dev/prod flavor support
+- Simplified README.md structure with link to RELEASE.md
+- Added RELEASE.md with comprehensive release workflow documentation
+- Fixed create_android_builds to build 6 APKs (dev+prod) instead of 9
+- Updated upload_to_playstore.py to use 'completed' status for auto-rollout
+
 # 4.1.4
 - Minor formatting updates
 

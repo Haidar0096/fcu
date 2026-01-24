@@ -29,8 +29,8 @@ Or with custom output:
 
 Generates in output directory (default: `./artifacts`):
 
-**9 APKs** - For each combination of:
-- Servers: development, staging, production
+**6 APKs** - For each combination of:
+- Servers: development, production
 - Platforms: android-arm, android-arm64, android-x64
 - Named: `app-{server}-v{version}-build-{code}-{platform}.apk`
 

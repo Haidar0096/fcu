@@ -130,7 +130,7 @@ def upload_to_internal_testing(aab_path: str, service_account_path: str, package
             'track': INTERNAL_TRACK,
             'releases': [{
                 'versionCodes': [str(version_code)],
-                'status': 'draft'  # Use 'draft' for unpublished apps, 'completed' for published
+                'status': 'completed'  # Use 'completed' for auto-rollout to testers
             }]
         }
 

@@ -33,7 +33,6 @@ void registerInstances(GetIt getIt, {required Environment environment}) {
     ..registerLazySingleton<EnvironmentVariables>(
       () => switch (getIt.get<Environment>()) {
         Environment.development => const DevelopmentEnvironmentVariables(),
-        Environment.staging => const StagingEnvironmentVariables(),
         Environment.production => const ProductionEnvironmentVariables(),
       },
     )
