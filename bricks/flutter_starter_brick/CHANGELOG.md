@@ -1,3 +1,7 @@
+# 4.1.3
+- Downgraded json_serializable to ^6.11.1 to fix dependency conflict with flutter_test
+- Added error throwing in post_gen.dart to fail fast on command errors
+
 # 4.1.2
 - Fixed unused variable warning in router.dart
 - Updated dependencies (go_router, json_serializable, etc.) in post_gen.dart

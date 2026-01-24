@@ -17,6 +17,7 @@ Future<void> run(HookContext context) async {
       context.logger.err('Command failed with exit code ${result.exitCode}');
       context.logger.err('stdout: ${result.stdout}');
       context.logger.err('stderr: ${result.stderr}');
+      throw Exception('Command failed: $message\n${result.stderr}');
     } else {
       progress.complete();
     }
@@ -34,7 +35,7 @@ Future<void> run(HookContext context) async {
         'build_runner:^2.10.5',
         'go_router_builder:^4.1.3',
         'build_verify:^3.1.1',
-        'json_serializable:^6.11.4',
+        'json_serializable:^6.11.1',
         'flutter_launcher_icons:^0.14.4'
       ],
     ),
