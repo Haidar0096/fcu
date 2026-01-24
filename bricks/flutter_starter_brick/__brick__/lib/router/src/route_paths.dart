@@ -1,6 +1,7 @@
 /// Sealed class hierarchy defining all routes in the application
 ///
-/// TODO({{dev_name}}): Add your app-specific routes here following the same pattern
+/// TODO({{dev_name}}): Add your app-specific routes here following the same
+/// pattern
 sealed class RoutePath {
   const RoutePath();
 
