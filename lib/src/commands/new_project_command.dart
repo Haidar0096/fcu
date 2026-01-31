@@ -268,6 +268,7 @@ class NewProjectCommand extends Command<int> {
       '',
       '# IAI scratchpad',
       'iai_scratchpad/',
+      'IAI.local.md',
       '',
       '# Android Kotlin metadata',
       '/android/.kotlin/',
