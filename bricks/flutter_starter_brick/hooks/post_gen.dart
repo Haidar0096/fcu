@@ -62,7 +62,9 @@ Future<void> run(HookContext context) async {
         'flutter_animate:^4.5.2',
         'rxdart:^0.28.0',
         'dio:^5.9.0',
-        'json_annotation:^4.9.0'
+        'json_annotation:^4.9.0',
+        'shared_preferences:^2.5.4',
+        'uuid:^4.5.2'
       ],
     ),
   );

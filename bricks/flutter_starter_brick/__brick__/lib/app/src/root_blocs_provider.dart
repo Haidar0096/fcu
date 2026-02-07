@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:{{proj_name}}/dependency_injection/dependency_injection.dart';
-import 'package:{{proj_name}}/foundation/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
+import 'package:{{proj_name}}/foundation/app_meta_data/app_meta_data.dart';
 import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 

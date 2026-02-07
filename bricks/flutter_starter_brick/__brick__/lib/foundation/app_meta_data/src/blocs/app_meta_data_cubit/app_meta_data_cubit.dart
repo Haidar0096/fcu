@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:android_id/android_id.dart';
 import 'package:bloc/bloc.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:{{proj_name}}/foundation/app_meta_data/src/repositories/app_meta_data_repository.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -16,9 +15,10 @@ part 'app_meta_data_state.dart';
 /// application information, such as device ID, OS type and version,
 /// app version, and build number.
 class AppMetaDataCubit extends Cubit<AppMetaDataState> {
-  AppMetaDataCubit(this._logger, this._errorLogger)
+  AppMetaDataCubit(this._repository, this._logger, this._errorLogger)
     : super(const AppMetaDataInitial());
 
+  final AppMetaDataRepository _repository;
   final AppLogger _logger;
   final ErrorLogger _errorLogger;
 
@@ -46,7 +46,7 @@ class AppMetaDataCubit extends Cubit<AppMetaDataState> {
     emit(const AppMetaDataLoading());
 
     try {
-      final deviceId = await _getDeviceId();
+      final deviceId = await _repository.getDeviceId();
       final osType = kIsWeb ? 'web' : Platform.operatingSystem;
       final osVersion = kIsWeb ? 'n/a' : Platform.operatingSystemVersion;
 
@@ -76,26 +76,6 @@ class AppMetaDataCubit extends Cubit<AppMetaDataState> {
     } finally {
       _initCompleter!.complete();
       _initCompleter = null;
-    }
-  }
-
-  /// Retrieves the device's unique ID.
-  ///
-  /// Returns the device unique id for iOS and Android platforms.
-  /// Returns null if the platform is not supported or if the ID can't be
-  /// determined.
-  Future<String?> _getDeviceId() async {
-    if (kIsWeb) {
-      return null;
-    }
-
-    final deviceInfo = DeviceInfoPlugin();
-    if (Platform.isIOS) {
-      return (await deviceInfo.iosInfo).identifierForVendor;
-    } else if (Platform.isAndroid) {
-      return const AndroidId().getId();
-    } else {
-      return null;
     }
   }
 }
