@@ -1,5 +1,8 @@
 # IAI.md
 
+## Project Overview
+<TODO({{dev_name}}): Add an overview of the app here, be comprehensive. This overview should cover everything one needs to know to understand what is this app.
+
 ## Architecture Overview
 
 ### Architecture Philosophy

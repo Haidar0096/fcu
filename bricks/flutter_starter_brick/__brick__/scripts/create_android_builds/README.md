@@ -2,15 +2,17 @@
 
 Builds APKs for all environments/architectures and production AAB for Google Play.
 
+## Prerequisites
+
+- [fvm](https://fvm.app/) installed and project Flutter version configured (`fvm install`)
+- Java JDK 17+
+- Android SDK
+- Android signing configured (see `scripts/upload_to_play_store/README.md` — "Android Signing Setup")
+
 ## Inputs
 
-**Required:**
-- `versions` file at project root with:
-  - `android_version_name` (e.g., "1.0.0")
-  - `android_build_number` (e.g., 1)
-
-**Optional:**
-- `--output-dir` flag for custom output location
+- `versions` file at project root with `android_version_name` and `android_build_number`
+- Optional: `--output-dir` flag for custom output location
 
 ## Usage
 
@@ -29,17 +31,11 @@ Or with custom output:
 
 Generates in output directory (default: `./artifacts`):
 
-**6 APKs** - For each combination of:
+**6 APKs** — for each combination of:
 - Servers: development, production
 - Platforms: android-arm, android-arm64, android-x64
 - Named: `app-{server}-v{version}-build-{code}-{platform}.apk`
 
-**1 AAB** - For Google Play Store:
+**1 AAB** — for Google Play Store:
 - Production environment only
 - Named: `app-production-v{version}-build-{code}.aab`
-
-## Notes
-
-- Uses `fvm` for consistent Flutter SDK versions
-- Builds from `lib/main_{environment}.dart` entry points
-- Production AAB uses `lib/main_production.dart`

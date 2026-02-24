@@ -1,36 +1,30 @@
 # Build Web Application
 
-Builds the Flutter Web application in release mode for Development or Production environments.
+Builds the Flutter Web application in release mode.
+
+## Prerequisites
+
+- [fvm](https://fvm.app/) installed and project Flutter version configured (`fvm install`)
 
 ## Inputs
 
-**Required:**
-- `versions` file at project root with:
-  - `web_version_name` (e.g., "1.0.0")
-  - `web_build_number` (e.g., 1)
+- `versions` file at project root with `web_version_name` and `web_build_number`
 
 ## Usage
 
 Run from project root:
 
 ```bash
-# For development flavor (main_development.dart)
+# For development server
 ./scripts/build_web/build_web.sh dev
 
-# For production flavor (main_production.dart)
+# For production server
 ./scripts/build_web/build_web.sh prod
 ```
 
 ## Output
 
-The script generates a unique output directory in `build/` to prevent overwriting:
+Generates a unique output directory in `build/`:
 
 - **Development:** `build/web_dev_v{version}_{build}`
 - **Production:** `build/web_prod_v{version}_{build}`
-
-Inside this folder is the fully built web application (HTML, JS, assets) ready for deployment.
-
-## Notes
-
-- Uses `fvm` for consistent Flutter SDK versions
-- Builds from `lib/main_development.dart` (Dev) or `lib/main_production.dart` (Prod)

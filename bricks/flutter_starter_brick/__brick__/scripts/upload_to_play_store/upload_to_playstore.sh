@@ -69,6 +69,12 @@ if [[ ! -f "$service_account_json" ]]; then
     exit 1
 fi
 
+# Prepare project
+echo "📦 Preparing project..."
+fvm flutter pub get || { echo "❌ flutter pub get failed"; exit 1; }
+fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; exit 1; }
+fvm dart run build_runner build --delete-conflicting-outputs || { echo "❌ build_runner failed"; exit 1; }
+
 # Build AAB
 echo "🚀 Building AAB for version $android_version_name ($android_build_number) [$FLAVOR]..."
 fvm flutter build appbundle \

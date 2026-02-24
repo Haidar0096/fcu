@@ -68,13 +68,21 @@ fi
 api_key=$(cat "$API_KEY_FILE")
 issuer_id=$(cat "$ISSUER_ID_FILE")
 
+# Prepare project
+echo "📦 Preparing project..."
+fvm flutter pub get || { echo "❌ flutter pub get failed"; exit 1; }
+fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; exit 1; }
+fvm dart run build_runner build --delete-conflicting-outputs || { echo "❌ build_runner failed"; exit 1; }
+(cd "$PROJECT_ROOT/ios" && pod install) || { echo "❌ pod install failed"; exit 1; }
+
 # Build IPA
 echo "🚀 Building IPA for version $ios_version_name ($ios_build_number) [$FLAVOR]..."
 fvm flutter build ipa \
     --release \
     --build-name="$ios_version_name" \
     --build-number="$ios_build_number" \
-    -t "$main_file" || {
+    -t "$main_file" \
+    --export-options-plist="$PROJECT_ROOT/ios/ci/ExportOptions.plist" || {
     echo "❌ Build failed"
     exit 1
 }

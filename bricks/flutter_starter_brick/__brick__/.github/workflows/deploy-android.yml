@@ -1,0 +1,109 @@
+{{=<% %>=}}
+name: Deploy Android to Play Store
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+
+jobs:
+  setup:
+    uses: ./.github/workflows/setup-common-config.yml
+
+  deploy:
+    name: Build & Upload AAB
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Java
+        uses: actions/setup-java@v5.2.0
+        with:
+          distribution: ${{ needs.setup.outputs.JAVA_DISTRIBUTION }}
+          java-version: ${{ needs.setup.outputs.JAVA_VERSION }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: ${{ needs.setup.outputs.FLUTTER_VERSION }}
+
+      - name: Read versions file
+        id: versions
+        run: |
+          source versions
+          echo "version_name=$android_version_name" >> "$GITHUB_OUTPUT"
+          echo "build_number=$android_build_number" >> "$GITHUB_OUTPUT"
+
+      - name: Determine main file
+        id: main_file
+        run: |
+          if [ "${{ inputs.environment }}" = "dev" ]; then
+            echo "main_file=lib/main_development.dart" >> "$GITHUB_OUTPUT"
+          else
+            echo "main_file=lib/main_production.dart" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Android signing
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+          echo "storeFile=upload-keystore.jks" > android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+
+      - name: Configure Gradle memory for CI
+        run: sed -i 's/org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx4G -XX:MaxMetaspaceSize=1G -XX:+HeapDumpOnOutOfMemoryError/' android/gradle.properties
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Generate localizations
+        run: flutter gen-l10n
+
+      - name: Run build_runner
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build AAB
+        run: |
+          flutter build appbundle \
+            --release \
+            --build-name="${{ steps.versions.outputs.version_name }}" \
+            --build-number="${{ steps.versions.outputs.build_number }}" \
+            -t "${{ steps.main_file.outputs.main_file }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install google-auth google-api-python-client
+
+      - name: Decode Google Play service account JSON
+        run: echo "${{ secrets.PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}" | base64 --decode > /tmp/service-account.json
+
+      - name: Upload to Google Play Internal Testing
+        run: |
+          python3 scripts/upload_to_play_store/upload_to_playstore.py \
+            build/app/outputs/bundle/release/app-release.aab \
+            /tmp/service-account.json \
+            <%org_name%>.<%proj_name%>
+
+      - name: Cleanup secrets
+        if: always()
+        run: |
+          rm -f android/app/upload-keystore.jks
+          rm -f android/key.properties
+          rm -f /tmp/service-account.json

@@ -1,0 +1,24 @@
+name: Setup common configuration
+
+on:
+  workflow_call:
+    outputs:
+      FLUTTER_VERSION:
+        description: "Flutter version"
+        value: "TODO({{dev_name}})"
+      JAVA_VERSION:
+        description: "Java version"
+        value: "17"
+      JAVA_DISTRIBUTION:
+        description: "Java distribution"
+        value: "temurin"
+
+jobs:
+  config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report configuration
+        run: |
+          echo "Flutter version: TODO({{dev_name}})"
+          echo "Java version: 17"
+          echo "Java distribution: temurin"
