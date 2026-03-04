@@ -1,3 +1,13 @@
+# 4.3.0
+- Added CI/CD GitHub Actions workflows for Android and iOS deployment
+- Added README documentation for CI/CD workflows
+- Added ExportOptions.plist for iOS CI builds
+- Added common config setup workflow for shared CI configuration
+- Refactored AppMetaDataCubit - extracted AppMetaDataRepository for cleaner separation
+- Added IAI.local.md to .gitignore in generated projects
+- Updated dependencies: go_router, dio, json_annotation, very_good_analysis, build_runner, go_router_builder, json_serializable
+- Added shared_preferences and uuid packages
+
 # 4.2.0
 - Removed staging environment (main_staging.dart, StagingEnvironmentVariables, Environment.staging)
 - Removed fastlane configuration (using direct API scripts instead)
