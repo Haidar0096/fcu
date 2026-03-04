@@ -54,6 +54,12 @@ if [[ -z "$web_version_name" || -z "$web_build_number" ]]; then
     exit 1
 fi
 
+# Prepare project
+echo "📦 Preparing project..."
+fvm flutter pub get || { echo "❌ flutter pub get failed"; exit 1; }
+fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; exit 1; }
+fvm dart run build_runner build --delete-conflicting-outputs || { echo "❌ build_runner failed"; exit 1; }
+
 # Build Web
 echo "🚀 Building Web for version $web_version_name ($web_build_number) [$FLAVOR]..."
 fvm flutter build web \

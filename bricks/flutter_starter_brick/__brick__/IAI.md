@@ -1,5 +1,8 @@
 # IAI.md
 
+## Project Overview
+<TODO({{dev_name}}): Add an overview of the app here, be comprehensive. This overview should cover everything one needs to know to understand what is this app.
+
 ## Architecture Overview
 
 ### Architecture Philosophy
@@ -150,7 +153,9 @@ backend HTTP client configuration).
 
 The foundation folder is structured differently from other top-level folders. It doesn't follow the
 src + barrel pattern itself because it contains multiple modules. Instead, it acts as a container
-for various foundational modules:
+for various foundational modules.
+
+*Note: The starter template includes core modules. Create additional modules (apis/, formatters/, models/) as your project requires them.*
 
 - apis/ - Shared API implementations
 - basic_types/ - Core type definitions and utilities
@@ -463,14 +468,14 @@ Container(
 
 **Theme Constants Over Magic Numbers:**
 ```dart
-// GOOD - Using theme spacing/sizing
+// GOOD - Using design system spacing
 Padding(
-  padding: EdgeInsets.all(context.themeData.spacing.medium),
+  padding: EdgeInsets.all(SpacingSize.spacing24.value),
 )
 
 // BAD - Hardcoding dimensions
 Padding(
-  padding: EdgeInsets.all(16),
+  padding: EdgeInsets.all(24),
 )
 ```
 
@@ -495,46 +500,54 @@ When translating designs from Figma to code, follow this systematic approach for
 
 **Our Spacing System** (`SpacingSize` enum in `foundation/ui/widgets/spacing.dart`):
 ```dart
-xxSmall  = 4px   // Minimal gaps
-xSmall   = 8px   // Small gaps (base unit)
-small    = 16px  // Standard gaps
-medium   = 24px  // Medium gaps
-large    = 32px  // Large gaps
-xLarge   = 40px  // Extra large gaps
-xxLarge  = 48px  // Very large gaps
-xxxLarge = 64px  // Maximum gaps
+spacing4  = 4px   // Minimal gaps
+spacing8  = 8px   // Small gaps (base unit)
+spacing12 = 12px  // Between small and standard
+spacing16 = 16px  // Standard gaps
+spacing20 = 20px  // Between standard and medium
+spacing24 = 24px  // Medium gaps
+spacing28 = 28px  // Between medium and large
+spacing32 = 32px  // Large gaps
+spacing36 = 36px  // Between large and extra large
+spacing40 = 40px  // Extra large gaps
+spacing44 = 44px  // Between extra large and very large
+spacing48 = 48px  // Very large gaps
+spacing52 = 52px  // Between very large and huge
+spacing56 = 56px  // Huge gaps
+spacing60 = 60px  // Between huge and maximum
+spacing64 = 64px  // Maximum gaps
 ```
 
 **Translation Rules:**
 
 1. **Round to nearest available `SpacingSize` value**
-   - Acceptable tolerance: **±4px** (half of base 8px unit)
+   - Values increment by 4px, so any Figma value can be rounded to nearest
    - Prioritize consistency over pixel-perfection
 
 2. **Example Translations:**
    | Figma Value | Round To | SpacingSize | Difference |
    |-------------|----------|-------------|------------|
-   | 6px | 8px | xSmall | +2px ✅ |
-   | 10px | 8px | xSmall | -2px ✅ |
-   | 12px | 16px | small | +4px ✅ |
-   | 20px | 16px | small | -4px ✅ |
-   | 28px | 24px | medium | -4px ✅ |
-   | 36px | 40px | xLarge | +4px ✅ |
+   | 6px | 8px | spacing8 | +2px ✅ |
+   | 10px | 8px or 12px | spacing8 or spacing12 | ±2px ✅ |
+   | 14px | 12px or 16px | spacing12 or spacing16 | ±2px ✅ |
+   | 22px | 20px or 24px | spacing20 or spacing24 | ±2px ✅ |
+   | 30px | 28px or 32px | spacing28 or spacing32 | ±2px ✅ |
+   | 38px | 36px or 40px | spacing36 or spacing40 | ±2px ✅ |
 
-3. **Always use `Spacing.vertical()` or `Spacing.horizontal()` widgets:**
+3. **Always use `SizedBox` with `SpacingSize.value`:**
    ```dart
    // GOOD - Using design system
-   const Spacing.vertical(SpacingSize.small)
+   SizedBox(height: SpacingSize.spacing16.value)
+   SizedBox(width: SpacingSize.spacing8.value)
 
    // BAD - Hardcoded spacing
    const SizedBox(height: 16)
    ```
 
 4. **When to add new spacing values:**
-   - **Only if** a specific value is used **20+ times** across the entire app
-   - **Only if** rounding creates obvious visual problems in user testing
-   - **Only if** designer explicitly requires it for accessibility/branding
-   - Otherwise, always round to existing values
+   - The enum already covers all 4px increments from 4-64px
+   - Only add values outside this range if truly needed
+   - Otherwise, always use existing values
 
 ### Sealed Class Patterns
 

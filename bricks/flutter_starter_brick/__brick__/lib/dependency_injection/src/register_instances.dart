@@ -4,7 +4,9 @@ import 'package:{{proj_name}}/dependency_injection/src/instance_names.dart';
 import 'package:{{proj_name}}/features/random_jokes/random_jokes.dart';
 import 'package:{{proj_name}}/features/random_jokes/src/apis/jokes_api.dart';
 import 'package:{{proj_name}}/features/splash_screen/splash_screen.dart';
-import 'package:{{proj_name}}/foundation/blocs/app_meta_data_cubit/app_meta_data_cubit.dart';
+import 'package:{{proj_name}}/foundation/app_meta_data/app_meta_data.dart';
+import 'package:{{proj_name}}/foundation/app_meta_data/src/repositories/app_meta_data_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:{{proj_name}}/foundation/environment_variables/environment_variables.dart';
 import 'package:{{proj_name}}/foundation/environments/environments.dart';
 import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
@@ -26,10 +28,15 @@ void registerInstances(GetIt getIt, {required Environment environment}) {
       () => LocalizationCubit(),
       dispose: (bloc) => bloc.close(),
     )
-    ..registerLazySingleton<AppMetaDataCubit>(
-      () => AppMetaDataCubit(getIt.get(), getIt.get()),
-      dispose: (bloc) => bloc.close(),
-    )
+    ..registerSingletonAsync<SharedPreferences>(SharedPreferences.getInstance)
+    ..registerSingletonAsync<AppMetaDataRepository>(() async {
+      await getIt.isReady<SharedPreferences>();
+      return AppMetaDataRepository(sharedPreferences: getIt.get());
+    })
+    ..registerSingletonAsync<AppMetaDataCubit>(() async {
+      await getIt.isReady<AppMetaDataRepository>();
+      return AppMetaDataCubit(getIt.get(), getIt.get(), getIt.get());
+    }, dispose: (bloc) => bloc.close())
     ..registerLazySingleton<EnvironmentVariables>(
       () => switch (getIt.get<Environment>()) {
         Environment.development => const DevelopmentEnvironmentVariables(),

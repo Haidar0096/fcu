@@ -1,0 +1,124 @@
+{{=<% %>=}}
+name: Deploy iOS to TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+
+jobs:
+  setup:
+    uses: ./.github/workflows/setup-common-config.yml
+
+  deploy:
+    name: Build & Upload to TestFlight
+    needs: setup
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: ${{ needs.setup.outputs.FLUTTER_VERSION }}
+
+      - name: Read versions file
+        id: versions
+        run: |
+          source versions
+          echo "version_name=$ios_version_name" >> "$GITHUB_OUTPUT"
+          echo "build_number=$ios_build_number" >> "$GITHUB_OUTPUT"
+
+      - name: Determine main file
+        id: main_file
+        run: |
+          if [ "${{ inputs.environment }}" = "dev" ]; then
+            echo "main_file=lib/main_development.dart" >> "$GITHUB_OUTPUT"
+          else
+            echo "main_file=lib/main_production.dart" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Generate localizations
+        run: flutter gen-l10n
+
+      - name: Run build_runner
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Install CocoaPods dependencies
+        run: cd ios && pod install
+
+      - name: Install Apple certificate and provisioning profile
+        env:
+          IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          CERTIFICATE_PATH=$RUNNER_TEMP/certificate.p12
+          echo "$IOS_CERTIFICATE_BASE64" | base64 --decode > "$CERTIFICATE_PATH"
+          security import "$CERTIFICATE_PATH" \
+            -P "$IOS_CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" login.keychain-db
+
+          PP_PATH=$RUNNER_TEMP/profile.mobileprovision
+          echo "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PP_PATH"
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Build IPA
+        run: |
+          flutter build ipa \
+            --release \
+            --build-name="${{ steps.versions.outputs.version_name }}" \
+            --build-number="${{ steps.versions.outputs.build_number }}" \
+            -t "${{ steps.main_file.outputs.main_file }}" \
+            --export-options-plist=ios/ci/ExportOptions.plist
+
+      - name: Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$APP_STORE_CONNECT_API_KEY_BASE64" | base64 --decode \
+            > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+
+          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -n 1)
+
+          xcrun altool --upload-app --type ios \
+            -f "$IPA_PATH" \
+            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
+
+      - name: Cleanup secrets
+        if: always()
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
+          rm -f $RUNNER_TEMP/certificate.p12
+          rm -f $RUNNER_TEMP/profile.mobileprovision
+          rm -rf ~/.appstoreconnect/private_keys
+          rm -rf ~/Library/MobileDevice/"Provisioning Profiles"/*

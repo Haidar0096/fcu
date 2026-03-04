@@ -31,11 +31,11 @@ Future<void> run(HookContext context) async {
         'pub',
         'add',
         '--dev',
-        'very_good_analysis:^10.0.0',
-        'build_runner:^2.10.5',
-        'go_router_builder:^4.1.3',
+        'very_good_analysis:^10.1.0',
+        'build_runner:^2.11.1',
+        'go_router_builder:^4.2.0',
         'build_verify:^3.1.1',
-        'json_serializable:^6.11.1',
+        'json_serializable:^6.12.0',
         'flutter_launcher_icons:^0.14.4'
       ],
     ),
@@ -58,11 +58,13 @@ Future<void> run(HookContext context) async {
         'android_id:^0.5.1',
         'device_info_plus:^12.3.0',
         'package_info_plus:^9.0.0',
-        'go_router:^17.0.1',
+        'go_router:^17.1.0',
         'flutter_animate:^4.5.2',
         'rxdart:^0.28.0',
-        'dio:^5.9.0',
-        'json_annotation:^4.9.0'
+        'dio:^5.9.1',
+        'json_annotation:^4.10.0',
+        'shared_preferences:^2.5.4',
+        'uuid:^4.5.2'
       ],
     ),
   );
