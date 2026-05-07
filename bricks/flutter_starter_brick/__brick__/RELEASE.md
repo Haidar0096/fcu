@@ -25,12 +25,22 @@ Development and production branches are synchronized (development has been merge
 
 1. Update `versions` file with new build numbers
 2. Update `CHANGELOG.md` with release notes
-3. Open a PR from development to production
-4. Team approves and merges the PR (regular merge, not squash)
+3. Push to development
+4. Trigger GitHub Actions workflows against the development branch
+5. Builds are uploaded to Google Play Internal Testing and TestFlight
 
-### After release
+### Testing
 
-1. Create a git tag on production: `vX.Y.Z+build_number`
+1. Team downloads and tests the builds from Internal Testing / TestFlight
+2. If issues are found, fix on development and repeat from step 4 above
+3. When team confirms the builds are good, proceed to release
+
+### Release
+
+1. Open a PR from development to production
+2. Team approves and merges the PR (regular merge, not squash)
+3. Promote the release to production on Google Play Console and App Store Connect
+4. Create a git tag on production: `vX.Y.Z+build_number`
 
 ## Merge strategy
 
