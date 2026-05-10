@@ -3,7 +3,7 @@ title: 'IAI legacy_rescue migration: outer + brick template'
 short_description: Migrate flutter_cli_utils outer project from legacy IAI (IAI.md, IAI.local.md, iai_scratchpad/) to current IAI v1.1.0; then migrate the flutter_starter_brick template's IAI files so generated projects also boot up_to_date on IAI v1.1.0. Migration is complete in code but not committed; awaiting Haidar review.
 status: in_progress
 started: 2026-05-08T01:06
-updated: 2026-05-09T20:43
+updated: 2026-05-10T15:14
 objective: Bring both the outer project and the brick template onto IAI v1.1.0 with zero information loss from legacy IAI artifacts, so future chats inside the outer project AND inside any brick-generated project boot as up_to_date.
 success_criteria: []
 failure_criteria: []
@@ -27,7 +27,7 @@ tasks:
 - id: '3'
   title: 'FOLLOW-UP: Review the migration diff and commit'
   short_description: Haidar reviews git diff, then commits the migration. Nothing is committed yet per his explicit instruction.
-  status: not_started
+  status: completed
   context: 'Working tree at 2026-05-09 EOD: all migration code intact PLUS two additional edits this chat — (1) removed ''.iai/startup/rules.local.iai.md'' gitignore line from new_project_command.dart per Haidar (he will fix kernel rule and request rerun), (2) extended post_gen.dart chmod step to cover all 5 scripts (cat.sh + 4 pre-existing brick scripts) — Task 4 done. Task 5 cancelled (README hint declined). NEXT CHAT IS BLOCKED on Haidar finishing iai-migrate skill update — wait for his signal, then rerun the skill, THEN review diff + commit. See handoff at .iai/scratchpad/handoff/2026-05-09-next.md for full state.'
   required_files:
   - path: .iai/scratchpad/handoff/2026-05-09-next.md
