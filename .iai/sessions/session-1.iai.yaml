@@ -1,9 +1,9 @@
 id: '1'
 title: 'IAI legacy_rescue migration: outer + brick template'
 short_description: Migrate flutter_cli_utils outer project from legacy IAI (IAI.md, IAI.local.md, iai_scratchpad/) to current IAI v1.1.0; then migrate the flutter_starter_brick template's IAI files so generated projects also boot up_to_date on IAI v1.1.0. Migration is complete in code but not committed; awaiting Haidar review.
-status: in_progress
+status: completed
 started: 2026-05-08T01:06
-updated: 2026-05-10T15:14
+updated: 2026-05-10T15:51
 objective: Bring both the outer project and the brick template onto IAI v1.1.0 with zero information loss from legacy IAI artifacts, so future chats inside the outer project AND inside any brick-generated project boot as up_to_date.
 success_criteria: []
 failure_criteria: []
@@ -73,19 +73,22 @@ tasks:
 plan: []
 decisions: []
 current_state:
-  working_on: Migration is complete in code for outer + brick + this chat's two follow-up edits (gitignore line removed, post_gen chmod expanded to 5 scripts). NOTHING IS COMMITTED. BLOCKED on Haidar's iai-migrate skill update.
-  next: 'End-of-chat 2026-05-09. Read .iai/scratchpad/handoff/2026-05-09-next.md FIRST — it has the full state, what changed this chat, expected working tree, and the next-chat plan. Two-line summary: (1) Wait for Haidar to signal his iai-migrate skill update is in (he is patching the kernel rule that prescribes a project-local rules file we removed this chat); (2) then rerun iai-migrate against this project, review diff, commit. Do NOT touch the kernel skill yourself — the update is Haidar''s action. Tasks: 1/2/4 completed, 3 pending (review+commit, blocked), 5 cancelled (README hint declined). Optional unrelated lint cleanup at line 522 of new_project_command.dart while in the file.'
-  blockers: Haidar's iai-migrate kernel skill update (he will signal when done, then ask agent to rerun migrate skill)
+  working_on: null
+  next: null
+  blockers: null
 corrections:
 - what_went_wrong: Phase 1 classified outer IAI.md 'brick-output' sections as drop-safe based on inspecting the brick's __brick__/IAI.md HEADERS only, not bodies. Advisor flagged that 10 sections existed only in the outer copy and would be silently lost if the brick's body did not actually cover them. Required writing a phase2_brick_migration.md handoff note as a save before any git rm.
   lesson: When migrating content across two related sources (e.g. outer project + template/copy), do not classify based on topic structure (heading match) alone. Cross-check the bodies — the same heading in the other source can have different content. If you cannot afford a full body diff, write a handoff note enumerating the dropped sections so the next migration step can verify before deletion.
-  disposition: null
+  disposition: drop
 - what_went_wrong: Initially shipped the brick template's new __brick__/.iai/startup/cat.sh without any post-render chmod, assuming Mason would preserve the executable bit. Render test showed Mason renders all files with default perms (-rw-r--r--), so the kernel walker (which checks `[ -x cat.sh ]`) silently skipped the rendered project's rules. Required adding a chmod step to post_gen.dart as the first action.
   lesson: Mason does NOT preserve file mode (executable bit). Any brick that ships a script that must be executable in the rendered project — `.sh` files, hooks, IAI cat.sh, etc. — needs a chmod step in post_gen.dart, OR the consumer must invoke the script via `bash $path` rather than `$path` directly. Verify with a render test before declaring the brick correct.
-  disposition: null
+  disposition: promote_project
 - what_went_wrong: Did not create an IAI session at the start of the legacy_rescue migration. The /iai-migrate skill drove the work directly, and a session was only created retroactively at save time when the user asked to persist state. The session therefore has no STEP 1 outputs, no plan-approved gate passing, no test/advisor records — workflow.current_step is the default.
   lesson: Even when a skill (like iai-migrate or iai-system) drives the work without explicitly walking the kernel STEPs, an IAI session should still be created at the start so the work is durable from minute one. If the skill itself does not create the session, create one manually after the skill's pre-checks but before any substantive mutation. A session created retroactively at save time loses the gate evidence (STEP 1 approvals, advisor stamp, test stamp).
-  disposition: null
+  disposition: drop
+- what_went_wrong: 'When Haidar asked for ''very short'' / ''high level'', I responded with 2-3 sentence paragraphs per point including jargon and causal chains (e.g. MM flag → exec bit → next status showed M). He pushed back twice; second push-back was angry: ''what the fuck is all of this? I did not read this shit.'''
+  lesson: When Haidar asks for 'very short' / 'high level' / 'briefly', cap each point at ONE line. No jargon, no embedded technical detail, no causal chains. The first push-back is the warning — honor it on the very next response, do not iterate down gradually. If one line genuinely cannot carry the answer, say so and ask whether he wants the details, instead of pre-emptively expanding.
+  disposition: drop
 workflow:
   current_step: null
   pending_questions: []
