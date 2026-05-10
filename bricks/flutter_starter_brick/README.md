@@ -33,7 +33,7 @@ foundation modules, and best practices built-in.
 - [✓] **Animations**: Pre-built animation utilities and extensions
 
 ### Developer Tools
-- [✓] **IAI.md Documentation**: Comprehensive architecture and pattern guide
+- [✓] **IAI System Setup**: Pre-configured `.iai/` skeleton with project-specific rules; universal Flutter rules ship via the global `flutter-developer` skill
 - [✓] **Build Scripts**: APK generation for all architectures and environments
 - [✓] **TestFlight Upload**: Automated iOS distribution script
 - [✗] **GitHub Actions (Coming Soon)**: CI/CD pipelines
@@ -83,13 +83,15 @@ lib/
 
 ## Documentation
 
-Every generated project includes a comprehensive `IAI.md` file that documents:
-- Architecture patterns and principles
-- Module structure and import rules
-- Coding patterns and best practices
-- Logger usage guidelines
-- Typography and theming system
-- State management patterns
+Every generated project includes a pre-configured `.iai/` skeleton with `.iai/startup/rules.iai.md` documenting the app-specific bits:
+- App-specific configuration (orientation, persistence, error handling)
+- Starter feature list (splash, random jokes, error)
+- Code generation dependency choices
+- Localization setup
+- Animation extensions
+- Common task workflows (modifying error handling, etc.)
+
+Universal Flutter/Dart architecture and patterns are provided by the global `flutter-developer` skill in the IAI agent system.
 
 ## Support Me
 

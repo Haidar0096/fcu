@@ -24,6 +24,18 @@ Future<void> run(HookContext context) async {
   }
 
   await _executeCommand(
+    'Making shell scripts executable',
+    () => Process.run('chmod', [
+      '+x',
+      '.iai/startup/cat.sh',
+      'scripts/create_android_builds/create_android_builds.sh',
+      'scripts/upload_to_test_flight/upload_to_testflight.sh',
+      'scripts/upload_to_play_store/upload_to_playstore.sh',
+      'scripts/build_web/build_web.sh',
+    ]),
+  );
+
+  await _executeCommand(
     'Adding dev dependencies',
     () => Process.run(
       'dart',

@@ -71,7 +71,27 @@
 - Added /android/.kotlin/ folder to .gitignore for Android Kotlin metadata
 
 # 4.0.0
-- Complete architecture overhaul
+- Complete architecture overhaul. Major refactoring of the starter brick architecture:
+
+  **Architecture Changes**
+  - **Migration**: `infrastructure/` → `foundation/` folder structure
+  - **Module Pattern**: Consistent src + barrel file pattern throughout
+  - **Simplified Widgets**: Removed complex/specific widgets, kept essentials
+  - **Logger Optimization**: Removed duplicate logging, centralized in HTTP client
+  - **Clean Separation**: Better organization of core vs app-specific code
+
+  **Code Quality Improvements**
+  - Removed all hardcoded values to defaults classes
+  - Fixed all import inconsistencies
+  - Eliminated unused dependencies (~24MB reduction)
+  - Streamlined localization (110 → 16 essential keys)
+  - Enhanced documentation with comprehensive IAI.md in generated projects
+
+  **Development Experience**
+  - Clearer module boundaries with explicit exports
+  - Better error handling patterns
+  - Improved state management patterns
+  - More maintainable codebase structure
 
 # 3.2.2
 - Fixed a wrong import.
