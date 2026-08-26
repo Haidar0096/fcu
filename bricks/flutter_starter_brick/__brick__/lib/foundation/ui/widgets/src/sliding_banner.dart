@@ -5,7 +5,7 @@ import 'package:{{proj_name}}/foundation/ui/animations/animations.dart';
 import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
 /// Default constants for sliding banners.
-class SlidingBannerDefaults {
+abstract final class SlidingBannerDefaults {
   static const Duration defaultDuration = Duration(seconds: 6);
   static const Duration errorDuration = Duration(seconds: 6);
   static const Duration successDuration = Duration(seconds: 4);
@@ -52,18 +52,17 @@ class SlidingBanner {
     final widgetKey = GlobalKey<_SlidingBannerWidgetState>();
 
     _currentEntry = OverlayEntry(
-      builder:
-          (context) => _SlidingBannerWidget(
-            key: widgetKey,
-            type: type,
-            message: message,
-            onAction: onAction,
-            actionText: actionText,
-            onDismiss: () {
-              hide();
-              onDismiss?.call();
-            },
-          ),
+      builder: (context) => _SlidingBannerWidget(
+        key: widgetKey,
+        type: type,
+        message: message,
+        onAction: onAction,
+        actionText: actionText,
+        onDismiss: () {
+          hide();
+          onDismiss?.call();
+        },
+      ),
     );
 
     overlay.insert(_currentEntry!);

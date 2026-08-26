@@ -28,6 +28,11 @@ class RouterImportRestrictionsRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'router_import_restrictions',
     'router/ can only import from features/, foundation/, resources/, and dependency_injection/.',
+    // WARNING, not the LintCode default of INFO: every rule here is
+    // registered with `registerWarningRule`, and an architecture breach is a
+    // build-stopping fault, not a suggestion. At INFO `dart analyze` exits 0
+    // and the gate passes with the breach in place.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Creates an instance of [RouterImportRestrictionsRule].

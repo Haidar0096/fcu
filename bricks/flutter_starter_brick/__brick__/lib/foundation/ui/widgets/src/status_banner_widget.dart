@@ -3,12 +3,13 @@ import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
-/// Generic status banner widget for displaying consistent status messages
-/// across the application.
+/// The app's ONE banner view, in every status it can take.
 ///
-/// Supports different types: loading, success, error with appropriate colors,
-/// icons, and optional action buttons. Can be used for any feature that needs
-/// to display status feedback to users.
+/// It is not a second banner beside the sliding one: the transient banner
+/// road (`context.showErrorBanner` and its siblings) renders THIS widget
+/// inside its overlay — see `sliding_banner.dart`. Rendering it directly, as
+/// a feature does for a failure that has to stay on the screen instead of
+/// sliding away, is the same widget used the other legal way.
 class StatusBannerWidget extends StatelessWidget {
   const StatusBannerWidget({
     required this.type,
@@ -24,7 +25,7 @@ class StatusBannerWidget extends StatelessWidget {
   final VoidCallback? onAction;
   final String? actionText;
 
-  /// Optional dismiss callback - shows an X button in top-right corner
+  /// Optional dismiss callback - shows an X button at the trailing edge
   final VoidCallback? onDismiss;
 
   @override
@@ -47,7 +48,7 @@ class StatusBannerWidget extends StatelessWidget {
               alpha: ThemeDefaults.shadowAlpha,
             ),
             blurRadius: SpacingSize.spacing8.value,
-            offset: Offset(0, SpacingSize.spacing4.value / 2),
+            offset: Offset(0, StatusBannerWidgetDefaults.shadowOffsetY),
           ),
         ],
       ),
@@ -64,10 +65,11 @@ class StatusBannerWidget extends StatelessWidget {
                     // Icon or loading indicator
                     if (type == StatusBannerType.loading)
                       SizedBox(
-                        width: ThemeDefaults.smallIconSize - 2,
-                        height: ThemeDefaults.smallIconSize - 2,
+                        width: StatusBannerWidgetDefaults.iconSize,
+                        height: StatusBannerWidgetDefaults.iconSize,
                         child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                          strokeWidth:
+                              StatusBannerWidgetDefaults.spinnerStrokeWidth,
                           color: colors.iconColor,
                         ),
                       )
@@ -75,7 +77,7 @@ class StatusBannerWidget extends StatelessWidget {
                       Icon(
                         icon,
                         color: colors.iconColor,
-                        size: ThemeDefaults.smallIconSize - 2,
+                        size: StatusBannerWidgetDefaults.iconSize,
                       ),
                     SizedBox(width: SpacingSize.spacing16.value),
                     // Message text
@@ -98,9 +100,8 @@ class StatusBannerWidget extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: MainButton(
-                      text:
-                          (actionText ?? context.appLocalizations.retry)
-                              .toUpperCase(),
+                      text: (actionText ?? context.appLocalizations.retry)
+                          .toUpperCase(),
                       onPressed: onAction,
                     ),
                   ),
@@ -108,11 +109,12 @@ class StatusBannerWidget extends StatelessWidget {
               ],
             ),
           ),
-          // Dismiss button
+          // Dismiss button. Directional, so it stays on the trailing edge in
+          // a right-to-left language instead of jumping across the banner.
           if (onDismiss != null)
-            Positioned(
+            PositionedDirectional(
               top: 0,
-              right: SpacingSize.spacing8.value,
+              end: SpacingSize.spacing8.value,
               bottom: 0,
               child: Center(
                 child: Material(

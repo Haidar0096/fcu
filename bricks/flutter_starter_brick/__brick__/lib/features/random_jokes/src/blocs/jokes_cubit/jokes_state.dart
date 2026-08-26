@@ -3,6 +3,12 @@ part of 'jokes_cubit.dart';
 /// Base state for jokes feature
 sealed class JokesState {
   const JokesState();
+
+  /// Whether a joke is currently being fetched.
+  bool get isLoading => switch (this) {
+    JokesLoading() => true,
+    JokesInitial() || JokesLoaded() || JokesFailed() => false,
+  };
 }
 
 /// Initial state before any joke is fetched

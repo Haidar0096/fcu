@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - TBD
+
+### Added
+- `app_import_restrictions` rule: app/ may import dependency_injection/, foundation/, resources/, router/
+- `dependency_injection_import_restrictions` rule: dependency_injection/ may import fake_data/, features/, foundation/, resources/, router/
+- `fake_data_import_restrictions` rule: fake_data/ may import features/, foundation/, resources/
+- `main_common_import_restrictions` rule: main_common.dart may import app/, dependency_injection/, foundation/, resources/
+
+### Changed
+- `no_src_imports` now sanctions all three composition roots (dependency_injection/, router/, the fake_data/ registry), and no longer skips files that live outside a `src/` folder — barrels and `main_common.dart` are checked too
+- `foundation_import_restrictions` and `resources_cannot_import` now use allow-lists scoped to the project's own package, instead of a deny-list of five folder names that both under-reported (fake_data/, main_common.dart) and could fire on a third-party package
+- `main_environment_files_import_restrictions` now matches every `main_<environment>.dart` a project defines, instead of three hardcoded names (one of which, `staging`, no longer exists)
+
 ## [1.0.0] - 2025-01-19
 
 ### Added

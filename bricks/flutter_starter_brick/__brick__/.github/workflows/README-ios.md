@@ -8,7 +8,7 @@ GitHub Actions workflow that builds an iOS IPA and uploads it to TestFlight.
 - Apple Distribution certificate (.p12)
 - App Store provisioning profile (.mobileprovision)
 - App Store Connect API key (.p8)
-- `setup-common-config.yml` updated with your Flutter version (replace the `TODO` placeholder)
+- `setup-common-config.yml`'s Flutter version matches the `.fvmrc` pin at the project root, byte for byte (both ship pinned; move them together)
 
 ## GitHub Secrets (6 required)
 
@@ -110,13 +110,13 @@ The bundle ID key is already set to your project's bundle ID.
 
 ## Shared Configuration
 
-Flutter version is defined in `setup-common-config.yml`. Update the version there to change it for both Android and iOS workflows.
+Flutter version, Java version, and Java distribution are defined in `setup-common-config.yml`. Update versions there to change them for both Android and iOS workflows. The Flutter version there and the `.fvmrc` pin at the project root are the same version with two readers — change both in the same commit, never one alone.
 
 ## Adapting for a New Project
 
 1. Copy `.github/workflows/deploy-ios.yml` and `setup-common-config.yml`
 2. Set all 6 secrets listed above
-3. Create `ios/ci/ExportOptions.plist` with your team ID, bundle ID, and profile name
+3. Fill in the two TODO placeholders in the shipped `ios/ci/ExportOptions.plist` — team ID and provisioning profile name (see "ExportOptions.plist" above); the bundle ID is already set
 4. Configure Xcode Manual signing for Release (see above)
-5. Update `setup-common-config.yml` with the correct Flutter version
+5. Update `setup-common-config.yml` and `.fvmrc` with the same correct Flutter version
 6. If your project doesn't use `build_runner`, `gen-l10n`, or CocoaPods, remove those steps

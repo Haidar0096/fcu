@@ -5,37 +5,75 @@ sealed class AppMetaDataState {
   const AppMetaDataState();
 
   /// Indicates whether the app meta data is currently being loaded.
-  bool get loading => false;
+  bool get loading => switch (this) {
+    AppMetaDataLoading() => true,
+    AppMetaDataInitial() ||
+    AppMetaDataLoaded() ||
+    AppMetaDataLoadingFailed() => false,
+  };
 
   /// The unique identifier for the device.
   ///
   /// Returns an empty string if not available or if initialization failed.
-  String get deviceId => '';
+  String get deviceId => switch (this) {
+    AppMetaDataLoaded(:final deviceId) => deviceId,
+    AppMetaDataInitial() ||
+    AppMetaDataLoading() ||
+    AppMetaDataLoadingFailed() => '',
+  };
 
   /// The type of the operating system (e.g., iOS, Android).
   ///
   /// Returns an empty string if not available or if initialization failed.
-  String get osType => '';
+  String get osType => switch (this) {
+    AppMetaDataLoaded(:final osType) => osType,
+    AppMetaDataInitial() ||
+    AppMetaDataLoading() ||
+    AppMetaDataLoadingFailed() => '',
+  };
 
   /// The version of the operating system.
   ///
   /// Returns an empty string if not available or if initialization failed.
-  String get osVersion => '';
+  String get osVersion => switch (this) {
+    AppMetaDataLoaded(:final osVersion) => osVersion,
+    AppMetaDataInitial() ||
+    AppMetaDataLoading() ||
+    AppMetaDataLoadingFailed() => '',
+  };
 
   /// The version of the app.
   ///
   /// Returns an empty string if not available or if initialization failed.
-  String get appVersion => '';
+  String get appVersion => switch (this) {
+    AppMetaDataLoaded(:final appVersion) => appVersion,
+    AppMetaDataInitial() ||
+    AppMetaDataLoading() ||
+    AppMetaDataLoadingFailed() => '',
+  };
 
   /// The build number of the app.
   ///
   /// Returns an empty string if not available or if initialization failed.
-  String get buildNumber => '';
+  String get buildNumber => switch (this) {
+    AppMetaDataLoaded(:final buildNumber) => buildNumber,
+    AppMetaDataInitial() ||
+    AppMetaDataLoading() ||
+    AppMetaDataLoadingFailed() => '',
+  };
 
   /// A formatted string containing both the app version and build number.
   ///
   /// Returns an empty string if either appVersion or buildNumber is empty.
-  String get appVersionAndBuildNumberString => '';
+  String get appVersionAndBuildNumberString => switch (this) {
+    AppMetaDataLoaded(:final appVersion, :final buildNumber)
+        when appVersion.isNotEmpty && buildNumber.isNotEmpty =>
+      'v-$appVersion+$buildNumber',
+    AppMetaDataInitial() ||
+    AppMetaDataLoading() ||
+    AppMetaDataLoaded() ||
+    AppMetaDataLoadingFailed() => '',
+  };
 }
 
 /// Represents the initial state when the app meta data has not been loaded yet.
@@ -46,9 +84,6 @@ final class AppMetaDataInitial extends AppMetaDataState {
 /// Represents the state when the app meta data is being loaded.
 final class AppMetaDataLoading extends AppMetaDataState {
   const AppMetaDataLoading();
-
-  @override
-  bool get loading => true;
 }
 
 /// Represents the state when the app meta data has been successfully loaded.
@@ -75,23 +110,12 @@ final class AppMetaDataLoaded extends AppMetaDataState {
 
   @override
   final String buildNumber;
-
-  @override
-  String get appVersionAndBuildNumberString {
-    if (appVersion.isNotEmpty && buildNumber.isNotEmpty) {
-      return 'v-$appVersion+$buildNumber';
-    }
-    return '';
-  }
 }
 
 /// Represents the state when the app meta data loading has failed.
+///
+/// The raw error and its stack trace are logged and reported inside the cubit;
+/// they deliberately do not ride the state, so no widget can render them.
 final class AppMetaDataLoadingFailed extends AppMetaDataState {
-  const AppMetaDataLoadingFailed({required this.error, this.stackTrace});
-
-  /// The error that caused the loading to fail.
-  final Object error;
-
-  /// The stack trace associated with the error, if available.
-  final StackTrace? stackTrace;
+  const AppMetaDataLoadingFailed();
 }

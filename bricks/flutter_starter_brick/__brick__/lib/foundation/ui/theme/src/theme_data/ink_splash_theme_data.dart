@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 ///
 /// These values configure the visual feedback for taps, long presses,
 /// and other interactions throughout the app.
-class InkSplashThemeData {
+abstract final class InkSplashThemeData {
   /// Creates ink splash colors based on the color scheme.
   ///
   /// Opacity values follow Material Design guidelines:

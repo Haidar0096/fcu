@@ -17,10 +17,9 @@ class CustomRadioButton extends StatelessWidget {
     decoration: BoxDecoration(
       shape: BoxShape.circle,
       border: Border.all(
-        color:
-            isSelected
-                ? context.themeData.colorScheme.primary
-                : context.themeData.colorScheme.outline,
+        color: isSelected
+            ? context.themeData.colorScheme.primary
+            : context.themeData.colorScheme.outline,
         width: CustomRadioButtonDefaults.borderWidth,
       ),
     ),
@@ -42,7 +41,7 @@ class CustomRadioButton extends StatelessWidget {
   );
 }
 
-class CustomRadioButtonDefaults {
+abstract final class CustomRadioButtonDefaults {
   static const double outerSize = 24;
   static const double innerSize = 12;
   static const double borderWidth = 2;

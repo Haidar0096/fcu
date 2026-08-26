@@ -9,8 +9,8 @@ on:
         required: true
         type: choice
         options:
-          - dev
-          - prod
+          - development
+          - production
 
 jobs:
   setup:
@@ -39,12 +39,7 @@ jobs:
 
       - name: Determine main file
         id: main_file
-        run: |
-          if [ "${{ inputs.environment }}" = "dev" ]; then
-            echo "main_file=lib/main_development.dart" >> "$GITHUB_OUTPUT"
-          else
-            echo "main_file=lib/main_production.dart" >> "$GITHUB_OUTPUT"
-          fi
+        run: echo "main_file=lib/main_${{ inputs.environment }}.dart" >> "$GITHUB_OUTPUT"
 
       - name: Install Flutter dependencies
         run: flutter pub get

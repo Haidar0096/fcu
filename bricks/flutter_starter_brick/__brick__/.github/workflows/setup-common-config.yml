@@ -1,24 +1,43 @@
+{{=<% %>=}}
 name: Setup common configuration
+
+# The Flutter version below is the SAME exact literal as the `.fvmrc` pin at the
+# project root — one version, two readers. Move both together, never one alone.
+# Inside this file each value is written once, in the step below, and every
+# other line reads it from there.
 
 on:
   workflow_call:
     outputs:
       FLUTTER_VERSION:
         description: "Flutter version"
-        value: "TODO({{dev_name}})"
+        value: ${{ jobs.config.outputs.FLUTTER_VERSION }}
       JAVA_VERSION:
         description: "Java version"
-        value: "17"
+        value: ${{ jobs.config.outputs.JAVA_VERSION }}
       JAVA_DISTRIBUTION:
         description: "Java distribution"
-        value: "temurin"
+        value: ${{ jobs.config.outputs.JAVA_DISTRIBUTION }}
 
 jobs:
   config:
     runs-on: ubuntu-latest
+    outputs:
+      FLUTTER_VERSION: ${{ steps.values.outputs.FLUTTER_VERSION }}
+      JAVA_VERSION: ${{ steps.values.outputs.JAVA_VERSION }}
+      JAVA_DISTRIBUTION: ${{ steps.values.outputs.JAVA_DISTRIBUTION }}
     steps:
+      - name: Set configuration
+        id: values
+        run: |
+          {
+            echo "FLUTTER_VERSION=3.44.9"
+            echo "JAVA_VERSION=17"
+            echo "JAVA_DISTRIBUTION=temurin"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Report configuration
         run: |
-          echo "Flutter version: TODO({{dev_name}})"
-          echo "Java version: 17"
-          echo "Java distribution: temurin"
+          echo "Flutter version: ${{ steps.values.outputs.FLUTTER_VERSION }}"
+          echo "Java version: ${{ steps.values.outputs.JAVA_VERSION }}"
+          echo "Java distribution: ${{ steps.values.outputs.JAVA_DISTRIBUTION }}"

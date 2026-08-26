@@ -2,6 +2,7 @@
 library;
 
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
+import 'package:analyzer_testing/package_config_file_builder.dart';
 import 'package:architecture_lint_rules/src/rules/foundation_import_restrictions_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
@@ -96,6 +97,71 @@ var x = HttpClient();
 
     await assertNoDiagnosticsInFile(
       '$testPackageLibPath/foundation/utils/src/api_helper.dart',
+    );
+  }
+
+  Future<void> test_importFromFakeData_violation() async {
+    newFile('$testPackageLibPath/fake_data/fake_data.dart', 'class Fakes {}');
+
+    newFile('$testPackageLibPath/foundation/ui/src/theme.dart', r'''
+import 'package:test/fake_data/fake_data.dart';
+
+var x = Fakes();
+''');
+
+    await assertDiagnosticsInFile(
+      '$testPackageLibPath/foundation/ui/src/theme.dart',
+      [
+        lint(
+          0,
+          47,
+          messageContainsAll: [
+            'foundation/ can only import from resources/ or other foundation subfolders.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> test_importFromMainCommon_violation() async {
+    newFile('$testPackageLibPath/main_common.dart', 'void mainCommon() {}');
+
+    newFile('$testPackageLibPath/foundation/ui/src/theme.dart', r'''
+import 'package:test/main_common.dart';
+
+void x() => mainCommon();
+''');
+
+    await assertDiagnosticsInFile(
+      '$testPackageLibPath/foundation/ui/src/theme.dart',
+      [
+        lint(
+          0,
+          39,
+          messageContainsAll: [
+            'foundation/ can only import from resources/ or other foundation subfolders.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> test_importFromExternalPackage_allowed() async {
+    // The other package's path carries a `features/` segment, which a
+    // path-only deny-list would flag.
+    newPackage(
+      'other',
+    ).addFile('lib/features/auth/auth.dart', 'class OtherAuth {}');
+    writeTestPackageConfig(PackageConfigFileBuilder());
+
+    newFile('$testPackageLibPath/foundation/ui/src/theme.dart', r'''
+import 'package:other/features/auth/auth.dart';
+
+var x = OtherAuth();
+''');
+
+    await assertNoDiagnosticsInFile(
+      '$testPackageLibPath/foundation/ui/src/theme.dart',
     );
   }
 }

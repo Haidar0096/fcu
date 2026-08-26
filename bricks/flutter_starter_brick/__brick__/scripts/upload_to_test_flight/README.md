@@ -44,10 +44,10 @@ Run from project root:
 
 ```bash
 # For development server
-./scripts/upload_to_test_flight/upload_to_testflight.sh dev
+./scripts/upload_to_test_flight/upload_to_testflight.sh development
 
 # For production server
-./scripts/upload_to_test_flight/upload_to_testflight.sh prod
+./scripts/upload_to_test_flight/upload_to_testflight.sh production
 ```
 
 ## Output

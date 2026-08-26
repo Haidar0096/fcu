@@ -17,7 +17,8 @@ import 'package:{{proj_name}}/foundation/ui/mixins/mixins.dart';
 /// InvisibleValidationWidget<Gender>(
 ///   key: _genderValidationKey,
 ///   value: _selectedGender,
-///   validator: (value) => value == null ? 'Gender is required' : null,
+///   validator: (value) =>
+///       value == null ? context.appLocalizations.<yourErrorKey> : null,
 /// )
 /// ```
 class InvisibleValidationWidget<T> extends StatefulWidget {

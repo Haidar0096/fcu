@@ -1,3 +1,29 @@
+# 4.4.0
+- Three review rounds of fixes across the starter brick and the fcu generator:
+  - Hardcoded UI values moved out of the widgets into companion defaults files: `splash_screen_defaults.dart`, `joke_card_defaults.dart`, `critical_error_screen_defaults.dart`, `alert_dialog_defaults.dart`, `status_banner_widget_defaults.dart`
+  - l10n module rebuilt: `LocalizationCubit` moved under `foundation/l10n/src/blocs/`, a `Language` type added, and the old `l10n.dart` helper replaced by an `AppLocalizations` `BuildContext` extension
+  - `ThemeCubit` moved to `foundation/ui/theme/src/blocs/theme_cubit/`
+  - `GlobalLoader` moved out of `foundation/ui/services/` into its own `foundation/ui/global_loader/` module; the focus helper moved to `foundation/ui/focus/` as a `BuildContext` extension; `foundation/ui/services/` removed
+  - Snackbar helpers removed from `foundation/ui/widgets/`
+  - `RequestDataSanitizer` removed from `foundation/networking/`, replaced by `SensitiveDataSanitizer` in `foundation/logging/`
+  - fcu generator: `CommandArgs` split into `CommandArg`, `CommandFlag`, `CommandOption` and `CommandMultiOption`
+- Logging system in generated apps:
+  - The report road: `ErrorLogger` composes an `ErrorReportDto`, `SensitiveDataSanitizer` strips it, `BackendReportSender` sends it behind the `ReportSender` interface, and `ParkedReportStore` holds a report on the device until it can be sent
+  - `ScreenTrailObserver`, a `NavigatorObserver` registered on the router's `observers`, records a route's declared compile-time name constant into `FlowBuffer` on push, replace and pop. It records the declared name and never the live address, and a route declaring no name records nothing. The three shipped routes now declare names (`splash_screen`, `critical_error_screen`, `random_jokes`), so a generated app records its screen trail from its first run
+  - Every report carries the sending app's short name (`EnvironmentVariables.appShortName`, one value across every environment) and a level (`ErrorReportLevel.info` or `ErrorReportLevel.error`, defaulting to `error`)
+  - Reporting is silent in a debug build and nowhere else: `kDebugMode` is the only signal. The environment picks the server, never whether a report goes out. Parked reports are not drained while reporting is silent
+  - `SensitiveDataSanitizer.sanitizeText` returns the text untouched when the deny-list is empty, instead of redacting the whole message
+  - `reportReceiverPath` ships empty in both environments and is asked for at project setup, never invented
+- Rebuilt architecture lint package (`packages/architecture_lint_rules`):
+  - Upgraded to `analysis_server_plugin ^0.3.20` and `analyzer ^14.1.0`; the Dart SDK floor moved to `^3.11.0`, because below it the plugin isolate fails to resolve and no rule runs at all
+  - Every rule now declares `DiagnosticSeverity.WARNING`, so `dart analyze` exits non-zero on an architecture breach instead of passing at the `LintCode` default of INFO. The rules fire and are fatal
+  - Four new rules: `app_import_restrictions`, `dependency_injection_import_restrictions`, `fake_data_import_restrictions`, `main_common_import_restrictions` — eleven rules in total
+  - `no_src_imports`: the `fake_data/` exemption is now the single registry file `lib/fake_data/src/fake_data_registry.dart` rather than the whole folder, and files outside a `src/` folder are checked too
+  - `foundation_import_restrictions` and `resources_cannot_import` now use allow-lists scoped to the project's own package instead of a deny-list of folder names
+  - `main_environment_files_import_restrictions` matches every `main_<environment>.dart` a project defines instead of three hardcoded names
+  - `packages/architecture_lint_rules/pubspec.lock` is now tracked, so every generated app resolving the plugin through its `git:` source resolves the same versions
+- The generated project's checks workflow gained an `Analyze (architecture rules)` step running `dart analyze`: on the pinned toolchain `flutter analyze` surfaces no analyzer-plugin diagnostic, so the architecture rules are gated by `dart analyze`
+
 # 4.3.0
 - Added CI/CD GitHub Actions workflows for Android and iOS deployment
 - Added README documentation for CI/CD workflows
@@ -71,7 +97,27 @@
 - Added /android/.kotlin/ folder to .gitignore for Android Kotlin metadata
 
 # 4.0.0
-- Complete architecture overhaul
+- Complete architecture overhaul. Major refactoring of the starter brick architecture:
+
+  **Architecture Changes**
+  - **Migration**: `infrastructure/` → `foundation/` folder structure
+  - **Module Pattern**: Consistent src + barrel file pattern throughout
+  - **Simplified Widgets**: Removed complex/specific widgets, kept essentials
+  - **Logger Optimization**: Removed duplicate logging, centralized in HTTP client
+  - **Clean Separation**: Better organization of core vs app-specific code
+
+  **Code Quality Improvements**
+  - Removed all hardcoded values to defaults classes
+  - Fixed all import inconsistencies
+  - Eliminated unused dependencies (~24MB reduction)
+  - Streamlined localization (110 → 16 essential keys)
+  - Enhanced documentation with comprehensive IAI.md in generated projects
+
+  **Development Experience**
+  - Clearer module boundaries with explicit exports
+  - Better error handling patterns
+  - Improved state management patterns
+  - More maintainable codebase structure
 
 # 3.2.2
 - Fixed a wrong import.

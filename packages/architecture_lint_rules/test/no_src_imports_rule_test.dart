@@ -102,6 +102,131 @@ var x = AuthCubit();
     );
   }
 
+  Future<void> test_routerImportingSrc_allowed() async {
+    newFile(
+      '$testPackageLibPath/features/auth/src/auth_screen.dart',
+      'class AuthScreen {}',
+    );
+
+    newFile('$testPackageLibPath/router/src/router.dart', r'''
+import 'package:test/features/auth/src/auth_screen.dart';
+
+var x = AuthScreen();
+''');
+
+    await assertNoDiagnosticsInFile(
+      '$testPackageLibPath/router/src/router.dart',
+    );
+  }
+
+  Future<void> test_fakeDataRegistryImportingSrc_allowed() async {
+    newFile(
+      '$testPackageLibPath/features/auth/src/apis/auth_api.dart',
+      'class AuthApi {}',
+    );
+
+    newFile('$testPackageLibPath/fake_data/src/fake_data_registry.dart', r'''
+import 'package:test/features/auth/src/apis/auth_api.dart';
+
+var x = AuthApi();
+''');
+
+    await assertNoDiagnosticsInFile(
+      '$testPackageLibPath/fake_data/src/fake_data_registry.dart',
+    );
+  }
+
+  Future<void> test_fakeDataNonRegistryFileImportingSrc_violation() async {
+    // The import table grants the src/ reach to the fake_data REGISTRY file,
+    // not to the fake_data folder: any other file there uses the barrel.
+    newFile(
+      '$testPackageLibPath/features/auth/src/apis/auth_api.dart',
+      'class AuthApi {}',
+    );
+
+    newFile('$testPackageLibPath/fake_data/src/fake_jokes.dart', r'''
+import 'package:test/features/auth/src/apis/auth_api.dart';
+
+var x = AuthApi();
+''');
+
+    await assertDiagnosticsInFile(
+      '$testPackageLibPath/fake_data/src/fake_jokes.dart',
+      [
+        lint(
+          0,
+          59,
+          messageContainsAll: [
+            'Do not import from src/ folders directly. Use barrel files instead.',
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> test_barrelFileImportingAnotherModuleSrc_violation() async {
+    newFile(
+      '$testPackageLibPath/foundation/clipboard/src/clipboard_service.dart',
+      'class ClipboardService {}',
+    );
+
+    newFile('$testPackageLibPath/app/app.dart', r'''
+import 'package:test/foundation/clipboard/src/clipboard_service.dart';
+
+var x = ClipboardService();
+''');
+
+    await assertDiagnosticsInFile('$testPackageLibPath/app/app.dart', [
+      lint(
+        0,
+        70,
+        messageContainsAll: [
+          'Do not import from src/ folders directly. Use barrel files instead.',
+        ],
+      ),
+    ]);
+  }
+
+  Future<void> test_mainCommonImportingSrc_violation() async {
+    newFile(
+      '$testPackageLibPath/foundation/clipboard/src/clipboard_service.dart',
+      'class ClipboardService {}',
+    );
+
+    newFile('$testPackageLibPath/main_common.dart', r'''
+import 'package:test/foundation/clipboard/src/clipboard_service.dart';
+
+var x = ClipboardService();
+''');
+
+    await assertDiagnosticsInFile('$testPackageLibPath/main_common.dart', [
+      lint(
+        0,
+        70,
+        messageContainsAll: [
+          'Do not import from src/ folders directly. Use barrel files instead.',
+        ],
+      ),
+    ]);
+  }
+
+  Future<void> test_moduleBarrelImportingItsOwnSrc_allowed() async {
+    newFile(
+      '$testPackageLibPath/foundation/clipboard/src/clipboard_service.dart',
+      'class ClipboardService {}',
+    );
+
+    newFile('$testPackageLibPath/foundation/clipboard/clipboard.dart', r'''
+import 'package:test/foundation/clipboard/src/clipboard_service.dart';
+
+var x = ClipboardService();
+''');
+
+    await assertNoDiagnosticsInFile(
+      '$testPackageLibPath/foundation/clipboard/clipboard.dart',
+    );
+  }
+
   Future<void> test_sameModuleSrcImport_threeLevelDeep_allowed() async {
     // Test case for 3-level deep modules like foundation/models/ui_models
     // Tests nested src/ folder handling that was previously reported as false flag

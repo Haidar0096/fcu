@@ -1,28 +1,27 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:flutter_cli_utils/src/commands/command_args.dart';
+import 'package:flutter_cli_utils/src/commands/command_arg.dart';
 import 'package:mason_logger/mason_logger.dart';
 
-typedef _FlutterProjectCreationData =
-    ({
-      String projectName,
-      String projectDescription,
-      String organization,
-      String iosLanguage,
-      String androidLanguage,
-      String template,
-      List<String> targetPlatforms,
-      String outputDirectory,
-      bool overwriteExistingDirectory,
-      bool useStarterBrick,
-      bool initGitRepo,
-    });
+typedef _FlutterProjectCreationData = ({
+  String projectName,
+  String projectDescription,
+  String organization,
+  String iosLanguage,
+  String androidLanguage,
+  String template,
+  List<String> targetPlatforms,
+  String outputDirectory,
+  bool overwriteExistingDirectory,
+  bool useStarterBrick,
+  bool initGitRepo,
+});
 
 /// {@template new_project_command}
 /// A [Command] to create a new Flutter project.
 ///
-/// *Usage:* `flutter_cli_utils new_project`
+/// *Usage:* `fcu create`
 ///
 /// {@endtemplate}
 class NewProjectCommand extends Command<int> {
@@ -192,11 +191,16 @@ class NewProjectCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    // Prompt for project details for the args that were not provided
-    // in the command line
     final creationData = await _promptForProjectCreationData();
 
-    // Check the output directory
+    // A dry run only reads and prints, so it answers before anything on
+    // disk is touched.
+    final dryRun = argResults?.flag(_dryRunCommandFlag.name) ?? false;
+    if (dryRun) {
+      _logDryRunDetails(creationData);
+      return ExitCode.success.code;
+    }
+
     final outputDir = Directory(creationData.outputDirectory);
     if (outputDir.existsSync()) {
       if (!creationData.overwriteExistingDirectory) {
@@ -212,14 +216,6 @@ class NewProjectCommand extends Command<int> {
       }
     }
 
-    // Check if the dry run flag is set
-    final dryRun = argResults?.wasParsed(_dryRunCommandFlag.name) ?? false;
-    if (dryRun) {
-      _logDryRunDetails(creationData);
-      return ExitCode.success.code;
-    }
-
-    // Run the Flutter create command
     _progress = _logger.progress(
       'Creating Flutter project at '
       '${outputDir.absolute.path}',
@@ -235,18 +231,17 @@ class NewProjectCommand extends Command<int> {
       }
       _progress?.complete();
 
-      // Check whether the user wants to use the starter brick
       if (creationData.useStarterBrick) {
         await _runStarterBrick(creationData);
       }
 
-      // Initialize a git repository in the project directory
       if (creationData.initGitRepo) {
         await _initGitRepo(creationData);
       }
 
       return ExitCode.success.code;
     } catch (error) {
+      _progress?.fail();
       _logger.err('$error');
       return ExitCode.software.code;
     }
@@ -258,17 +253,16 @@ class NewProjectCommand extends Command<int> {
       ' commit...',
     );
 
-    // Add .config.dart files to .gitignore
-    // Add .g.dart files to .gitignore
     final gitIgnoreLines = [
       '\n# Generated files',
       '**/dependency_injection.config.dart',
       '**/**.g.dart',
+      // The route table is reviewed like hand-written code, so it is tracked.
+      '!lib/router/src/router.g.dart',
       '**/**.freezed.dart',
       '',
-      '# IAI scratchpad',
-      'iai_scratchpad/',
-      'IAI.local.md',
+      '# IAI',
+      '.iai/scratchpad/',
       '',
       '# Android Kotlin metadata',
       '/android/.kotlin/',
@@ -292,7 +286,6 @@ class NewProjectCommand extends Command<int> {
       );
     }
 
-    // Run git init command
     final gitInitResult = await Process.run('git', [
       'init',
     ], workingDirectory: creationData.outputDirectory);
@@ -302,7 +295,6 @@ class NewProjectCommand extends Command<int> {
       );
     }
 
-    // Run git add command
     final gitAddResult = await Process.run('git', [
       'add',
       '.',
@@ -313,7 +305,6 @@ class NewProjectCommand extends Command<int> {
       );
     }
 
-    // Run git commit command
     final gitCommitResult = await Process.run('git', [
       'commit',
       '-m',
@@ -331,7 +322,6 @@ class NewProjectCommand extends Command<int> {
   Future<void> _runStarterBrick(
     _FlutterProjectCreationData creationData,
   ) async {
-    // Run `mason init` command
     _progress = _logger.progress('Running `mason init`...');
     final masonInitResult = await Process.run('mason', [
       'init',
@@ -343,7 +333,6 @@ class NewProjectCommand extends Command<int> {
     }
     _progress?.complete();
 
-    // Run `mason add` command
     _progress = _logger.progress('Running `mason add`...');
     final masonAddResult = await Process.run('mason', [
       'add',
@@ -357,7 +346,6 @@ class NewProjectCommand extends Command<int> {
     }
     _progress?.complete();
 
-    // Run `mason get` command
     _progress = _logger.progress('Running `mason get`...');
     final masonGetResult = await Process.run('mason', [
       'get',
@@ -369,9 +357,10 @@ class NewProjectCommand extends Command<int> {
     }
     _progress?.complete();
 
-    // Run `mason make` command
     _progress = _logger.progress('Running `mason make`...');
-    final masonMakeResult = await Process.start(
+    // `mason make` inherits this process' stdio, so its own output is already
+    // on the terminal and its `stderr` stream is not connected to read back.
+    final masonMakeProcess = await Process.start(
       'mason',
       [
         'make',
@@ -388,13 +377,14 @@ class NewProjectCommand extends Command<int> {
       workingDirectory: creationData.outputDirectory,
       mode: ProcessStartMode.inheritStdio,
     );
-    _progress?.complete();
-    if ((await masonMakeResult.exitCode) != 0) {
+    final masonMakeExitCode = await masonMakeProcess.exitCode;
+    if (masonMakeExitCode != 0) {
       throw Exception(
-        'Failed to run `mason make flutter_starter_brick` in project:\n'
-        '${masonMakeResult.stderr}',
+        'Failed to run `mason make flutter_starter_brick` in project '
+        '(exit code $masonMakeExitCode); see the output above.',
       );
     }
+    _progress?.complete();
   }
 
   void _logDryRunDetails(_FlutterProjectCreationData creationData) =>
@@ -427,8 +417,7 @@ class NewProjectCommand extends Command<int> {
       '--org',
       creationData.organization,
       // iOS language is only supported for plugin templates
-      if (isPlugin && !isPluginFfi)
-        '--ios-language=${creationData.iosLanguage}',
+      if (isPlugin) '--ios-language=${creationData.iosLanguage}',
       // Android language is supported for app and plugin templates
       if (!isPluginFfi) '--android-language=${creationData.androidLanguage}',
       '-t',
@@ -442,10 +431,15 @@ class NewProjectCommand extends Command<int> {
     ]);
   }
 
-  String _optionOrPrompt(String argName, String Function() promptForArg) =>
-      argResults?.option(argName) ?? promptForArg();
+  String _optionOrPrompt({
+    required String argName,
+    required String Function() promptForArg,
+  }) => argResults?.option(argName) ?? promptForArg();
 
-  bool _flagOrPrompt(String argName, bool Function() promptForArg) {
+  bool _flagOrPrompt({
+    required String argName,
+    required bool Function() promptForArg,
+  }) {
     final wasParsed = argResults?.wasParsed(argName) ?? false;
     if (wasParsed) {
       return argResults?.flag(argName) ?? false;
@@ -455,36 +449,39 @@ class NewProjectCommand extends Command<int> {
 
   Future<_FlutterProjectCreationData> _promptForProjectCreationData() async {
     final projectName = _optionOrPrompt(
-      _projectNameCommandOption.name,
-      _promptForProjectName,
+      argName: _projectNameCommandOption.name,
+      promptForArg: _promptForProjectName,
     );
 
     final projectDescription = _optionOrPrompt(
-      _projectDescriptionCommandOption.name,
-      _promptForProjectDescription,
+      argName: _projectDescriptionCommandOption.name,
+      promptForArg: _promptForProjectDescription,
     );
 
     final organization = _optionOrPrompt(
-      _organizationCommandOption.name,
-      _promptForOrganization,
-    );
-
-    final iosLanguage = _optionOrPrompt(
-      _iosLanguageCommandOption.name,
-      _promptForIosLanguage,
-    );
-
-    final androidLanguage = _optionOrPrompt(
-      _androidLanguageCommandOption.name,
-      _promptForAndroidLanguage,
+      argName: _organizationCommandOption.name,
+      promptForArg: _promptForOrganization,
     );
 
     final template = _optionOrPrompt(
-      _templateCommandOption.name,
-      _promptForTemplate,
+      argName: _templateCommandOption.name,
+      promptForArg: _promptForTemplate,
     );
     final isApp = template == 'app';
     final isPlugin = template == 'plugin';
+
+    // iOS language is only supported for plugin templates
+    final iosLanguage = isPlugin
+        ? _optionOrPrompt(
+            argName: _iosLanguageCommandOption.name,
+            promptForArg: _promptForIosLanguage,
+          )
+        : _iosLanguageCommandOption.defaultsTo;
+
+    final androidLanguage = _optionOrPrompt(
+      argName: _androidLanguageCommandOption.name,
+      promptForArg: _promptForAndroidLanguage,
+    );
 
     final List<String>? parsedTargetPlatforms;
     final List<String> targetPlatforms;
@@ -492,37 +489,36 @@ class NewProjectCommand extends Command<int> {
       parsedTargetPlatforms = argResults?.multiOption(
         _targetPlatformsCommandMultiOption.name,
       );
-      targetPlatforms =
-          (parsedTargetPlatforms ?? []).isEmpty
-              ? _promptForTargetPlatforms()
-              : parsedTargetPlatforms!;
+      targetPlatforms = (parsedTargetPlatforms ?? []).isEmpty
+          ? _promptForTargetPlatforms()
+          : parsedTargetPlatforms!;
     } else {
       targetPlatforms = [];
     }
 
     final outputDirectory = _optionOrPrompt(
-      _outputDirectoryCommandOption.name,
-      () => _promptForOutputDirectory(projectName),
+      argName: _outputDirectoryCommandOption.name,
+      promptForArg: () => _promptForOutputDirectory(projectName),
     );
 
     final overwrite = _flagOrPrompt(
-      _overwriteExistingDirectoryCommandFlag.name,
-      _promptForOverwriteExistingDirectory,
+      argName: _overwriteExistingDirectoryCommandFlag.name,
+      promptForArg: _promptForOverwriteExistingDirectory,
     );
 
     final bool useStarterBrick;
     if (isApp) {
       useStarterBrick = _flagOrPrompt(
-        _useStarterBrickCommandFlag.name,
-        _promptForUseStarterBrick,
+        argName: _useStarterBrickCommandFlag.name,
+        promptForArg: _promptForUseStarterBrick,
       );
     } else {
       useStarterBrick = false;
     }
 
-    final bool initGitRepo = _flagOrPrompt(
-      _initializeGitRepoCommandFlag.name,
-      _promptForInitializeGitRepo,
+    final initGitRepo = _flagOrPrompt(
+      argName: _initializeGitRepoCommandFlag.name,
+      promptForArg: _promptForInitializeGitRepo,
     );
 
     return (

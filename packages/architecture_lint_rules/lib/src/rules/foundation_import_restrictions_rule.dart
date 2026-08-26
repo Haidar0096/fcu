@@ -27,6 +27,11 @@ class FoundationImportRestrictionsRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'foundation_import_restrictions',
     'foundation/ can only import from resources/ or other foundation subfolders.',
+    // WARNING, not the LintCode default of INFO: every rule here is
+    // registered with `registerWarningRule`, and an architecture breach is a
+    // build-stopping fault, not a suggestion. At INFO `dart analyze` exits 0
+    // and the gate passes with the breach in place.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Creates an instance of [FoundationImportRestrictionsRule].
@@ -69,11 +74,38 @@ class _FoundationImportRestrictionsVisitor extends SimpleAstVisitor<void> {
     // Only check files in foundation/ folder
     if (!filePath.contains('lib/foundation/')) return;
 
-    // Foundation can only import from resources/ or foundation/
-    // Disallowed: features, app, router, dependency_injection
-    if (RegExp(
-      r'package:.+/(features|app|router|dependency_injection)/',
-    ).hasMatch(uri)) {
+    // Only check package: imports (skip dart: and relative imports)
+    if (!uri.startsWith('package:')) return;
+
+    // Extract package name and path from import
+    final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);
+    if (packageMatch == null) return;
+
+    final importPackage = packageMatch.group(1)!;
+    final importPath = packageMatch.group(2)!;
+
+    // Get current package name from the library identifier
+    final libraryElement = context.libraryElement;
+    if (libraryElement == null) return;
+
+    // Extract package name from library identifier (e.g., "package:myapp/...")
+    final identifier = libraryElement.identifier;
+    final currentPackageMatch = RegExp(
+      r'package:([^/]+)/',
+    ).firstMatch(identifier);
+    if (currentPackageMatch == null) return;
+
+    final currentPackage = currentPackageMatch.group(1)!;
+
+    // Only check imports from the same package (skip external packages)
+    if (importPackage != currentPackage) return;
+
+    // Foundation can ONLY import from foundation/ or resources/
+    final isImportingFromFoundation = importPath.startsWith('foundation/');
+    final isImportingFromResources = importPath.startsWith('resources/');
+
+    // If importing from same package but NOT from allowed folders, report error
+    if (!isImportingFromFoundation && !isImportingFromResources) {
       rule.reportAtNode(node);
     }
   }

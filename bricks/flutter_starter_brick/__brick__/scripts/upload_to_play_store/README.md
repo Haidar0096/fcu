@@ -79,10 +79,10 @@ Run from project root:
 
 ```bash
 # For development server
-./scripts/upload_to_play_store/upload_to_playstore.sh dev
+./scripts/upload_to_play_store/upload_to_playstore.sh development
 
 # For production server
-./scripts/upload_to_play_store/upload_to_playstore.sh prod
+./scripts/upload_to_play_store/upload_to_playstore.sh production
 ```
 
 ## Output

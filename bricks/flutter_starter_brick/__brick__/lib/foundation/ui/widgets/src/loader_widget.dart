@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 
 /// A simple loading widget that shows a circular progress indicator.
 class LoaderWidget extends StatelessWidget {
@@ -18,7 +19,7 @@ class LoaderWidget extends StatelessWidget {
     final indicator = CircularProgressIndicator(
       strokeWidth: strokeWidth ?? LoaderWidgetDefaults.strokeWidth,
       valueColor: AlwaysStoppedAnimation<Color>(
-        color ?? Theme.of(context).colorScheme.primary,
+        color ?? context.themeData.colorScheme.primary,
       ),
     );
 
@@ -32,7 +33,7 @@ class LoaderWidget extends StatelessWidget {
   }
 }
 
-class LoaderWidgetDefaults {
+abstract final class LoaderWidgetDefaults {
   static const double size = 48;
   static const double strokeWidth = 4;
 }

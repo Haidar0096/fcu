@@ -1,7 +1,5 @@
 /// HTTP status codes and utilities for network operations
-final class StatusCodes {
-  const StatusCodes._();
-
+abstract final class StatusCodes {
   /// HTTP status codes that indicate unauthorized access
   static const unauthorizedStatusCodes = [401, 403];
 

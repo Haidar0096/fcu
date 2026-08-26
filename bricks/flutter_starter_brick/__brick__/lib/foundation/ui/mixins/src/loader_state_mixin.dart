@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:{{proj_name}}/foundation/ui/services/services.dart';
+import 'package:{{proj_name}}/foundation/ui/global_loader/global_loader.dart';
 
 /// Mixin that handles global loader state management for widgets.
 ///
@@ -15,9 +15,9 @@ import 'package:{{proj_name}}/foundation/ui/services/services.dart';
 ///
 /// class _MyWidgetState extends State<MyWidget> with LoaderStateMixin {
 ///   void _onButtonPressed() {
-///     changeLoaderVisibility(true); // Show loader
+///     changeLoaderVisibility(show: true);
 ///     // ... do async work
-///     changeLoaderVisibility(false); // Hide loader
+///     changeLoaderVisibility(show: false);
 ///   }
 /// }
 /// ```
@@ -29,8 +29,7 @@ mixin LoaderStateMixin<T extends StatefulWidget> on State<T> {
   /// Shows the global loader when [show] is true and it's not already
   /// shown. Hides the global loader when [show] is false and it's
   /// currently shown.
-  // ignore: avoid_positional_boolean_parameters
-  void changeLoaderVisibility(bool show) {
+  void changeLoaderVisibility({required bool show}) {
     if (show && !_isLoaderShown) {
       showGlobalLoader();
       _isLoaderShown = true;

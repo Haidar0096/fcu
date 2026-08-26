@@ -4,33 +4,29 @@
 # See README.md for detailed setup instructions.
 #
 # Usage:
-#   ./upload_to_testflight.sh dev   # builds main_development.dart
-#   ./upload_to_testflight.sh prod  # builds main_production.dart
+#   ./upload_to_testflight.sh development  # builds main_development.dart
+#   ./upload_to_testflight.sh production   # builds main_production.dart
 
-# Check for flavor argument
+# Check for environment argument
 if [[ -z "$1" ]]; then
-    echo "❌ Usage: $0 <dev|prod>"
-    echo "   dev  - builds lib/main_development.dart"
-    echo "   prod - builds lib/main_production.dart"
+    echo "❌ Usage: $0 <development|production>"
+    echo "   development - builds lib/main_development.dart"
+    echo "   production  - builds lib/main_production.dart"
     exit 1
 fi
 
-FLAVOR="$1"
+ENVIRONMENT="$1"
 
-# Set main file based on flavor
-case "$FLAVOR" in
-    dev)
-        main_file="lib/main_development.dart"
-        ;;
-    prod)
-        main_file="lib/main_production.dart"
-        ;;
+case "$ENVIRONMENT" in
+    development|production) ;;
     *)
-        echo "❌ Invalid flavor: $FLAVOR"
-        echo "   Valid options: dev, prod"
+        echo "❌ Invalid environment: $ENVIRONMENT"
+        echo "   Valid options: development, production"
         exit 1
         ;;
 esac
+
+main_file="lib/main_$ENVIRONMENT.dart"
 
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -70,13 +66,16 @@ issuer_id=$(cat "$ISSUER_ID_FILE")
 
 # Prepare project
 echo "📦 Preparing project..."
+# Clean first: a dev-only plugin left in a stale generated registrant by an
+# earlier debug run fails the release build.
+fvm flutter clean || { echo "❌ flutter clean failed"; exit 1; }
 fvm flutter pub get || { echo "❌ flutter pub get failed"; exit 1; }
 fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; exit 1; }
 fvm dart run build_runner build --delete-conflicting-outputs || { echo "❌ build_runner failed"; exit 1; }
 (cd "$PROJECT_ROOT/ios" && pod install) || { echo "❌ pod install failed"; exit 1; }
 
 # Build IPA
-echo "🚀 Building IPA for version $ios_version_name ($ios_build_number) [$FLAVOR]..."
+echo "🚀 Building IPA for version $ios_version_name ($ios_build_number) [$ENVIRONMENT]..."
 fvm flutter build ipa \
     --release \
     --build-name="$ios_version_name" \

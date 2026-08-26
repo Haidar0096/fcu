@@ -1,3 +1,5 @@
+# Run: flutter analyze
+
 include: package:very_good_analysis/analysis_options.yaml
 
 plugins:
@@ -9,7 +11,12 @@ plugins:
 
 analyzer:
   errors:
+    # This is an app, not a published package: its public members are internal
+    # to the app, so a document-everything list would be noise.
     public_member_api_docs: ignore
+    # Licenses the house catch shape: typed `on` arms first, then one bare
+    # last-resort `catch` so nothing escapes unlogged.
     avoid_catches_without_on_clauses: ignore
   exclude:
     - lib/**/*.g.dart
+    - .iai/scratchpad/**

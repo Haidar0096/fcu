@@ -78,7 +78,7 @@ class CustomElevatedButton extends StatelessWidget {
   );
 }
 
-class CustomElevatedButtonDefaults {
+abstract final class CustomElevatedButtonDefaults {
   static const TextAlign textAlign = TextAlign.center;
 
   static const TextOverflow textOverflow = TextOverflow.ellipsis;

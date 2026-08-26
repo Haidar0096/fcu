@@ -21,18 +21,17 @@ class BlurWidget extends StatelessWidget {
   final double blurIntensity;
 
   @override
-  Widget build(BuildContext context) =>
-      applyBlur
-          ? BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: blurIntensity,
-              sigmaY: blurIntensity,
-            ),
-            child: child,
-          )
-          : child;
+  Widget build(BuildContext context) => applyBlur
+      ? BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: blurIntensity,
+            sigmaY: blurIntensity,
+          ),
+          child: child,
+        )
+      : child;
 }
 
-class BlurWidgetDefaults {
+abstract final class BlurWidgetDefaults {
   static const double blurIntensity = 5;
 }

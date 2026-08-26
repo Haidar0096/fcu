@@ -7,10 +7,16 @@ import 'package:{{proj_name}}/foundation/app_meta_data/app_meta_data.dart';
 import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 
+/// Builds the tree that sits under the app-wide blocs.
+///
+/// The [BuildContext] it receives is a descendant of the providers below, so
+/// everything it builds can read them.
+typedef RootBlocsChildBuilder = Widget Function(BuildContext context);
+
 class RootBlocsProvider extends StatefulWidget {
   const RootBlocsProvider({required this.builder, super.key});
 
-  final Widget Function(BuildContext) builder;
+  final RootBlocsChildBuilder builder;
 
   @override
   State<RootBlocsProvider> createState() => _RootBlocsProviderState();

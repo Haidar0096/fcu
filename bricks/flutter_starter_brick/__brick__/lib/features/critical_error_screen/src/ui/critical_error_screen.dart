@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:{{proj_name}}/features/critical_error_screen/src/ui/critical_error_screen_defaults.dart';
 import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
@@ -21,13 +22,13 @@ class CriticalErrorScreen extends StatelessWidget {
     canPop: false, // Disable back navigation completely
     body: Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(ThemeDefaults.screenContentPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.error_outline,
-              size: 64,
+              size: CriticalErrorScreenDefaults.iconSize,
               color: context.themeData.colorScheme.error,
             ),
             SizedBox(height: SpacingSize.spacing24.value),
@@ -40,12 +41,10 @@ class CriticalErrorScreen extends StatelessWidget {
             ),
             SizedBox(height: SpacingSize.spacing16.value),
             Text(
-              errorMessage ??
-                  '${context.appLocalizations.criticalErrorMessage} '
-                      '${context.appLocalizations.restartAppMessage}',
+              errorMessage ?? context.appLocalizations.criticalErrorFullMessage,
               style: context.typography?.bodyText.copyWith(
                 color: context.themeData.colorScheme.onSurface.withValues(
-                  alpha: 0.8,
+                  alpha: CriticalErrorScreenDefaults.messageAlpha,
                 ),
               ),
               textAlign: TextAlign.center,

@@ -1,3 +1,11 @@
 export 'src/app_logger.dart';
+export 'src/backend_report_sender.dart';
 export 'src/error_logger.dart';
+export 'src/error_report_dto.dart';
 export 'src/event_logger.dart';
+export 'src/flow_buffer.dart';
+export 'src/parked_report_store.dart';
+export 'src/report_sender.dart';
+export 'src/report_sender_kind.dart';
+export 'src/screen_trail_observer.dart';
+export 'src/sensitive_data_sanitizer.dart';

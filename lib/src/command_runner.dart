@@ -23,7 +23,6 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
     : _logger = logger ?? Logger(),
       _pubUpdater = pubUpdater ?? PubUpdater(),
       super(executableName, description) {
-    // Add root options and flags
     argParser
       ..addFlag(
         'version',
@@ -36,7 +35,6 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
         help: 'Noisy logging, including all shell commands executed.',
       );
 
-    // Add sub commands
     addCommand(NewProjectCommand(logger: _logger));
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
@@ -83,7 +81,6 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
       return ExitCode.success.code;
     }
 
-    // Verbose logs
     const tab = '  ';
     _logger
       ..detail('Argument information:')
@@ -105,7 +102,6 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
       }
     }
 
-    // Run the command or show version
     final int? exitCode;
     if (topLevelResults['version'] == true) {
       _logger.info(packageVersion);
@@ -114,7 +110,6 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
       exitCode = await super.runCommand(topLevelResults);
     }
 
-    // Check for updates
     if (topLevelResults.command?.name != UpdateCommand.commandName) {
       await _checkForUpdates();
     }
@@ -130,11 +125,14 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
       final latestVersion = await _pubUpdater.getLatestVersion(packageName);
       final isUpToDate = packageVersion == latestVersion;
       if (!isUpToDate) {
+        final updateBanner =
+            '${lightYellow.wrap('Update available!')} '
+            '${lightCyan.wrap(packageVersion)} \u2192 '
+            '${lightCyan.wrap(latestVersion)}\n'
+            'Run ${lightCyan.wrap('$executableName update')} to update';
         _logger
           ..info('')
-          ..info('''
-${lightYellow.wrap('Update available!')} ${lightCyan.wrap(packageVersion)} \u2192 ${lightCyan.wrap(latestVersion)}
-Run ${lightCyan.wrap('$executableName update')} to update''');
+          ..info(updateBanner);
       }
     } catch (e) {
       _logger.warn('Failed to check for updates: error was $e');

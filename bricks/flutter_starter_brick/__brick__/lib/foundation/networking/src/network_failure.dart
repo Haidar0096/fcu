@@ -3,7 +3,12 @@ import 'package:{{proj_name}}/foundation/networking/src/status_codes.dart';
 
 @immutable
 sealed class NetworkFailure {
-  const NetworkFailure({this.statusCode, this.message, this.code});
+  const NetworkFailure({
+    this.statusCode,
+    this.message,
+    this.code,
+    this.backendCorrelationId,
+  });
 
   /// HTTP status code returned by the server (e.g., 404, 500)
   final int? statusCode;
@@ -15,15 +20,28 @@ sealed class NetworkFailure {
   /// (e.g., 'USER_NOT_FOUND')
   final String? code;
 
+  /// The correlation id the BACKEND minted for this request and echoed on
+  /// its response. It rides here so the seam that reports this failure can
+  /// hand it to the reporter and the report meets the server request that
+  /// produced it. The app never mints one; it is null when the response
+  /// carried none.
+  final String? backendCorrelationId;
+
   /// Returns true if this is a ServerError with unauthorized status code
   bool get isUnauthorizedServerError => switch (this) {
     ServerError() => StatusCodes.isUnauthorized(statusCode),
-    _ => false,
+    NetworkError() ||
+    TimeoutError() ||
+    CancelError() ||
+    UnknownError() => false,
   };
 
   bool get isCancelError => switch (this) {
     CancelError() => true,
-    _ => false,
+    NetworkError() ||
+    ServerError() ||
+    TimeoutError() ||
+    UnknownError() => false,
   };
 
   @override
@@ -33,63 +51,95 @@ sealed class NetworkFailure {
           runtimeType == other.runtimeType &&
           statusCode == other.statusCode &&
           message == other.message &&
-          code == other.code;
+          code == other.code &&
+          backendCorrelationId == other.backendCorrelationId;
 
   @override
-  int get hashCode => Object.hash(statusCode, message, code);
+  int get hashCode =>
+      Object.hash(statusCode, message, code, backendCorrelationId);
 }
 
-class NetworkError extends NetworkFailure {
-  const NetworkError({super.statusCode, super.message, super.code});
+final class NetworkError extends NetworkFailure {
+  const NetworkError({
+    super.statusCode,
+    super.message,
+    super.code,
+    super.backendCorrelationId,
+  });
 
   @override
   String toString() =>
       'NetworkError{'
       'statusCode: $statusCode, '
       'message: $message, '
-      'code: $code}';
+      'code: $code, '
+      'backendCorrelationId: $backendCorrelationId}';
 }
 
-class ServerError extends NetworkFailure {
-  const ServerError({super.statusCode, super.message, super.code});
+final class ServerError extends NetworkFailure {
+  const ServerError({
+    super.statusCode,
+    super.message,
+    super.code,
+    super.backendCorrelationId,
+  });
 
   @override
   String toString() =>
       'ServerError{'
       'statusCode: $statusCode, '
       'message: $message, '
-      'code: $code}';
+      'code: $code, '
+      'backendCorrelationId: $backendCorrelationId}';
 }
 
-class TimeoutError extends NetworkFailure {
-  const TimeoutError({super.statusCode, super.message, super.code});
+final class TimeoutError extends NetworkFailure {
+  const TimeoutError({
+    super.statusCode,
+    super.message,
+    super.code,
+    super.backendCorrelationId,
+  });
 
   @override
   String toString() =>
       'TimeoutError{'
       'statusCode: $statusCode, '
       'message: $message, '
-      'code: $code}';
+      'code: $code, '
+      'backendCorrelationId: $backendCorrelationId}';
 }
 
-class CancelError extends NetworkFailure {
-  const CancelError({super.statusCode, super.message, super.code});
+final class CancelError extends NetworkFailure {
+  const CancelError({
+    super.statusCode,
+    super.message,
+    super.code,
+    super.backendCorrelationId,
+  });
 
   @override
   String toString() =>
       'CancelError{'
       'statusCode: $statusCode, '
       'message: $message, '
-      'code: $code}';
+      'code: $code, '
+      'backendCorrelationId: $backendCorrelationId}';
 }
 
-class UnknownError extends NetworkFailure {
-  const UnknownError({super.statusCode, super.message, super.code});
+final class UnknownError extends NetworkFailure {
+  const UnknownError({
+    super.statusCode,
+    super.message,
+    super.code,
+    super.backendCorrelationId,
+  });
 
   @override
   String toString() =>
       'UnknownError{'
       'statusCode: $statusCode, '
       'message: $message, '
-      'code: $code}';
+      'code: $code, '
+      'backendCorrelationId: $backendCorrelationId}';
 }

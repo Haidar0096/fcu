@@ -1,18 +1,14 @@
 /// Sealed class hierarchy defining all routes in the application
 ///
+/// Every route fact lives here and only here: the path string, and the
+/// screen NAME the screen trail records. The name is a compile-time constant
+/// so the trail never has to read a live address, which can carry data that
+/// must stay out of a recorded trail.
+///
 /// TODO({{dev_name}}): Add your app-specific routes here following the same
-/// pattern
+/// pattern — path constant, name constant, and a `fromPath` arm.
 sealed class RoutePath {
   const RoutePath();
-
-  /// Whether this route is the splash route
-  bool get isSplashRoute => this is SplashRoutePath;
-
-  /// Whether this route is the random jokes route
-  bool get isRandomJokesRoute => this is RandomJokesRoutePath;
-
-  /// Whether this route is the critical error route
-  bool get isCriticalErrorRoute => this is CriticalErrorRoutePath;
 
   /// Get a RoutePath instance from a path string
   /// Throws [ArgumentError] if the path is not recognized
@@ -29,6 +25,9 @@ final class SplashRoutePath extends RoutePath {
   const SplashRoutePath();
 
   static const String path = '/splash_screen';
+
+  /// What the screen trail records when the user lands here.
+  static const String name = 'splash_screen';
 }
 
 /// Critical error screen for unrecoverable errors
@@ -36,6 +35,10 @@ final class CriticalErrorRoutePath extends RoutePath {
   const CriticalErrorRoutePath();
 
   static const String path = '/critical_error';
+
+  /// What the screen trail records when the user lands here. The name, never
+  /// the address: this route's address carries the error message.
+  static const String name = 'critical_error_screen';
 }
 
 /// Random jokes screen - demonstrates API integration and state management
@@ -43,4 +46,7 @@ final class RandomJokesRoutePath extends RoutePath {
   const RandomJokesRoutePath();
 
   static const String path = '/random_jokes';
+
+  /// What the screen trail records when the user lands here.
+  static const String name = 'random_jokes';
 }
