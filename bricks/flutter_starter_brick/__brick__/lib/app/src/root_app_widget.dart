@@ -9,7 +9,7 @@ import 'package:{{proj_name}}/router/router.dart';
 /// The root widget of the application.
 ///
 /// This widget sets up the BLoC providers, routing, theming, and localization
-/// for the entire app. It also handles connectivity status.
+/// for the entire app.
 class RootAppWidget extends StatelessWidget {
   /// Creates a [RootAppWidget].
   const RootAppWidget({super.key});
@@ -23,18 +23,26 @@ class RootAppWidget extends StatelessWidget {
                 debugShowCheckedModeBanner: false,
                 routerConfig: router,
                 theme: themeState.themeData,
-                builder: (context, child) => Scaffold(
-                  resizeToAvoidBottomInset: false,
-                  body: Overlay(
-                    initialEntries: [
-                      OverlayEntry(builder: (context) => child!),
-                    ],
+                builder: (context, child) => Directionality(
+                  textDirection: context
+                      .select<LocalizationCubit, TextDirection>(
+                        (cubit) => cubit.state.textDirection,
+                      ),
+                  child: Scaffold(
+                    resizeToAvoidBottomInset: false,
+                    body: Overlay(
+                      initialEntries: [
+                        OverlayEntry(builder: (context) => child!),
+                      ],
+                    ),
                   ),
                 ),
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
                 locale: Locale.fromSubtags(
-                  languageCode: context.watch<LocalizationCubit>().state.code,
+                  languageCode: context.select<LocalizationCubit, String>(
+                    (cubit) => cubit.state.code,
+                  ),
                 ),
               ),
         ),

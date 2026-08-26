@@ -1,6 +1,6 @@
 # Flutter CLI Utils — Project Rules
 
-Project-specific rules and reference for `flutter_cli_utils`. Universal Flutter/Dart rules and architecture come from the global `flutter-developer` skill — only the CLI-tool-specific bits live here.
+Project-specific rules and reference for `flutter_cli_utils`. Universal Flutter/Dart rules and architecture come from the global mobile skill (`~/.iai/skills/mobile/`, Flutter mechanics under `mobile/flutter/`) — only the CLI-tool-specific bits live here.
 
 ## Project Overview
 
@@ -22,14 +22,17 @@ flutter_cli_utils/
 │       ├── command_runner.dart         # CLI runner with completion support
 │       ├── version.dart                # Generated version info
 │       └── commands/
-│           ├── command_args.dart       # Command argument definitions
+│           ├── command_arg.dart        # Sealed command-argument family
+│           ├── command_option.dart     # Option argument
+│           ├── command_multi_option.dart # Multi-option argument
+│           ├── command_flag.dart       # Flag argument
 │           ├── new_project_command.dart # Project creation command
 │           └── update_command.dart     # Self-update command
 ├── bricks/
 │   └── flutter_starter_brick/          # Main project template
 ├── scripts/
 │   └── activate.sh                     # Local development activation
-└── test/                               # CLI tests (currently empty)
+└── test/                               # CLI tests, mirroring lib/ paths
 ```
 
 ## Common Development Commands
@@ -37,7 +40,7 @@ flutter_cli_utils/
 ### Build and Development
 ```bash
 # Activate CLI locally for development
-sh -e scripts/activate.sh /path/to/project
+bash scripts/activate.sh
 
 # Build version info (required after updating pubspec.yaml version)
 dart run build_runner build --delete-conflicting-outputs
@@ -57,7 +60,7 @@ dart run bin/flutter_cli_utils.dart [command] [options]
 
 ### Testing
 ```bash
-# Run all tests (Note: test directory is currently empty)
+# Run all tests
 dart test
 
 # Test brick generation locally
@@ -115,7 +118,7 @@ fcu update
 
 1. **Setup Development Environment**
 ```bash
-sh -e scripts/activate.sh /path/to/project
+bash scripts/activate.sh
 ```
 
 2. **Test Changes**
@@ -156,27 +159,22 @@ flutter run
 
 ## Build Scripts
 
-### Create APK Script
-Location: `bricks/flutter_starter_brick/__brick__/scripts/create_apk.sh`
+### Android Builds Script
+Location: `bricks/flutter_starter_brick/__brick__/scripts/create_android_builds/create_android_builds.sh`
 
 Builds APKs for all environments and architectures:
 ```bash
-./scripts/create_apk.sh /output/directory
+./scripts/create_android_builds/create_android_builds.sh /output/directory
 ```
 
-Generates 9 APKs (3 environments × 3 architectures):
-- `app_name-dev-1.0.0+1-arm.apk`
-- `app_name-dev-1.0.0+1-arm64.apk`
-- `app_name-dev-1.0.0+1-x64.apk`
-- (same pattern for staging and prod)
+The brick ships two environments, named in full — `development` and
+`production`. The script builds one APK per environment per architecture (three
+architectures), plus one production AAB. Artifacts carry the house pattern
+`<app>-<environment>-<version>+<build>-<arch>.apk`.
 
-**Version Management**: Scripts read version info from a `versions` file:
-```
-android_version_name=1.0.0
-android_build_number=1
-ios_version_name=1.0.0
-ios_build_number=1
-```
+**Version Management**: Scripts read version info from a `versions` file at the
+project root. It holds an independent version name and build number per
+platform, so a platform's build number can move without disturbing the others.
 
 ### Upload to TestFlight Script
 Location: `bricks/flutter_starter_brick/__brick__/scripts/upload_to_test_flight/upload_to_testflight.sh`
@@ -199,7 +197,7 @@ The brick uses these variables:
 ### Post-Generation Hook
 The starter brick includes a `post_gen.dart` hook that automatically:
 - Adds 25+ dependencies (flutter_bloc, get_it, dio, go_router, etc.)
-- Adds dev dependencies (very_good_analysis, build_runner, mockito, etc.)
+- Adds dev dependencies (very_good_analysis, build_runner, json_serializable, etc.)
 - Adds internet permission to Android manifest
 - Runs `flutter clean` and `flutter pub get`
 - Executes `dart run build_runner build --delete-conflicting-outputs`
@@ -211,20 +209,20 @@ The starter brick includes a `post_gen.dart` hook that automatically:
 **Architecture Lint Rules Plugin:**
 Located at `packages/architecture_lint_rules/`. Dart Analyzer Plugin (uses `analysis_server_plugin` API, Dart 3.10+) that enforces Flutter architecture boundaries in FCU-generated projects.
 
-**7 Rules Implemented:**
+**Rules implemented** — the complete, current list with examples lives in `packages/architecture_lint_rules/README.md`. The core ones:
 
 | Rule Name | What It Enforces | Exception |
 |-----------|------------------|-----------|
 | `no_feature_cross_imports` | Features cannot import other features | Can import from `shared/` within same parent feature |
-| `no_src_imports` | Must use barrel files, not direct /src/ imports | `dependency_injection/` CAN import any /src/ |
+| `no_src_imports` | Must use barrel files, not direct /src/ imports | `dependency_injection/`, `router/` and `fake_data/` CAN import any /src/ |
 | `resources_cannot_import` | resources/ folder cannot import project code | None |
 | `foundation_import_restrictions` | foundation/ can only import resources/ and other foundation/ | None |
 | `features_import_restrictions` | features/ can only import foundation/, resources/, fake_data/, features/ | None |
 | `router_import_restrictions` | router/ can import features/, foundation/, resources/, dependency_injection/, router/ | None |
 | `main_environment_files_import_restrictions` | main_*.dart can only import foundation/, main_common.dart | None |
 
-**Critical: dependency_injection Exception:**
-The `no_src_imports` rule has a special exception - `dependency_injection/` CAN import from any /src/ folder. This is architecturally correct because DI needs to know about internal implementations for registration.
+**Critical: the composition-root exception:**
+The `no_src_imports` rule exempts the three composition roots — `dependency_injection/`, `router/` and `fake_data/` — which CAN import from any /src/ folder. This is architecturally correct: they compose the app, so they need to know about the internal implementations they wire together.
 
 **Plugin Architecture Pattern:**
 
@@ -281,13 +279,23 @@ This was chosen over pub.dev publishing for easier iteration and immediate updat
 
 **Plugin Limitations:**
 
-- Plugin takes 10-30 seconds to load after IDE restart
+- MEASURED 2026-08-26, on the pinned toolchain (Flutter 3.44.9 / Dart 3.12.2):
+  the plugin produces NO diagnostics through the `git:` wiring above. A freshly
+  generated app carrying a deliberate `/src/` import and a deliberate feature
+  cross-import answers `No issues found!` and `flutter analyze` exits 0. So a
+  generated project's import rules are NOT gated by the analyzer today — they
+  rest on review alone. Nobody has measured an IDE, so no claim is made about
+  one, and no remedy is named here because the remedy is the user's call.
 
 **Testing analysis_server_plugin Rules:**
 
 - Use `analyzer_testing` package v0.1.7+ (supports analysis_server_plugin API)
-- Requires upgrading: `analysis_server_plugin: ^0.3.4`, `analyzer: ^9.0.0`
-- 28 comprehensive tests covering all 7 rules, located in `packages/architecture_lint_rules/test/`. Run with `dart test`.
+- These are the package's CURRENT constraints, read off
+  `packages/architecture_lint_rules/pubspec.yaml` — `analysis_server_plugin:
+  ^0.3.4`, `analyzer: ^9.0.0` — not an upgrade target. They are what the
+  package pins today; whether they move is the user's call, because moving
+  them rewrites that package's lock file.
+- Every rule has its own test file under `packages/architecture_lint_rules/test/`, covering both directions. Run with `dart test`.
 - Tests verify both violations and allowed cases; each rule has a dedicated test file.
 - Test pattern: `AnalysisRuleTest` base class with `rule` field set in setUp
 - Use `newFile()` to create test files at specific paths
@@ -344,14 +352,22 @@ For detailed release instructions for both the brick and CLI tool, see [RELEASE.
 
 ### System Requirements
 
-- **Dart SDK**: 3.0.0 or higher
+- **Dart SDK**: 3.10.0 or higher (`pubspec.yaml` declares `sdk: ^3.10.0`;
+  the lint plugin package declares the same floor)
 - **Flutter SDK**: Required for generated projects
 - **Mason CLI**: Required for brick operations (`dart pub global activate mason_cli`)
 
 ### CLI Development Dependencies
 
+Read from `pubspec.yaml`, which is their one home.
+
 - `args`: Command-line argument parsing
 - `cli_completion`: Shell completion support
-- `dcli`: Additional CLI utilities
-- `mason`: Brick template system
-- `build_runner`: Code generation (for version info)
+- `mason_logger`: Console output, prompts and progress
+- `pub_updater`: The self-update check
+
+Dev dependencies: `build_runner` and `build_version` (they generate
+`lib/src/version.dart`), `test`, and `very_good_analysis` (the lint baseline).
+
+Mason itself is NOT a package dependency of this CLI: the tool shells out to the
+`mason` executable, which is why it is listed under System Requirements above.

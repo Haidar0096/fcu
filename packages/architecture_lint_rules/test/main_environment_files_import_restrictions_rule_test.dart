@@ -34,7 +34,7 @@ var x = App();
         9,
         35,
         messageContainsAll: [
-          'main_development/staging/production.dart can only import foundation/ (for Environment) and main_common.dart.',
+          'main_<environment>.dart can only import foundation/ (for Environment) and main_common.dart.',
         ],
       ),
     ]);
@@ -55,7 +55,7 @@ var x = AppRouter();
         9,
         41,
         messageContainsAll: [
-          'main_development/staging/production.dart can only import foundation/ (for Environment) and main_common.dart.',
+          'main_<environment>.dart can only import foundation/ (for Environment) and main_common.dart.',
         ],
       ),
     ]);
@@ -92,5 +92,58 @@ void main() => mainCommon();
     await assertNoDiagnosticsInFile(
       '$testPackageLibPath/main_development.dart',
     );
+  }
+
+  Future<void> test_projectDefinedEnvironment_importFromApp_violation() async {
+    newFile('$testPackageLibPath/app/app.dart', 'class App {}');
+
+    newFile('$testPackageLibPath/main_qa.dart', r'''
+library;
+import 'package:test/app/app.dart';
+
+var x = App();
+''');
+
+    await assertDiagnosticsInFile('$testPackageLibPath/main_qa.dart', [
+      lint(
+        9,
+        35,
+        messageContainsAll: [
+          'main_<environment>.dart can only import foundation/ (for Environment) and main_common.dart.',
+        ],
+      ),
+    ]);
+  }
+
+  Future<void> test_widgetNamedMainSomething_notCoveredByThisRule() async {
+    // A shared widget file whose name starts with `main_` is not an entry
+    // point: `main_button.dart` lives in the starter's own foundation.
+    newFile('$testPackageLibPath/resources/resources.dart', 'class Fonts {}');
+
+    newFile(
+      '$testPackageLibPath/foundation/ui/widgets/src/main_button.dart',
+      r'''
+import 'package:test/resources/resources.dart';
+
+var x = Fonts();
+''',
+    );
+
+    await assertNoDiagnosticsInFile(
+      '$testPackageLibPath/foundation/ui/widgets/src/main_button.dart',
+    );
+  }
+
+  Future<void> test_mainCommon_notCoveredByThisRule() async {
+    newFile('$testPackageLibPath/app/app.dart', 'class App {}');
+
+    newFile('$testPackageLibPath/main_common.dart', r'''
+library;
+import 'package:test/app/app.dart';
+
+var x = App();
+''');
+
+    await assertNoDiagnosticsInFile('$testPackageLibPath/main_common.dart');
   }
 }

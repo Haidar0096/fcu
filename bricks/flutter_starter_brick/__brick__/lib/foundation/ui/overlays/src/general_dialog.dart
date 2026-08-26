@@ -53,23 +53,21 @@ Future<T?> showCustomGeneralDialog<T>({
 }) async => showGeneralDialog(
   context: context,
   barrierColor: barrierColor ?? Colors.transparent,
-  pageBuilder:
-      (context, animation, secondaryAnimation) => _CustomDialogContent(
-        content: content,
-        barrierDismissible: barrierDismissible,
-        backgroundColor: backgroundColor,
-        contentAlignment: contentAlignment,
-        onBarrierDismissed: onBarrierDismissed,
-        onAppLifecycleStateChanged: onAppLifecycleStateChanged,
-      ),
+  pageBuilder: (context, animation, secondaryAnimation) => _CustomDialogContent(
+    content: content,
+    barrierDismissible: barrierDismissible,
+    backgroundColor: backgroundColor,
+    contentAlignment: contentAlignment,
+    onBarrierDismissed: onBarrierDismissed,
+    onAppLifecycleStateChanged: onAppLifecycleStateChanged,
+  ),
   transitionDuration: transitionDuration ?? AnimationDefaults.animationDuration,
-  transitionBuilder:
-      (applyBlur || applyDim)
-          ? _createBlurDimTransitionBuilder(
-            applyBlur: applyBlur,
-            applyDim: applyDim,
-          )
-          : transitionBuilder ?? scaleTransitionBuilder,
+  transitionBuilder: (applyBlur || applyDim)
+      ? _createBlurDimTransitionBuilder(
+          applyBlur: applyBlur,
+          applyDim: applyDim,
+        )
+      : transitionBuilder ?? scaleTransitionBuilder,
 );
 
 class _CustomDialogContent extends StatefulWidget {
@@ -117,7 +115,10 @@ class _CustomDialogContentState extends State<_CustomDialogContent>
               onTap: () {
                 if (widget.onBarrierDismissed != null) {
                   widget.onBarrierDismissed!.call(context);
-                } else {
+                } else if (Navigator.of(context).canPop()) {
+                  // Chosen deviation from go_router's context.canPop(): this
+                  // closes a dialog route on the Navigator stack, which is the
+                  // stack that has to be asked.
                   Navigator.of(context).pop();
                 }
               },

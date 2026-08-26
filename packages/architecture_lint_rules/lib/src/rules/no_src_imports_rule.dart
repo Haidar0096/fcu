@@ -4,19 +4,24 @@
 /// Importing directly from src/ folders breaks encapsulation and violates the
 /// module pattern where src/ should be private implementation.
 ///
-/// Exception: The dependency_injection/ folder is allowed to import from any
-/// src/ folder as it needs direct access to classes for dependency registration.
+/// Exception: the composition roots — dependency_injection/, router/, and the
+/// fake_data/ registry FILE — are allowed to import from any src/ folder, as
+/// they need direct access to classes in order to compose them. The exemption
+/// on fake_data/ is the registry file alone (lib/fake_data/src/
+/// fake_data_registry.dart), not the whole folder: every other file under
+/// fake_data/ goes through the barrel like any other module.
 ///
 /// Examples:
 /// ```dart
-/// // ❌ BAD: Importing through src/ (from non-DI folder)
+/// // ❌ BAD: Importing through src/ (from a non-composition folder)
 /// import 'package:myapp/foundation/clipboard/src/clipboard_service.dart';
 ///
 /// // ✅ GOOD: Importing through barrel file
 /// import 'package:myapp/foundation/clipboard/clipboard.dart';
 ///
-/// // ✅ GOOD: dependency_injection/ can import src/
-/// // (in dependency_injection/ folder only)
+/// // ✅ GOOD: a composition root can import src/
+/// // (anywhere in dependency_injection/ or router/, and in the one file
+/// // lib/fake_data/src/fake_data_registry.dart)
 /// import 'package:myapp/features/auth/src/auth_cubit.dart';
 /// ```
 library;
@@ -36,6 +41,11 @@ class NoSrcImportsRule extends AnalysisRule {
     'Do not import from src/ folders directly. Use barrel files instead.',
     correctionMessage:
         'Import through the barrel file (without /src/) to maintain encapsulation.',
+    // WARNING, not the LintCode default of INFO: every rule here is
+    // registered with `registerWarningRule`, and an architecture breach is a
+    // build-stopping fault, not a suggestion. At INFO `dart analyze` exits 0
+    // and the gate passes with the breach in place.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Creates an instance of [NoSrcImportsRule].
@@ -57,6 +67,38 @@ class NoSrcImportsRule extends AnalysisRule {
     final visitor = _NoSrcImportsVisitor(this, context);
     registry.addImportDirective(this, visitor);
   }
+}
+
+/// The top-level homes that may reach into another module's src/ to compose
+/// it, WHOLE: the import table's two sanctioned reachers-in that are homes.
+///
+/// `fake_data/` is deliberately absent — the table grants that exemption to its
+/// registry file only, which [_fakeDataRegistryPath] names.
+const _composingHomes = {'dependency_injection', 'router'};
+
+/// The one file inside `fake_data/` the import table lets reach into another
+/// module's src/: "its registry".
+///
+/// The path is anchored on `/lib/` so a file of the same name elsewhere (a
+/// test double, a nested package) is not mistaken for the registry.
+const _fakeDataRegistryPath = '/lib/fake_data/src/fake_data_registry.dart';
+
+/// The module a file belongs to.
+///
+/// A file inside a src/ folder belongs to the module owning that src/. Any
+/// other file under lib/ belongs to the folder it sits in (a barrel, a
+/// composition-root file), and a file directly under lib/ (main_common.dart,
+/// main_<environment>.dart) belongs to no module at all.
+String? _moduleOfFile(String filePath) {
+  final srcMatch = RegExp(r'lib/([^/]+(?:/[^/]+)*?)/src/').firstMatch(filePath);
+  if (srcMatch != null) return srcMatch.group(1);
+
+  final libMatch = RegExp(r'lib/(.*)$').firstMatch(filePath);
+  if (libMatch == null) return null;
+
+  final segments = libMatch.group(1)!.split('/');
+  if (segments.length == 1) return '';
+  return segments.sublist(0, segments.length - 1).join('/');
 }
 
 /// Visitor implementation for [NoSrcImportsRule].
@@ -105,25 +147,27 @@ class _NoSrcImportsVisitor extends SimpleAstVisitor<void> {
     if (currentUnit == null) return;
     final currentFilePath = currentUnit.file.path;
 
-    // Extract the module path from both current file and import
-    // Module = everything before /src/ (e.g., "foundation/clipboard" or "features/auth")
-    // Use non-greedy matching (*?) to stop at the FIRST /src/ encountered
-    // (handles nested src folders like features/x/src/blocs/y/src/)
-    final currentModuleMatch = RegExp(
-      r'lib/([^/]+(?:/[^/]+)*?)/src/',
-    ).firstMatch(currentFilePath);
+    // Module = everything before /src/ (e.g., "foundation/clipboard" or
+    // "features/auth"). Use non-greedy matching (*?) to stop at the FIRST
+    // /src/ encountered (handles nested src folders like
+    // features/x/src/blocs/y/src/).
     final importModuleMatch = RegExp(
       r'^([^/]+(?:/[^/]+)*?)/src/',
     ).firstMatch(importPath);
 
-    // If we can't determine modules, be conservative and don't report
-    if (currentModuleMatch == null || importModuleMatch == null) return;
+    // If we can't determine the modules, be conservative and don't report
+    final currentModule = _moduleOfFile(currentFilePath);
+    if (currentModule == null || importModuleMatch == null) return;
 
-    final currentModule = currentModuleMatch.group(1)!;
     final importModule = importModuleMatch.group(1)!;
 
-    // Exception: dependency_injection/ can import from any src/ folder
-    if (currentModule == 'dependency_injection') {
+    // Exception: the composition roots can import from any src/ folder.
+    // dependency_injection/ and router/ are exempt as WHOLE homes; inside
+    // fake_data/ only the registry file is.
+    if (_composingHomes.contains(currentModule.split('/').first)) {
+      return;
+    }
+    if (currentFilePath.endsWith(_fakeDataRegistryPath)) {
       return;
     }
 

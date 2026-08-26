@@ -34,8 +34,8 @@ Generates in output directory (default: `./artifacts`):
 **6 APKs** — for each combination of:
 - Servers: development, production
 - Platforms: android-arm, android-arm64, android-x64
-- Named: `app-{server}-v{version}-build-{code}-{platform}.apk`
+- Named: `{{proj_name}}-{server}-{version}+{code}-{platform}.apk`
 
 **1 AAB** — for Google Play Store:
 - Production environment only
-- Named: `app-production-v{version}-build-{code}.aab`
+- Named: `{{proj_name}}-production-{version}+{code}.aab`

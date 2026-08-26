@@ -133,7 +133,7 @@ class ExpandableCardState extends State<ExpandableCard>
         widget.child,
         SizeTransition(
           sizeFactor: _expandAnimation,
-          axisAlignment: ExpandableCardDefaults.axisAlignment,
+          alignment: ExpandableCardDefaults.alignment,
           child: widget.expandedChild,
         ),
       ],
@@ -141,8 +141,11 @@ class ExpandableCardState extends State<ExpandableCard>
   }
 }
 
-class ExpandableCardDefaults {
+abstract final class ExpandableCardDefaults {
   static const Duration duration = Duration(milliseconds: 300);
   static const Curve curve = Curves.easeInOut;
-  static const double axisAlignment = -1; // -1 = top, 0 = center, 1 = bottom
+
+  /// Where the revealed child sits while the card grows: the directional
+  /// form keeps the reveal correct under RTL.
+  static const AlignmentGeometry alignment = AlignmentDirectional.topStart;
 }

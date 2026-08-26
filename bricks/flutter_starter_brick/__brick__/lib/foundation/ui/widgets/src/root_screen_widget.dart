@@ -43,8 +43,9 @@ class RootScreenWidget extends StatelessWidget {
   /// The background color of the SafeArea.
   final Color? safeAreaBackgroundColor;
 
-  /// Padding to apply to the body.
-  final EdgeInsets? padding;
+  /// Padding to apply to the body. Typed as a geometry so screens can hand
+  /// down the directional (start/end) form and stay RTL-safe.
+  final EdgeInsetsGeometry? padding;
 
   /// Controls the resizing behavior when the keyboard appears.
   final bool? resizeToAvoidBottomInset;
@@ -137,7 +138,12 @@ class RootScreenWidget extends StatelessWidget {
               // Swipe from left to right. Pop the screen.
               if (canPop!) {
                 if (!context.mounted) return;
-                Navigator.of(context).pop();
+                // Chosen deviation from go_router's context.canPop(): the pop
+                // below is a Navigator pop, so the Navigator's stack is the
+                // one that must be asked.
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
               }
             }
           },
@@ -155,6 +161,6 @@ class RootScreenWidget extends StatelessWidget {
   }
 }
 
-class RootScreenWidgetDefaults {
+abstract final class RootScreenWidgetDefaults {
   static const int swipeSensitivity = 20;
 }

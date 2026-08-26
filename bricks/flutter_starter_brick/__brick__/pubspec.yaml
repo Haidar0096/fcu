@@ -1,13 +1,14 @@
 name: {{proj_name}}
 description: {{proj_desc}}
 publish_to: 'none'
+# Dummy. The shipped version lives in the `versions` file at the project root,
+# which the release scripts and the CI workflows read.
 version: 0.1.0
 
 environment:
   sdk: ^3.11.0
 
 dependencies:
-  cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
 

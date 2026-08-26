@@ -27,6 +27,11 @@ class ResourcesCannotImportRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'resources_cannot_import',
     'resources/ is a leaf folder and cannot import from other project folders.',
+    // WARNING, not the LintCode default of INFO: every rule here is
+    // registered with `registerWarningRule`, and an architecture breach is a
+    // build-stopping fault, not a suggestion. At INFO `dart analyze` exits 0
+    // and the gate passes with the breach in place.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Creates an instance of [ResourcesCannotImportRule].
@@ -69,11 +74,35 @@ class _ResourcesCannotImportVisitor extends SimpleAstVisitor<void> {
     // Only check files in resources/ folder
     if (!filePath.contains('lib/resources/')) return;
 
-    // Resources cannot import from any package:*/lib/ folders
-    // Disallowed: foundation, features, app, router, dependency_injection
-    if (RegExp(
-      r'package:.+/(foundation|features|app|router|dependency_injection)/',
-    ).hasMatch(uri)) {
+    // Only check package: imports (skip dart: and relative imports)
+    if (!uri.startsWith('package:')) return;
+
+    // Extract package name from import
+    final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);
+    if (packageMatch == null) return;
+
+    final importPackage = packageMatch.group(1)!;
+    final importPath = packageMatch.group(2)!;
+
+    // Get current package name from the library identifier
+    final libraryElement = context.libraryElement;
+    if (libraryElement == null) return;
+
+    // Extract package name from library identifier (e.g., "package:myapp/...")
+    final identifier = libraryElement.identifier;
+    final currentPackageMatch = RegExp(
+      r'package:([^/]+)/',
+    ).firstMatch(identifier);
+    if (currentPackageMatch == null) return;
+
+    final currentPackage = currentPackageMatch.group(1)!;
+
+    // Only check imports from the same package (skip external packages)
+    if (importPackage != currentPackage) return;
+
+    // Every home may import itself; resources/ is a leaf, so any OTHER folder
+    // of the project's own code is a violation.
+    if (!importPath.startsWith('resources/')) {
       rule.reportAtNode(node);
     }
   }

@@ -13,10 +13,7 @@
 /// ```
 enum PngImages {
   /// Placeholder image used when the actual image is not available or loading.
-  placeholderImage(path: 'assets/images/common/placeholder_image.png'),
-
-  /// App icon (used for launcher icons generation)
-  appIcon(path: 'assets/images/app_icon/app_icon.png');
+  placeholderImage(path: 'assets/images/common/placeholder_image.png');
 
   /// Constructor for the PngImages enum.
   ///

@@ -1,6 +1,8 @@
+dump: full
+
 # {{proj_name.pascalCase()}} — Project Rules
 
-Project-specific rules for this app. Universal Flutter/Dart rules and architecture come from the global `flutter-developer` skill — only the app-specific bits live here.
+Project-specific rules for this app. Universal Flutter/Dart rules and architecture come from the global `mobile` skill (its Flutter mechanics live in `mobile/flutter/`) — only the app-specific bits live here.
 
 ## Project Overview
 
@@ -21,12 +23,11 @@ This app was generated from the Flutter Starter Brick (`flutter_starter_brick` f
 The brick ships with three example features in `lib/features/`:
 - `splash_screen/` — Splash with initialization
 - `random_jokes/` — Example feature with API
-- `error/` — Global error screen
+- `critical_error_screen/` — Unrecoverable-error screen
 
 ### Code Generation Dependencies
 - `json_serializable`: DTO serialization
 - `go_router_builder`: Type-safe routing
-- `flutter_gen`: Asset generation
 
 ### Localization System
 - Supports English out of the box (Arabic structure ready)
@@ -35,18 +36,21 @@ The brick ships with three example features in `lib/features/`:
 - Access via `context.appLocalizations.keyName`
 
 ### Animation Extensions
-Widgets can be easily animated using extensions on `Widget`:
+Widgets are animated through one extension, `withAnimations`, on `Widget` and on `List<Widget>` (`foundation/ui/animations/`):
 
 ```dart
-// Single widget animations
-MyWidget().fadeIn(duration: Duration(seconds: 1))
-MyWidget().scaleIn()
-MyWidget().slideInFromBottom()
+// Single widget
+MyWidget().withAnimations(withFade: true, duration: Duration(seconds: 1))
+MyWidget().withAnimations(withScale: true)
+MyWidget().withAnimations(
+  withSlide: true,
+  slideDirection: SlideDirection.bottomToTop,
+)
 
-// List animations with stagger
-[widget1, widget2, widget3].staggeredFadeIn(
-  duration: Duration(milliseconds: 300),
-  delay: Duration(milliseconds: 100),
+// List, with stagger
+[widget1, widget2, widget3].withAnimations(
+  staggered: true,
+  staggeredDelay: Duration(milliseconds: 100),
 )
 ```
 
@@ -70,7 +74,7 @@ For `Bloc`s, `emitIfNotClosed(emit, state)` is also available — see the file i
 
 ### Modifying Error Handling
 
-1. Add new failure type to `foundation/networking/models/`
-2. Create corresponding UI wrapper in `foundation/models/ui_models/`
-3. Add localized messages to ARB files
-4. Update state classes to use new failure types
+1. Add the new failure type to the sealed family in `foundation/networking/src/network_failure.dart`
+2. Add its arm to the UI wrapper's `getDisplayText` switch in `foundation/ui/models/src/ui_network_failure.dart` — that method is the only road error text takes to a user
+3. Add the localized messages to both ARB files
+4. Update state classes to use the new failure types

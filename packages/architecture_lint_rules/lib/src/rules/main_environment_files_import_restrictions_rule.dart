@@ -1,8 +1,12 @@
-/// Lint rule: main_development/staging/production.dart can only import foundation/ and main_common.dart.
+/// Lint rule: main_&lt;environment&gt;.dart can only import foundation/ and
+/// main_common.dart.
 ///
 /// Environment entry points should remain minimal and only set up the environment
 /// before delegating to main_common.dart. They should not directly depend on
 /// app, features, router, or dependency injection.
+///
+/// Applies to every `main_<environment>.dart` a project declares — never to
+/// `main_common.dart`, which has its own rule.
 ///
 /// Examples:
 /// ```dart
@@ -28,7 +32,12 @@ class MainEnvironmentFilesImportRestrictionsRule extends AnalysisRule {
   /// Diagnostic code for this rule.
   static const LintCode code = LintCode(
     'main_environment_files_import_restrictions',
-    'main_development/staging/production.dart can only import foundation/ (for Environment) and main_common.dart.',
+    'main_<environment>.dart can only import foundation/ (for Environment) and main_common.dart.',
+    // WARNING, not the LintCode default of INFO: every rule here is
+    // registered with `registerWarningRule`, and an architecture breach is a
+    // build-stopping fault, not a suggestion. At INFO `dart analyze` exits 0
+    // and the gate passes with the breach in place.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Creates an instance of [MainEnvironmentFilesImportRestrictionsRule].
@@ -73,14 +82,13 @@ class _MainEnvironmentFilesImportRestrictionsVisitor
     if (currentUnit == null) return;
     final filePath = currentUnit.file.path;
 
-    // Check if this is one of the main environment files
+    // Check if this is a main environment file: any main_<environment>.dart
+    // sitting DIRECTLY under lib/, whatever environments the project defines —
+    // never main_common.dart, which has its own rule. The direct-child check
+    // matters: a shared widget named main_button.dart is not an entry point.
     final isMainEnvironmentFile =
-        filePath.endsWith('/main_development.dart') ||
-        filePath.endsWith('/main_staging.dart') ||
-        filePath.endsWith('/main_production.dart') ||
-        filePath.endsWith('/main_development_test.dart') ||
-        filePath.endsWith('/main_staging_test.dart') ||
-        filePath.endsWith('/main_production_test.dart');
+        RegExp(r'/lib/main_[^/]+\.dart$').hasMatch(filePath) &&
+        !filePath.endsWith('/lib/main_common.dart');
 
     if (!isMainEnvironmentFile) return;
 

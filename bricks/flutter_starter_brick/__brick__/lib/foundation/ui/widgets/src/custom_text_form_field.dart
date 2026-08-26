@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:{{proj_name}}/foundation/ui/focus/focus.dart';
 import 'package:{{proj_name}}/foundation/ui/mixins/mixins.dart';
-import 'package:{{proj_name}}/foundation/ui/services/services.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 
 /// A customizable [TextFormField] with default styling and behavior.
@@ -303,26 +303,18 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                             ),
                       ),
                   contentPadding: widget.contentPadding,
-                  enabledBorder:
-                      hasError
-                          ? context.themeData.inputDecorationTheme.errorBorder
-                          : context
-                              .themeData
-                              .inputDecorationTheme
-                              .enabledBorder,
+                  enabledBorder: hasError
+                      ? context.themeData.inputDecorationTheme.errorBorder
+                      : context.themeData.inputDecorationTheme.enabledBorder,
                   disabledBorder:
                       widget.disabledBorder ??
                       context.themeData.inputDecorationTheme.disabledBorder,
-                  focusedBorder:
-                      hasError
-                          ? context
-                              .themeData
-                              .inputDecorationTheme
-                              .focusedErrorBorder
-                          : context
-                              .themeData
-                              .inputDecorationTheme
-                              .focusedBorder,
+                  focusedBorder: hasError
+                      ? context
+                            .themeData
+                            .inputDecorationTheme
+                            .focusedErrorBorder
+                      : context.themeData.inputDecorationTheme.focusedBorder,
                 ),
             onChanged: (value) {
               widget.onChanged?.call(value);
@@ -330,7 +322,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
             },
             onFieldSubmitted: widget.onFieldSubmitted,
             textInputAction: widget.textInputAction,
-            onTapOutside: widget.onTapOutside ?? (_) => unfocus(),
+            onTapOutside: widget.onTapOutside ?? (_) => context.unfocus(),
           ),
         ),
         ...errorWidgets,
@@ -339,7 +331,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
   }
 }
 
-class CustomTextFormFieldDefaults {
+abstract final class CustomTextFormFieldDefaults {
   static const double cursorWidth = 2;
   static const double suffixPaddingRight = 20.0;
   static const double suffixMaxSide = 23.0;
@@ -359,7 +351,4 @@ class CustomTextFormFieldDefaults {
     vertical: 12,
   );
   static const TextInputAction textInputAction = TextInputAction.next;
-
-  /// Default maximum character limit for input fields across the app
-  static const int defaultMaxInputFieldChars = 500;
 }

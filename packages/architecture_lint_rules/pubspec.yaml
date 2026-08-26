@@ -3,14 +3,19 @@ description: Dart analyzer plugin enforcing Flutter architecture boundaries for 
 version: 1.0.0
 repository: https://github.com/Haidar0096/fcu/tree/production/packages/architecture_lint_rules
 
+# The floor is set by the analyzer, not by this package's own code: the
+# analysis server builds its plugin entrypoint against
+# `analysis_server_plugin ^0.3.8` or newer, 0.3.20 pins `analyzer 14.1.0`, and
+# analyzer 14.1.0 requires Dart ^3.11.0. Below this floor the plugin isolate
+# fails to resolve and NO rule runs at all.
 environment:
-  sdk: ^3.10.0
+  sdk: ^3.11.0
 
 dependencies:
-  analysis_server_plugin: ^0.3.4
-  analyzer: ^9.0.0
+  analysis_server_plugin: ^0.3.20
+  analyzer: ^14.1.0
 
 dev_dependencies:
-  analyzer_testing: ^0.1.7
+  analyzer_testing: ^0.3.4
   test: ^1.24.0
   test_reflective_loader: ^0.2.0

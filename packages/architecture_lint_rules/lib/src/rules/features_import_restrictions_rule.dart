@@ -1,7 +1,10 @@
-/// Lint rule: features/ can only import from foundation/ and resources/.
+/// Lint rule: features/ can only import from foundation/, resources/,
+/// fake_data/, and features/.
 ///
 /// Features should remain decoupled from router, app, and dependency injection.
-/// They can depend on foundation (infrastructure) and resources (assets/strings).
+/// They can depend on foundation (infrastructure), resources (assets/strings),
+/// fake_data (the fake registry), and other features under the cross-import
+/// rule.
 ///
 /// Examples:
 /// ```dart
@@ -27,6 +30,11 @@ class FeaturesImportRestrictionsRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'features_import_restrictions',
     'features/ can only import from foundation/, resources/, fake_data/, or features/.',
+    // WARNING, not the LintCode default of INFO: every rule here is
+    // registered with `registerWarningRule`, and an architecture breach is a
+    // build-stopping fault, not a suggestion. At INFO `dart analyze` exits 0
+    // and the gate passes with the breach in place.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Creates an instance of [FeaturesImportRestrictionsRule].

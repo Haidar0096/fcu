@@ -3,10 +3,11 @@ import 'dart:io';
 import 'package:android_id/android_id.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-/// Repository for device metadata retrieval.
+/// Repository for device and application metadata retrieval.
 ///
 /// Abstracts device ID retrieval across platforms:
 /// - Web: generates a UUID and caches it in SharedPreferences for reuse
@@ -38,6 +39,18 @@ class AppMetaDataRepository {
     } else {
       return null;
     }
+  }
+
+  /// Reads the running build's own version facts off the platform bundle.
+  ///
+  /// Important: see https://pub.dev/packages/package_info_plus for the timing
+  /// constraints on reading package info.
+  Future<({String appVersion, String buildNumber})> getAppVersionInfo() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    return (
+      appVersion: packageInfo.version,
+      buildNumber: packageInfo.buildNumber,
+    );
   }
 
   /// Web: returns cached UUID from SharedPreferences, or generates and caches

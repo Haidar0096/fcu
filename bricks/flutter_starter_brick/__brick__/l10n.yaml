@@ -1,4 +1,10 @@
+# Run: flutter gen-l10n
+
 arb-dir: lib/resources/src/arb
 template-arb-file: app_en.arb
 output-localization-file: app_localizations.dart
 nullable-getter: false
+# The generated Dart lands in lib/ and is committed, so the code-check gate's
+# format step reads it. Without this it is never format-clean and the gate is
+# red on every run.
+format: true

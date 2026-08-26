@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/defaults.dart';
 import 'package:{{proj_name}}/resources/resources.dart';
 
 /// Enum representing fonts used in the application.
@@ -44,18 +45,32 @@ final class Typography extends ThemeExtension<Typography> {
   });
 
   factory Typography() => Typography._(
-    primaryTitle: Fonts.montserratBold.textStyle.copyWith(fontSize: 24),
-    indicationText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 12),
-    fieldInput: Fonts.montserratRegular.textStyle.copyWith(fontSize: 14),
-    linkText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 16),
-    smallLinkText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 12),
-    bodyText: Fonts.montserratRegular.textStyle.copyWith(fontSize: 14),
-    mediumBodyText: Fonts.montserratRegular.textStyle.copyWith(
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-      height: 1.5,
+    primaryTitle: Fonts.montserratBold.textStyle.copyWith(
+      fontSize: ThemeDefaults.titleTextSize,
     ),
-    errorText: Typography.defaultErrorFont.textStyle.copyWith(fontSize: 14),
+    indicationText: Fonts.montserratRegular.textStyle.copyWith(
+      fontSize: ThemeDefaults.smallTextSize,
+    ),
+    fieldInput: Fonts.montserratRegular.textStyle.copyWith(
+      fontSize: ThemeDefaults.bodyTextSize,
+    ),
+    linkText: Fonts.montserratRegular.textStyle.copyWith(
+      fontSize: ThemeDefaults.linkTextSize,
+    ),
+    smallLinkText: Fonts.montserratRegular.textStyle.copyWith(
+      fontSize: ThemeDefaults.smallTextSize,
+    ),
+    bodyText: Fonts.montserratRegular.textStyle.copyWith(
+      fontSize: ThemeDefaults.bodyTextSize,
+    ),
+    mediumBodyText: Fonts.montserratRegular.textStyle.copyWith(
+      fontSize: ThemeDefaults.bodyTextSize,
+      fontWeight: FontWeight.w500,
+      height: ThemeDefaults.bodyTextHeight,
+    ),
+    errorText: Typography.defaultErrorFont.textStyle.copyWith(
+      fontSize: ThemeDefaults.bodyTextSize,
+    ),
   );
 
   // Default fonts used by theme components

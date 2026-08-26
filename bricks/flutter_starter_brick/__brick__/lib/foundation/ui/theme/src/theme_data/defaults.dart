@@ -1,4 +1,4 @@
-class ThemeDefaults {
+abstract final class ThemeDefaults {
   static const double borderWidth = 1.3;
   static const double buttonHeight = 50;
   static const double buttonWidth = 100;
@@ -8,12 +8,12 @@ class ThemeDefaults {
   // Using a geometric scale that provides good visual hierarchy
   static const double borderRadiusXSmall = 2;
   static const double borderRadiusSmall = 8;
+  static const double borderRadiusMedium = 12;
   static const double borderRadiusExtraLarge = 20;
 
   // Semantic border radius values for specific use cases
   static const double buttonBorderRadius = borderRadiusSmall; // 8
-  static const double cardBorderRadius =
-      12; // Direct value since borderRadiusMedium was unused
+  static const double cardBorderRadius = borderRadiusMedium; // 12
   static const double bottomSheetBorderRadius = borderRadiusExtraLarge; // 20
 
   // Icon button defaults
@@ -22,11 +22,10 @@ class ThemeDefaults {
   static const double iconButtonSize = 48;
   static const double smallIconButtonSize = 40;
 
-  // Screen content padding defaults
-  static const double screenContentHorizontalPadding = 24;
+  // The one screen-edge gutter, applied on every edge.
+  static const double screenContentPadding = 24;
 
   // Opacity values
-  static const int disabledAlpha = 102; // ~0.4 opacity for custom widgets
   static const double buttonDisabledOverlayAlpha =
       0.12; // Disabled/overlay opacity for buttons
   static const double materialDisabledOpacity =
@@ -40,8 +39,13 @@ class ThemeDefaults {
   static const double shadowAlpha = 0.08; // For subtle box shadows
 
   // Text size defaults
+  static const double titleTextSize = 24; // Screen and section titles
+  static const double linkTextSize = 16; // Link text
+  static const double bodyTextSize = 14; // Body, field input and error text
+  static const double smallTextSize = 12; // Hints, labels and small links
   static const double buttonTextSize = 16; // Standard button text size
   static const double dropdownTextSize = 18; // Dropdown menu text size
+  static const double bodyTextHeight = 1.5; // Line height for flowing body text
 
   // Component-specific defaults
   static const double scrollbarThickness = 10; // Scrollbar thumb thickness

@@ -14,7 +14,7 @@ Or locally via:
 - Run the following script from the project root to activate the CLI application globally:
 
 ```sh
-sh -e scripts/activate.sh <path_to_root_of_this_project>
+bash scripts/activate.sh
 ```
 
 ## Usage

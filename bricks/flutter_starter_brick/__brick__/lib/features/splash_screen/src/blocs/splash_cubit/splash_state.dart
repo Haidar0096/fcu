@@ -3,9 +3,6 @@ part of 'splash_cubit.dart';
 /// Base state for splash screen
 sealed class SplashState {
   const SplashState();
-
-  /// Checks if the splash screen initialization is complete
-  bool get isComplete => this is SplashComplete;
 }
 
 /// Initial state when splash screen loads

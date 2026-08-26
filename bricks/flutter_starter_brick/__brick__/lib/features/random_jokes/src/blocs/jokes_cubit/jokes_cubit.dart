@@ -7,7 +7,11 @@ import 'package:{{proj_name}}/foundation/ui/models/models.dart';
 part 'jokes_state.dart';
 
 /// Manages the state and logic for fetching random jokes
-class JokesCubit extends Cubit<JokesState> with CubitUtils {
+///
+/// Conflict matrix: none — fetching a joke is the only action and the entry
+/// guard below drops a second one. A matrix becomes needed the moment a second
+/// action (a save, a share) can sit in an async gap beside the fetch.
+class JokesCubit extends Cubit<JokesState> with CubitUtils<JokesState> {
   JokesCubit({required JokesApi jokesApi})
     : _jokesApi = jokesApi,
       super(const JokesInitial());
@@ -15,7 +19,7 @@ class JokesCubit extends Cubit<JokesState> with CubitUtils {
   final JokesApi _jokesApi;
 
   Future<void> fetchJoke() async {
-    if (state is JokesLoading) return; // Prevent multiple fetches
+    if (state.isLoading) return;
 
     emitIfNotClosed(const JokesLoading());
 

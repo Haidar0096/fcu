@@ -2,6 +2,11 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/src/{{proj_name.snakeCase()}}_theme.dart';
 
 /// Manages the theme of the app.
+///
+/// Conflict matrix: none — [setTheme] is the only action and it is fully
+/// synchronous, so no action can sit in an async gap here. A matrix becomes
+/// needed the moment a theme arrives over an await (a server-driven theme,
+/// a downloaded palette).
 class ThemeCubit extends HydratedCubit<{{proj_name.pascalCase()}}Theme> {
   ThemeCubit({
     {{proj_name.pascalCase()}}Theme? initialTheme,

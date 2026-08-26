@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
+import 'package:{{proj_name}}/foundation/ui/overlays/src/alert_dialog_defaults.dart';
 import 'package:{{proj_name}}/foundation/ui/overlays/src/general_dialog.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
@@ -23,12 +24,16 @@ Future<void> showAlertDialog({
   applyDim: true,
   content: AlertDialog(
     contentPadding: const EdgeInsets.only(
-      left: 24,
-      right: 24,
-      top: 20,
-      bottom: 12,
+      left: AlertDialogDefaults.horizontalPadding,
+      right: AlertDialogDefaults.horizontalPadding,
+      top: AlertDialogDefaults.contentTopPadding,
+      bottom: AlertDialogDefaults.contentBottomPadding,
     ),
-    actionsPadding: const EdgeInsets.only(left: 24, right: 24, bottom: 20),
+    actionsPadding: const EdgeInsets.only(
+      left: AlertDialogDefaults.horizontalPadding,
+      right: AlertDialogDefaults.horizontalPadding,
+      bottom: AlertDialogDefaults.actionsBottomPadding,
+    ),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -52,7 +57,10 @@ Future<void> showAlertDialog({
     actions: [
       TextButton(
         onPressed: () {
-          if (autoDismissOnAction) {
+          // Chosen deviation from go_router's context.canPop(): this closes a
+          // dialog route on the Navigator stack, which is the stack that has
+          // to be asked.
+          if (autoDismissOnAction && Navigator.of(context).canPop()) {
             Navigator.pop(context);
           }
           onAction?.call();

@@ -13,7 +13,7 @@
   },
   "criticalErrorTitle": "Something went wrong",
   "criticalErrorMessage": "A critical error occurred and the app cannot continue.",
-  "restartAppMessage": "Please close and restart the app to try again.",
+  "criticalErrorFullMessage": "A critical error occurred and the app cannot continue. Please close and restart the app to try again.",
   "tellMeAJoke": "Tell me a joke",
   "@tellMeAJoke": {
     "description": "Button text to request a random joke"

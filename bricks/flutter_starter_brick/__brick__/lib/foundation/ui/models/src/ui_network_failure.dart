@@ -9,9 +9,6 @@ class UiNetworkFailure implements DisplayableUiModelMixin {
 
   final NetworkFailure _failure;
 
-  @visibleForTesting
-  NetworkFailure get networkFailure => _failure;
-
   @override
   String getDisplayText(BuildContext context) {
     // Always use localized generic messages for security reasons

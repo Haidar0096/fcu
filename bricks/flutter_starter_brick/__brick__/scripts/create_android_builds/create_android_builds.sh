@@ -43,7 +43,7 @@ fi
 
 version="$android_version_name"
 version_code="$android_build_number"
-version_formatted="v$version-build-$version_code"
+version_formatted="$version+$version_code"
 
 # Set default output path if not specified
 output_path=${output_path:-"$PROJECT_ROOT/artifacts"}
@@ -67,7 +67,7 @@ get_build_cmd() {
 get_output_path() {
     local platform="$1"
     local server="$2"
-    echo "$output_path/app-$server-$version_formatted-$platform.apk"
+    echo "$output_path/{{proj_name}}-$server-$version_formatted-$platform.apk"
 }
 
 # Function that builds the app and copies the output to the output path
@@ -95,6 +95,9 @@ build_and_copy() {
 
 # Prepare project
 echo "📦 Preparing project..."
+# Clean first: a dev-only plugin left in a stale generated registrant by an
+# earlier debug run fails the release build.
+fvm flutter clean || error_exit "flutter clean failed"
 fvm flutter pub get || error_exit "flutter pub get failed"
 fvm flutter gen-l10n || error_exit "flutter gen-l10n failed"
 fvm dart run build_runner build --delete-conflicting-outputs || error_exit "build_runner failed"
@@ -121,7 +124,7 @@ echo "🔧 Executing: $aab_build_cmd"
 eval "$aab_build_cmd" || error_exit "AAB build failed for production"
 
 # Copy AAB output to specified location
-aab_output_file="$output_path/app-production-$version_formatted.aab"
+aab_output_file="$output_path/{{proj_name}}-production-$version_formatted.aab"
 cp "$PROJECT_ROOT/build/app/outputs/bundle/release/app-release.aab" "$aab_output_file" || error_exit "Failed to copy AAB"
 echo "✅ Production AAB saved to: $aab_output_file"
 echo "📱 Ready for upload to Google Play Console"

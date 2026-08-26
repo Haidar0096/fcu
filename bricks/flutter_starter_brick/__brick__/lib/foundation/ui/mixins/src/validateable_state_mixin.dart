@@ -50,10 +50,9 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
     if (showErrorMessage) ...[
       SizeTransition(
         sizeFactor: animationController,
-        child:
-            hasError
-                ? SizedBox(height: SpacingSize.spacing4.value)
-                : const SizedBox.shrink(),
+        child: hasError
+            ? SizedBox(height: SpacingSize.spacing4.value)
+            : const SizedBox.shrink(),
       ),
       SizeTransition(
         sizeFactor: animationController,
@@ -125,7 +124,6 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
   }
 }
 
-class ValidateableStateMixinDefaults {
-  static const double errorFontSize = 14;
+abstract final class ValidateableStateMixinDefaults {
   static const int errorMaxLines = 2;
 }

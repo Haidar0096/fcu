@@ -11,7 +11,7 @@ foundation modules, and best practices built-in.
 - [✓] **Clean Architecture**: Feature-based modular structure with clear separation of concerns
 - [✓] **Foundation Layer**: Reusable core modules (networking, UI, logging, etc.)
 - [✓] **Module Pattern**: Consistent src + barrel file pattern for encapsulation
-- [✓] **Multiple Environments**: Development, staging, and production configurations
+- [✓] **Multiple Environments**: Development and production configurations
 
 ### Development Experience
 - [✓] **Type Safety**: Sealed classes, Result types, exhaustive pattern matching
@@ -33,10 +33,10 @@ foundation modules, and best practices built-in.
 - [✓] **Animations**: Pre-built animation utilities and extensions
 
 ### Developer Tools
-- [✓] **IAI System Setup**: Pre-configured `.iai/` skeleton with project-specific rules; universal Flutter rules ship via the global `flutter-developer` skill
+- [✓] **IAI System Setup**: Pre-configured `.iai/` skeleton with project-specific rules; universal Flutter rules ship via the global `mobile` skill
 - [✓] **Build Scripts**: APK generation for all architectures and environments
 - [✓] **TestFlight Upload**: Automated iOS distribution script
-- [✗] **GitHub Actions (Coming Soon)**: CI/CD pipelines
+- [✓] **GitHub Actions**: PR checks (format, analyze, test, build) plus Play Store and TestFlight deploy workflows
 
 ## Project Structure
 
@@ -47,9 +47,9 @@ lib/
 ├── app/                      # Application root widget
 ├── dependency_injection/     # Service registration
 ├── features/                 # Feature modules
-│   ├── splash_screen/       # Splash with initialization
-│   ├── random_jokes/        # Example feature
-│   └── error/              # Error handling screen
+│   ├── splash_screen/          # Splash with initialization
+│   ├── random_jokes/           # Example feature
+│   └── critical_error_screen/  # Unrecoverable-error screen
 ├── foundation/              # Core reusable modules
 │   ├── blocs/              # Base cubits and utilities
 │   ├── environments/       # Environment configuration
@@ -60,8 +60,7 @@ lib/
 │   └── validators/        # Form validators
 ├── resources/              # Assets, fonts, translations
 ├── router/                 # Type-safe navigation
-├── main_development.dart   # Dev entry point
-├── main_staging.dart       # Staging entry point
+├── main_development.dart   # Development entry point
 ├── main_production.dart    # Production entry point
 └── main_common.dart        # Shared initialization
 ```
@@ -78,20 +77,21 @@ lib/
 
 1. Generate your project using the Flutter CLI Utils tool
 2. Run `flutter pub get` to install dependencies
-3. Run `dart run build_runner build --delete-conflicting-outputs` for code generation
-4. Choose your environment and run: `flutter run -t lib/main_development.dart`
+3. Run `flutter gen-l10n` to generate the localizations
+4. Run `dart run build_runner build --delete-conflicting-outputs` for code generation
+5. Choose your environment and run: `flutter run -t lib/main_development.dart`
 
 ## Documentation
 
-Every generated project includes a pre-configured `.iai/` skeleton with `.iai/startup/rules.iai.md` documenting the app-specific bits:
+Every generated project includes a pre-configured `.iai/` skeleton with `.iai/docs/project_rules.md` — a memory doc the IAI boot dump shows in every chat — documenting the app-specific bits:
 - App-specific configuration (orientation, persistence, error handling)
-- Starter feature list (splash, random jokes, error)
+- Starter feature list (splash, random jokes, critical error)
 - Code generation dependency choices
 - Localization setup
 - Animation extensions
 - Common task workflows (modifying error handling, etc.)
 
-Universal Flutter/Dart architecture and patterns are provided by the global `flutter-developer` skill in the IAI agent system.
+Universal Flutter/Dart architecture and patterns are provided by the global `mobile` skill in the IAI agent system, with the Flutter mechanics under `mobile/flutter/`.
 
 ## Support Me
 

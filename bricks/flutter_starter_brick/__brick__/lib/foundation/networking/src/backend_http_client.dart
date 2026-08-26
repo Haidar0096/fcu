@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' as dio;
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:{{proj_name}}/foundation/networking/src/backend_error_message_parser.dart';
 import 'package:{{proj_name}}/foundation/networking/src/dio_http_client.dart';
@@ -7,24 +7,20 @@ const Duration _defaultTimeout = Duration(seconds: 30);
 
 /// A request handler for backend requests.
 ///
-/// This class is responsible for managing HTTP requests to the backend,
-/// including setting up the Dio client with appropriate interceptors
-/// and error handling mechanisms.
+/// This class sets the base URL, the default headers, the timeouts and the
+/// injected error parser — once, here.
 final class BackendHttpClient extends DioHttpClient {
   /// Creates a new backend request handler.
   /// - [appLogger] is the logger to be used for logging.
   /// - [errorLogger] is the error logger to be used for logging errors.
   /// - [baseUrl] is the base URL for the backend.
-  /// - [interceptorsBuilder] is an optional factory function that receives the
-  /// Dio instance and returns the list of interceptors to be added.
   factory BackendHttpClient({
     required String baseUrl,
     required AppLogger appLogger,
     required ErrorLogger errorLogger,
-    List<Interceptor> Function(Dio dio)? interceptorsBuilder,
   }) {
-    final dio = Dio(
-      BaseOptions(
+    final client = dio.Dio(
+      dio.BaseOptions(
         baseUrl: baseUrl,
         headers: {'Content-Type': 'application/json'},
         connectTimeout: _defaultTimeout,
@@ -33,14 +29,8 @@ final class BackendHttpClient extends DioHttpClient {
       ),
     );
 
-    // Get interceptors from factory if provided
-    final interceptors = interceptorsBuilder?.call(dio) ?? [];
-    if (interceptors.isNotEmpty) {
-      dio.interceptors.addAll(interceptors);
-    }
-
     return BackendHttpClient._(
-      client: dio,
+      client: client,
       serverErrorMessageParser: backendErrorMessageParser,
       appLogger: appLogger,
       errorLogger: errorLogger,
@@ -49,8 +39,8 @@ final class BackendHttpClient extends DioHttpClient {
 
   BackendHttpClient._({
     required super.client,
+    required super.appLogger,
+    required super.errorLogger,
     super.serverErrorMessageParser,
-    super.appLogger,
-    super.errorLogger,
   });
 }

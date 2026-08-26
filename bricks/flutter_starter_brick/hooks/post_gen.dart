@@ -3,6 +3,44 @@ import 'dart:io';
 import 'package:mason/mason.dart';
 import 'package:xml/xml.dart';
 
+/// The entitlement macOS demands before a sandboxed app may open an OUTGOING
+/// connection. The starter's error logger posts every report to the project's
+/// own receiver endpoint, so without this key the macOS sandbox denies that
+/// request — and the sender is silent by design, so the loss is invisible.
+const String _macOsNetworkClientEntitlement =
+    'com.apple.security.network.client';
+
+/// The two entitlement files `flutter create` writes for a macOS target. Both
+/// need the key: the debug/profile one for local runs, the release one for the
+/// shipped build.
+const List<String> _macOsEntitlementsFiles = [
+  'macos/Runner/DebugProfile.entitlements',
+  'macos/Runner/Release.entitlements',
+];
+
+/// Adds [_macOsNetworkClientEntitlement] to one entitlements plist unless it
+/// is already there, so a re-run cannot write the key twice.
+///
+/// Returns whether the file was rewritten.
+bool _addMacOsNetworkClientEntitlement(File file) {
+  final document = XmlDocument.parse(file.readAsStringSync());
+  final dict = document.findAllElements('dict').first;
+  final alreadyDeclared = dict.findElements('key').any(
+        (XmlElement key) => key.innerText == _macOsNetworkClientEntitlement,
+      );
+  if (alreadyDeclared) return false;
+  dict.children.add(
+    XmlElement(XmlName('key'), [], [
+      XmlText(_macOsNetworkClientEntitlement),
+    ]),
+  );
+  dict.children.add(XmlElement(XmlName('true'), [], [], true));
+  file.writeAsStringSync(
+    '${document.toXmlString(pretty: true, indent: '\t')}\n',
+  );
+  return true;
+}
+
 Future<void> run(HookContext context) async {
   Progress progress;
 
@@ -27,7 +65,6 @@ Future<void> run(HookContext context) async {
     'Making shell scripts executable',
     () => Process.run('chmod', [
       '+x',
-      '.iai/startup/cat.sh',
       'scripts/create_android_builds/create_android_builds.sh',
       'scripts/upload_to_test_flight/upload_to_testflight.sh',
       'scripts/upload_to_play_store/upload_to_playstore.sh',
@@ -46,7 +83,6 @@ Future<void> run(HookContext context) async {
         'very_good_analysis:^10.1.0',
         'build_runner:^2.11.1',
         'go_router_builder:^4.2.0',
-        'build_verify:^3.1.1',
         'json_serializable:^6.12.0',
         'flutter_launcher_icons:^0.14.4'
       ],
@@ -66,14 +102,15 @@ Future<void> run(HookContext context) async {
         'bloc:^9.2.0',
         'path_provider:^2.1.5',
         'path:^1.9.1',
-        'collection:^1.19.1',
         'android_id:^0.5.1',
         'device_info_plus:^12.3.0',
         'package_info_plus:^9.0.0',
         'go_router:^17.1.0',
         'flutter_animate:^4.5.2',
         'rxdart:^0.28.0',
-        'dio:^5.9.1',
+        // 5.10.0 is the floor: `DioExceptionType.transformTimeout`, which the
+        // networking client switches on, does not exist before it.
+        'dio:^5.10.0',
         'json_annotation:^4.10.0',
         'shared_preferences:^2.5.4',
         'uuid:^4.5.2'
@@ -96,6 +133,10 @@ Future<void> run(HookContext context) async {
     () async {
       try {
         final file = File('android/app/src/main/AndroidManifest.xml');
+        // A project generated without an Android target owns no manifest, so
+        // this step does nothing rather than failing the generation — the
+        // same guard the macOS entitlements step below carries.
+        if (!file.existsSync()) return ProcessResult(0, 0, 'Success', '');
         final document = XmlDocument.parse(await file.readAsString());
         final manifestElement = document.findElements('manifest').first;
         final internetPermission = XmlElement(
@@ -117,6 +158,24 @@ Future<void> run(HookContext context) async {
   );
 
   await _executeCommand(
+    'Adding network client entitlement to macos entitlements',
+    () async {
+      try {
+        for (final path in _macOsEntitlementsFiles) {
+          final file = File(path);
+          // A project generated without a macOS target owns neither file, so
+          // this step does nothing rather than failing the generation.
+          if (!file.existsSync()) continue;
+          _addMacOsNetworkClientEntitlement(file);
+        }
+        return ProcessResult(0, 0, 'Success', '');
+      } catch (e) {
+        return ProcessResult(0, 1, '', e.toString());
+      }
+    },
+  );
+
+  await _executeCommand(
     'Running flutter clean',
     () => Process.run('flutter', ['clean']),
   );
@@ -127,16 +186,16 @@ Future<void> run(HookContext context) async {
   );
 
   await _executeCommand(
-    'Running build_runner',
-    () => Process.run(
-      'dart',
-      ['pub', 'run', 'build_runner', 'build', '--delete-conflicting-outputs'],
-    ),
+    'Running flutter gen-l10n',
+    () => Process.run('flutter', ['gen-l10n']),
   );
 
   await _executeCommand(
-    'Running flutter gen-l10n',
-    () => Process.run('flutter', ['gen-l10n']),
+    'Running build_runner',
+    () => Process.run(
+      'dart',
+      ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
+    ),
   );
 
   await _executeCommand(

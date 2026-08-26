@@ -4,40 +4,16 @@ import 'package:flutter/foundation.dart';
 class AppLogger {
   const AppLogger();
 
-  /// Logs a message.
-  void log(
-    String message, {
-    String? tag,
-    StackTrace? stackTrace,
-    bool prependDateTime = true,
-  }) {
-    final sb = StringBuffer();
-
-    if (prependDateTime) {
-      sb.write('[${DateTime.now().toIso8601String()}] ');
-    }
-
-    if (tag != null) {
-      sb.write('[$tag] ');
-    }
-
-    sb.write(message);
-
-    // Using debugPrint for proper console output in debug mode
+  /// Logs a message under [tag], which names the calling class or file so the
+  /// caller stays searchable. Call sites pass a bare message; the line
+  /// (timestamp, tag, message, stack as a second line) is composed here.
+  void log(String message, {required String tag, StackTrace? stackTrace}) {
     if (kDebugMode) {
-      debugPrint(sb.toString());
+      final timestamp = DateTime.now().toIso8601String();
+      debugPrint('[$timestamp] [$tag] $message');
 
-      // Print stack trace if provided
       if (stackTrace != null) {
-        final stackSb = StringBuffer();
-        if (prependDateTime) {
-          stackSb.write('[${DateTime.now().toIso8601String()}] ');
-        }
-        if (tag != null) {
-          stackSb.write('[$tag] ');
-        }
-        stackSb.write('Stack trace:\n$stackTrace');
-        debugPrint(stackSb.toString());
+        debugPrint('[$timestamp] [$tag] Stack trace:\n$stackTrace');
       }
     }
   }

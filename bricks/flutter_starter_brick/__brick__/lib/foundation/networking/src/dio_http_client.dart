@@ -17,18 +17,24 @@ import 'package:{{proj_name}}/foundation/networking/src/network_failure.dart';
 class DioHttpClient extends HttpClient {
   DioHttpClient({
     required dio.Dio client,
+    required AppLogger appLogger,
+    required ErrorLogger errorLogger,
     this.serverErrorMessageParser,
-    AppLogger? appLogger,
-    ErrorLogger? errorLogger,
   }) : _client = client,
        _appLogger = appLogger,
        _errorLogger = errorLogger;
 
   final dio.Dio _client;
-  final AppLogger? _appLogger;
-  final ErrorLogger? _errorLogger;
+  final AppLogger _appLogger;
+  final ErrorLogger _errorLogger;
 
   static const String _tag = 'DioHttpClient';
+
+  /// The header the project's backend echoes its correlation id under, on
+  /// every response — success and error alike. Reading it here is the one
+  /// place the id enters the app: this is where a transport failure is
+  /// classified, so this is where the id joins the failure it belongs to.
+  static const String _correlationIdHeader = 'x-correlation-id';
 
   /// A function that parses error response and returns message and code.
   final ({String? message, String? code})? Function(dynamic response)?
@@ -271,19 +277,35 @@ class DioHttpClient extends HttpClient {
 
       return Result.success(successResponseMapper(response.toHttpResponse));
     } on dio.DioException catch (dioException) {
-      // Log detailed error information before converting to NetworkFailure
-      final errorDetails = buildDetailedErrorMessage(dioException, path);
-      _appLogger?.log(errorDetails, tag: _tag);
-      await _errorLogger?.recordError(
-        error: errorDetails,
-        stackTrace: dioException.stackTrace,
-      );
-
       // Parse error data once
       final errorData = serverErrorMessageParser?.call(
         dioException.response?.data,
       );
       final statusCode = dioException.response?.statusCode;
+      final correlationId = _readCorrelationId(dioException.response);
+
+      // A user backing out is not a failure: it is returned here, before the
+      // log-and-report block, so a cancellation never reaches the crash
+      // dashboard.
+      if (dioException.type == dio.DioExceptionType.cancel) {
+        return Result.failure(
+          CancelError(
+            statusCode: statusCode,
+            message: errorData?.message,
+            code: errorData?.code,
+            backendCorrelationId: correlationId,
+          ),
+        );
+      }
+
+      // Log detailed error information before converting to NetworkFailure
+      final errorDetails = buildDetailedErrorMessage(dioException, path);
+      _appLogger.log(errorDetails, tag: _tag);
+      await _errorLogger.recordError(
+        error: errorDetails,
+        stackTrace: dioException.stackTrace,
+        backendCorrelationId: correlationId,
+      );
 
       // Handle dio exceptions
       switch (dioException.type) {
@@ -291,11 +313,13 @@ class DioHttpClient extends HttpClient {
         case dio.DioExceptionType.sendTimeout:
         case dio.DioExceptionType.receiveTimeout:
         case dio.DioExceptionType.connectionTimeout:
+        case dio.DioExceptionType.transformTimeout:
           return Result.failure(
             TimeoutError(
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
+              backendCorrelationId: correlationId,
             ),
           );
         // Check for network errors
@@ -307,6 +331,7 @@ class DioHttpClient extends HttpClient {
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
+              backendCorrelationId: correlationId,
             ),
           );
         case dio.DioExceptionType.cancel:
@@ -315,6 +340,7 @@ class DioHttpClient extends HttpClient {
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
+              backendCorrelationId: correlationId,
             ),
           );
         case dio.DioExceptionType.badCertificate:
@@ -324,6 +350,7 @@ class DioHttpClient extends HttpClient {
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
+              backendCorrelationId: correlationId,
             ),
           );
         case dio.DioExceptionType.unknown:
@@ -332,14 +359,15 @@ class DioHttpClient extends HttpClient {
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
+              backendCorrelationId: correlationId,
             ),
           );
       }
     } catch (error, stackTrace) {
       // Log general errors that aren't DioExceptions
       final errorMessage = 'Non-DioException error for $method $path: $error';
-      _appLogger?.log(errorMessage, tag: _tag);
-      await _errorLogger?.recordError(
+      _appLogger.log(errorMessage, tag: _tag);
+      await _errorLogger.recordError(
         error: errorMessage,
         stackTrace: stackTrace,
       );
@@ -350,6 +378,9 @@ class DioHttpClient extends HttpClient {
       );
     }
   }
+
+  static String? _readCorrelationId(dio.Response<dynamic>? response) =>
+      response?.headers.value(_correlationIdHeader);
 }
 
 extension DioResponseExtension<T> on dio.Response<T> {

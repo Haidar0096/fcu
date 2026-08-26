@@ -25,64 +25,60 @@ To release a new version of the starter brick to BrickHub:
 
 ## Releasing the CLI Tool (fcu)
 
-To release a new version of the Flutter CLI Utils tool:
+The steps themselves live in the software-release skill; this section records
+the flow this repo uses.
 
-1. **Update the version** in `pubspec.yaml` (at project root)
+1. **Cut a release-prep branch from `development`**
 
-   ```yaml
-   version: 1.0.0+1  # Update this
+   ```bash
+   git switch development && git pull
+   git switch -c chore/release-v1.0.0
    ```
 
-2. **Generate version info**
+   The version bump and the changelog entry ride this branch like any other
+   change — never a direct write on `development`.
+
+2. **Update the version** in `pubspec.yaml` (at project root)
+
+   ```yaml
+   version: 1.0.0  # Update this
+   ```
+
+3. **Generate version info**
 
    ```bash
    dart run build_runner build --delete-conflicting-outputs
    ```
 
-   This generates the required version information in `lib/src/version.dart`
+   This regenerates `lib/src/version.dart`. `test/src/version_test.dart`
+   fails while that file is stale, so run `dart test` before opening the PR.
 
-3. **Verify brick reference**
-   - Check `lib/src/commands/new_project_command.dart` around line 335
-   - Remove the `--path` flag and local path before release
-   - The code should reference BrickHub, not a local path:
+4. **Update `CHANGELOG.md`** with the release notes and the release date —
+   `TBD` while the date is unknown, the exact date once it is known (on
+   release day a branch updates the date even if that is the only change).
 
-   ```dart
-   // For development (remove before release):
-   final masonAddResult = await Process.run('mason', [
-     'add',
-     'flutter_starter_brick',
-     '--path',  // TODO remove this and the next line before publishing
-     '/Users/haidarmehsen/dev/projects/flutter/projects/flutter_cli_utils/bricks/flutter_starter_brick'
-   ], workingDirectory: tempDirectory.path);
-
-   // For release (use this):
-   final masonAddResult = await Process.run('mason', [
-     'add',
-     'flutter_starter_brick',
-   ], workingDirectory: tempDirectory.path);
-   ```
-
-4. **Push to GitHub**
+5. **Open the release-prep PR into `development` and squash-merge it**
 
    ```bash
-   # If working on a feature branch
-   git add .
-   git commit -m "chore: release v1.0.0"
-   git push origin feature/release-v1.0.0
+   gh pr create --base development --head chore/release-v1.0.0 --title "Release v1.0.0" --body "Release version 1.0.0"
+   gh pr merge --squash --delete-branch
    ```
 
-5. **Create and merge pull requests**
+6. **Open the PR from `development` into `production`, and merge it only on
+   the explicit human go**
 
    ```bash
-   # If on feature branch, first merge to development
-   gh pr create --base development --head feature/release-v1.0.0 --title "Release v1.0.0" --body "Release version 1.0.0 with updates"
-   gh pr merge --merge --delete-branch
-
-   # Then create PR from development to production
-   gh pr create --base production --head development --title "Release v1.0.0 to production" --body "Release version 1.0.0 with updates"
-
-   # After review, merge to production
+   gh pr create --base production --head development --title "Release v1.0.0 to production" --body "Release version 1.0.0"
+   # after review and the go:
    gh pr merge --merge --delete-branch=false
+   ```
+
+7. **Tag the release on `production`**
+
+   ```bash
+   git switch production && git pull
+   git tag v1.0.0
+   git push origin v1.0.0
    ```
 
    > **Note**: The CLI tool is currently distributed as source code on GitHub (not published to pub.dev)

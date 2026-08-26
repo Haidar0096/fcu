@@ -1,10 +1,10 @@
 String? validateEmail(
   String? value, {
-  String? emptyEmailErrorMessage,
-  String? invalidEmailErrorMessage,
+  required String emptyEmailErrorMessage,
+  required String invalidEmailErrorMessage,
 }) {
   if (value == null || value.isEmpty) {
-    return emptyEmailErrorMessage ?? 'Email is required';
+    return emptyEmailErrorMessage;
   }
 
   // More precise email validation:
@@ -20,7 +20,7 @@ String? validateEmail(
       value.contains(' ') ||
       value.endsWith('@') ||
       value.startsWith('@')) {
-    return invalidEmailErrorMessage ?? 'Enter a valid email';
+    return invalidEmailErrorMessage;
   }
 
   // Check if email ends with just a dot after domain
@@ -29,7 +29,7 @@ String? validateEmail(
     if (domainPart.isEmpty ||
         domainPart.endsWith('.') ||
         !domainPart.contains('.')) {
-      return invalidEmailErrorMessage ?? 'Enter a valid email';
+      return invalidEmailErrorMessage;
     }
 
     // Check for domain starting or ending with hyphen or underscore
@@ -42,14 +42,14 @@ String? validateEmail(
           part.endsWith('_') ||
           RegExp(r'^_+$').hasMatch(part)) {
         // All underscores
-        return invalidEmailErrorMessage ?? 'Enter a valid email';
+        return invalidEmailErrorMessage;
       }
     }
 
     // Check TLD has at least 2 characters and is not 'example' (test domain)
     final tld = domainParts.last;
     if (tld.length < 2 || tld == 'example') {
-      return invalidEmailErrorMessage ?? 'Enter a valid email';
+      return invalidEmailErrorMessage;
     }
   }
 
@@ -57,14 +57,14 @@ String? validateEmail(
   if (value.contains('@')) {
     final localPart = value.split('@')[0];
     if (localPart.endsWith('.')) {
-      return invalidEmailErrorMessage ?? 'Enter a valid email';
+      return invalidEmailErrorMessage;
     }
   }
 
   // Basic regex for overall structure
   final emailRegex = RegExp(r'^[\w\-.]+@[\w\-]+(\.[\w\-]+)+$');
   if (!emailRegex.hasMatch(value)) {
-    return invalidEmailErrorMessage ?? 'Enter a valid email';
+    return invalidEmailErrorMessage;
   }
 
   return null;

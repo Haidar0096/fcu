@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
+import 'package:{{proj_name}}/foundation/ui/animations/animations.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
 /// Global loader singleton for managing app-wide loading overlays.
 class GlobalLoader {
   GlobalLoader._({required this.appLogger, required this.rootNavigatorKey});
+
+  static const String _tag = 'GlobalLoader';
 
   static GlobalLoader? _instance;
 
@@ -39,14 +42,13 @@ class GlobalLoader {
 
   /// Shows the global loading overlay.
   void show({String? loadingText, TextStyle? loadingTextStyle}) {
-    // Cancel any pending hide operation
     _hideTimer?.cancel();
     _hideTimer = null;
 
     final context = rootNavigatorKey.currentContext;
 
     if (context == null) {
-      appLogger.log('Tried to show loader using a null context');
+      appLogger.log('Tried to show loader using a null context', tag: _tag);
       return;
     }
 
@@ -54,6 +56,7 @@ class GlobalLoader {
       appLogger.log(
         'Tried to show loader on a context that is not attached to an'
         ' overlay',
+        tag: _tag,
       );
       return;
     }
@@ -103,17 +106,16 @@ class GlobalLoader {
 
   /// Hides the global loading overlay.
   void hide() {
-    // Cancel any pending hide operation
     _hideTimer?.cancel();
 
-    // Schedule the hide with a small delay to handle rapid show/hide cycles
-    _hideTimer = Timer(const Duration(milliseconds: 50), () {
+    // The delay absorbs rapid show/hide cycles so the overlay does not flicker.
+    _hideTimer = Timer(AnimationDefaults.animationDurationVeryShort, () {
       if (_loadingOverlay != null) {
         if (_loadingOverlay!.mounted) {
           try {
             _loadingOverlay!.remove();
           } catch (e) {
-            appLogger.log('Error removing loader overlay: $e');
+            appLogger.log('Error removing loader overlay: $e', tag: _tag);
           }
         }
         _loadingOverlay = null;
@@ -123,7 +125,6 @@ class GlobalLoader {
   }
 }
 
-// Convenience functions that delegate to the singleton
 void showGlobalLoader({String? loadingText, TextStyle? loadingTextStyle}) {
   GlobalLoader.instance.show(
     loadingText: loadingText,

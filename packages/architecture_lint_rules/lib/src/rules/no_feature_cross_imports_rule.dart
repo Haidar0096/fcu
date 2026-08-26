@@ -29,6 +29,11 @@ class NoFeatureCrossImportsRule extends AnalysisRule {
     'Features cannot import from other features.',
     correctionMessage:
         'Move shared code to foundation/ or to a shared/ folder within the parent feature.',
+    // WARNING, not the LintCode default of INFO: every rule here is
+    // registered with `registerWarningRule`, and an architecture breach is a
+    // build-stopping fault, not a suggestion. At INFO `dart analyze` exits 0
+    // and the gate passes with the breach in place.
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Creates an instance of [NoFeatureCrossImportsRule].

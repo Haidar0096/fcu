@@ -7,16 +7,20 @@ Dart analyzer plugin that enforces architectural boundaries for Flutter projects
 This plugin provides lint rules that enforce clean architecture principles:
 
 - **No Feature Cross-Imports**: Features cannot import from other features
-- **No Src Imports**: Modules must use barrel files, not direct /src/ imports (except dependency_injection/)
+- **No Src Imports**: Modules must use barrel files, not direct /src/ imports (except the composition roots: dependency_injection/, router/ and the one fake_data registry file, `lib/fake_data/src/fake_data_registry.dart`)
 - **Resources Isolation**: Resources folder cannot import project code
-- **Foundation Boundaries**: Foundation can only import resources
-- **Feature Boundaries**: Features can only import foundation and resources
+- **Foundation Boundaries**: Foundation can only import foundation and resources
+- **Feature Boundaries**: Features can only import foundation, resources, fake_data and other features
 - **Router Boundaries**: Router can import features, foundation, resources, and DI
+- **App Boundaries**: App can import dependency_injection, foundation, resources and router
+- **Dependency Composition**: Dependency injection can import fake_data, features, foundation, resources and router
+- **Fake-data Composition**: Fake data can import features, foundation and resources
+- **Common Main Restrictions**: main_common.dart can only import app, dependency_injection, foundation and resources
 - **Main File Restrictions**: Environment entry points can only import foundation and main_common.dart
 
 ## Requirements
 
-- Dart SDK >= 3.10.0
+- Dart SDK >= 3.11.0 (the floor comes from `analyzer` 14.1.0, which `analysis_server_plugin` 0.3.20 pins; below it the plugin isolate fails to resolve and no rule runs)
 - Projects generated with Flutter CLI Utils (or following the same architecture)
 
 ## Installation
@@ -65,6 +69,10 @@ plugins:
       foundation_import_restrictions: false
       features_import_restrictions: false
       router_import_restrictions: false
+      app_import_restrictions: false
+      dependency_injection_import_restrictions: false
+      fake_data_import_restrictions: false
+      main_common_import_restrictions: false
       main_environment_files_import_restrictions: false
 ```
 
@@ -104,7 +112,7 @@ import 'package:flutter/material.dart';
 
 **Severity**: Warning (enabled by default)
 
-Foundation can only import from `resources/` and other `foundation/` subfolders.
+Foundation can only import from `resources/` and other `foundation/` subfolders. Every other folder of the project's own code is a violation.
 
 ```dart
 // ❌ BAD: Foundation importing features
@@ -146,11 +154,71 @@ import 'package:myapp/features/home/home.dart';
 import 'package:myapp/foundation/ui/theme.dart';
 ```
 
+### `app_import_restrictions`
+
+**Severity**: Warning (enabled by default)
+
+`app/` can only import from `dependency_injection/`, `foundation/`, `resources/`, `router/`, and `app/`.
+
+```dart
+// ❌ BAD: App importing a feature
+// lib/app/src/root_app_widget.dart
+import 'package:myapp/features/home/home.dart'; // ERROR
+
+// ✅ GOOD: App importing the router
+import 'package:myapp/router/router.dart';
+```
+
+### `dependency_injection_import_restrictions`
+
+**Severity**: Warning (enabled by default)
+
+`dependency_injection/` can only import from `fake_data/`, `features/`, `foundation/`, `resources/`, `router/`, and `dependency_injection/`.
+
+```dart
+// ❌ BAD: Composition root importing app
+// lib/dependency_injection/src/register_instances.dart
+import 'package:myapp/app/app.dart'; // ERROR
+
+// ✅ GOOD: Composition root importing a feature
+import 'package:myapp/features/home/src/apis/home_api.dart';
+```
+
+### `fake_data_import_restrictions`
+
+**Severity**: Warning (enabled by default)
+
+`fake_data/` can only import from `features/`, `foundation/`, `resources/`, and `fake_data/`.
+
+```dart
+// ❌ BAD: Fake data importing the router
+// lib/fake_data/src/fake_data_registry.dart
+import 'package:myapp/router/router.dart'; // ERROR
+
+// ✅ GOOD: Fake data importing a feature's api
+import 'package:myapp/features/home/src/apis/home_api.dart';
+```
+
+### `main_common_import_restrictions`
+
+**Severity**: Warning (enabled by default)
+
+`main_common.dart` can only import from `app/`, `dependency_injection/`, `foundation/`, and `resources/`.
+
+```dart
+// ❌ BAD: Common main importing the router
+// lib/main_common.dart
+import 'package:myapp/router/router.dart'; // ERROR
+
+// ✅ GOOD: Common main importing the app layer
+import 'package:myapp/app/app.dart';
+```
+
 ### `main_environment_files_import_restrictions`
 
 **Severity**: Warning (enabled by default)
 
-Environment entry points (`main_development.dart`, `main_staging.dart`, `main_production.dart`) can only import `foundation/` and `main_common.dart`.
+Environment entry points (every `main_<environment>.dart`, whatever environments the project defines — never `main_common.dart`) can only import `foundation/` and `main_common.dart`.
 
 ```dart
 // ❌ BAD: Main file importing app
@@ -168,7 +236,7 @@ import 'package:myapp/main_common.dart';
 
 Prevents direct imports from other modules' `/src/` folders. All imports must go through barrel files to maintain encapsulation.
 
-**Exception**: The `dependency_injection/` folder can import from any `/src/` folder since it needs direct access to classes for dependency registration.
+**Exception**: The composition roots — `dependency_injection/`, `router/`, and the `fake_data/` registry — can import from any `/src/` folder, since they need direct access to classes in order to compose them. `dependency_injection/` and `router/` are exempt as whole homes; inside `fake_data/` the exemption is the registry file alone, `lib/fake_data/src/fake_data_registry.dart` — every other file there uses the barrel.
 
 ```dart
 // ❌ BAD: Importing from another module's src/ folder
@@ -182,9 +250,13 @@ import 'package:myapp/features/auth/auth.dart';
 // lib/features/auth/src/login_screen.dart
 import 'package:myapp/features/auth/src/auth_cubit.dart'; // OK - same module
 
-// ✅ GOOD: dependency_injection/ can import any src/
+// ✅ GOOD: a composition root can import any src/
 // lib/dependency_injection/src/register_instances.dart
-import 'package:myapp/features/auth/src/auth_cubit.dart'; // OK - DI exception
+import 'package:myapp/features/auth/src/auth_cubit.dart'; // OK - composition
+
+// ❌ BAD: a non-registry file under fake_data/ has no such exemption
+// lib/fake_data/src/fake_jokes.dart
+import 'package:myapp/features/auth/src/auth_cubit.dart'; // ERROR
 ```
 
 ## Suppressing Diagnostics
@@ -242,7 +314,7 @@ import 'package:myapp/features/other/other.dart';
 
 If the plugin isn't working:
 
-1. **Check Dart SDK version**: Ensure you're using Dart >= 3.10.0
+1. **Check Dart SDK version**: Ensure you're using Dart >= 3.11.0
    ```bash
    dart --version
    ```
@@ -262,7 +334,7 @@ If the plugin isn't working:
 
 ### Running Tests
 
-The plugin has comprehensive test coverage with 28 tests covering all 7 rules.
+Every rule has its own test file, covering both directions — an import that must be reported, and a legal import that must not.
 
 ```bash
 cd packages/architecture_lint_rules
@@ -277,6 +349,10 @@ dart test
 - `foundation_import_restrictions_rule_test.dart` - Foundation boundary tests
 - `features_import_restrictions_rule_test.dart` - Feature boundary tests
 - `router_import_restrictions_rule_test.dart` - Router boundary tests
+- `app_import_restrictions_rule_test.dart` - App boundary tests
+- `dependency_injection_import_restrictions_rule_test.dart` - Dependency composition tests
+- `fake_data_import_restrictions_rule_test.dart` - Fake-data composition tests
+- `main_common_import_restrictions_rule_test.dart` - Common main restriction tests
 - `main_environment_files_import_restrictions_rule_test.dart` - Entry point restriction tests
 
 All tests use the `analyzer_testing` package for robust, maintainable testing.
@@ -305,4 +381,4 @@ BSD-3-Clause - See LICENSE file for details.
 
 - [Flutter CLI Utils](https://github.com/Haidar0096/fcu)
 - [Dart Analyzer Plugins Documentation](https://dart.dev/tools/analyzer-plugins)
-- [FCU Architecture Guide](https://github.com/Haidar0096/fcu/blob/production/IAI.md)
+- [FCU README](https://github.com/Haidar0096/fcu/blob/production/README.md)

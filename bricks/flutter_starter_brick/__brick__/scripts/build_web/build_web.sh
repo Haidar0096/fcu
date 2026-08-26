@@ -5,35 +5,29 @@
 # versions present at the project root.
 #
 # Usage:
-#   ./build_web.sh dev   # builds main_development.dart
-#   ./build_web.sh prod  # builds main_production.dart
+#   ./build_web.sh development  # builds main_development.dart
+#   ./build_web.sh production   # builds main_production.dart
 
-# Check for flavor argument
+# Check for environment argument
 if [[ -z "$1" ]]; then
-    echo "❌ Usage: $0 <dev|prod>"
-    echo "   dev  - builds lib/main_development.dart"
-    echo "   prod - builds lib/main_production.dart"
+    echo "❌ Usage: $0 <development|production>"
+    echo "   development - builds lib/main_development.dart"
+    echo "   production  - builds lib/main_production.dart"
     exit 1
 fi
 
-FLAVOR="$1"
+ENVIRONMENT="$1"
 
-# Set main file and output suffix based on flavor
-case "$FLAVOR" in
-    dev)
-        main_file="lib/main_development.dart"
-        output_suffix="dev"
-        ;;
-    prod)
-        main_file="lib/main_production.dart"
-        output_suffix="prod"
-        ;;
+case "$ENVIRONMENT" in
+    development|production) ;;
     *)
-        echo "❌ Invalid flavor: $FLAVOR"
-        echo "   Valid options: dev, prod"
+        echo "❌ Invalid environment: $ENVIRONMENT"
+        echo "   Valid options: development, production"
         exit 1
         ;;
 esac
+
+main_file="lib/main_$ENVIRONMENT.dart"
 
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -56,12 +50,15 @@ fi
 
 # Prepare project
 echo "📦 Preparing project..."
+# Clean first: a dev-only plugin left in a stale generated registrant by an
+# earlier debug run fails the release build.
+fvm flutter clean || { echo "❌ flutter clean failed"; exit 1; }
 fvm flutter pub get || { echo "❌ flutter pub get failed"; exit 1; }
 fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; exit 1; }
 fvm dart run build_runner build --delete-conflicting-outputs || { echo "❌ build_runner failed"; exit 1; }
 
 # Build Web
-echo "🚀 Building Web for version $web_version_name ($web_build_number) [$FLAVOR]..."
+echo "🚀 Building Web for version $web_version_name ($web_build_number) [$ENVIRONMENT]..."
 fvm flutter build web \
     --release \
     --build-name="$web_version_name" \
@@ -72,7 +69,7 @@ fvm flutter build web \
 }
 
 # Create a unique output directory name
-OUTPUT_DIR="$PROJECT_ROOT/build/web_${output_suffix}_v${web_version_name}_${web_build_number}"
+OUTPUT_DIR="$PROJECT_ROOT/build/{{proj_name}}-$ENVIRONMENT-$web_version_name+$web_build_number-web"
 
 # Remove existing output directory if it exists
 if [[ -d "$OUTPUT_DIR" ]]; then
@@ -80,6 +77,6 @@ if [[ -d "$OUTPUT_DIR" ]]; then
 fi
 
 # Rename build/web to the unique output directory
-mv "$PROJECT_ROOT/build/web" "$OUTPUT_DIR"
+mv "$PROJECT_ROOT/build/web" "$OUTPUT_DIR" || { echo "❌ Failed to move the build output to $OUTPUT_DIR"; exit 1; }
 
 echo "✅ Build complete! Output located at: $OUTPUT_DIR"

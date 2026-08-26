@@ -9,8 +9,8 @@ on:
         required: true
         type: choice
         options:
-          - dev
-          - prod
+          - development
+          - production
 
 jobs:
   setup:
@@ -45,12 +45,20 @@ jobs:
 
       - name: Determine main file
         id: main_file
+        run: echo "main_file=lib/main_${{ inputs.environment }}.dart" >> "$GITHUB_OUTPUT"
+
+      - name: Read the package name
+        id: package
+        # Read the same applicationId gradle signs and the local upload script
+        # reads: one home for the fact. A copy of it here would go on uploading
+        # to the old Play listing the day a project changes its package name.
         run: |
-          if [ "${{ inputs.environment }}" = "dev" ]; then
-            echo "main_file=lib/main_development.dart" >> "$GITHUB_OUTPUT"
-          else
-            echo "main_file=lib/main_production.dart" >> "$GITHUB_OUTPUT"
+          package_name=$(grep 'applicationId' android/app/build.gradle.kts | sed 's/.*"\(.*\)".*/\1/')
+          if [ -z "$package_name" ]; then
+            echo "Could not read applicationId from android/app/build.gradle.kts" >&2
+            exit 1
           fi
+          echo "package_name=$package_name" >> "$GITHUB_OUTPUT"
 
       - name: Set up Android signing
         run: |
@@ -99,7 +107,7 @@ jobs:
           python3 scripts/upload_to_play_store/upload_to_playstore.py \
             build/app/outputs/bundle/release/app-release.aab \
             /tmp/service-account.json \
-            <%org_name%>.<%proj_name%>
+            "${{ steps.package.outputs.package_name }}"
 
       - name: Cleanup secrets
         if: always()

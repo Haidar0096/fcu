@@ -4,7 +4,6 @@ const Color black = Color(0xFF000000);
 const Color white = Color(0xFFFFFFFF);
 
 const Color errorRed = Color(0xFFE74C3C);
-const Color successGreen = Color.fromARGB(255, 0, 225, 90);
 const Color inactiveGray = Color(0xFFCACACA);
 
 // Primary colors (specific)

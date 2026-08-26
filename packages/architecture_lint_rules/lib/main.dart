@@ -5,15 +5,21 @@
 ///
 /// Rules enforce:
 /// - Feature isolation (no cross-feature imports)
-/// - Layer boundaries (foundation, features, resources, router)
-/// - Entry point restrictions (main_*.dart files)
+/// - The barrel as the only door (no direct src/ imports)
+/// - Layer boundaries (foundation, features, resources, router, app)
+/// - Composition roots (dependency_injection, fake_data)
+/// - Entry point restrictions (main_common.dart, main_*.dart files)
 library;
 
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 
+import 'package:architecture_lint_rules/src/rules/app_import_restrictions_rule.dart';
+import 'package:architecture_lint_rules/src/rules/dependency_injection_import_restrictions_rule.dart';
+import 'package:architecture_lint_rules/src/rules/fake_data_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/features_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/foundation_import_restrictions_rule.dart';
+import 'package:architecture_lint_rules/src/rules/main_common_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/main_environment_files_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/no_feature_cross_imports_rule.dart';
 import 'package:architecture_lint_rules/src/rules/no_src_imports_rule.dart';
@@ -40,6 +46,10 @@ class ArchitectureLintPlugin extends Plugin {
     registry.registerWarningRule(FoundationImportRestrictionsRule());
     registry.registerWarningRule(FeaturesImportRestrictionsRule());
     registry.registerWarningRule(RouterImportRestrictionsRule());
+    registry.registerWarningRule(AppImportRestrictionsRule());
+    registry.registerWarningRule(DependencyInjectionImportRestrictionsRule());
+    registry.registerWarningRule(FakeDataImportRestrictionsRule());
+    registry.registerWarningRule(MainCommonImportRestrictionsRule());
     registry.registerWarningRule(MainEnvironmentFilesImportRestrictionsRule());
   }
 }
