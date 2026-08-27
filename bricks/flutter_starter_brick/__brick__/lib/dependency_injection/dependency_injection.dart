@@ -1,1 +1,1 @@
-export 'src/service_locator.dart';
+export 'src/initialize_dependencies.dart';

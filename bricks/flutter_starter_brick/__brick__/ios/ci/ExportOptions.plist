@@ -7,11 +7,11 @@
 	<key>signingStyle</key>
 	<string>manual</string>
 	<key>teamID</key>
-	<string>TODO({{dev_name}}): Replace with Apple Team ID</string>
+	<string>TODO({{dev_name.paramCase()}}): Replace with Apple Team ID</string>
 	<key>provisioningProfiles</key>
 	<dict>
 		<key>{{org_name}}.{{proj_name}}</key>
-		<string>TODO({{dev_name}}): Replace with provisioning profile name</string>
+		<string>TODO({{dev_name.paramCase()}}): Replace with provisioning profile name</string>
 	</dict>
 	<key>uploadSymbols</key>
 	<true/>

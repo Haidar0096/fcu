@@ -37,45 +37,20 @@ jobs:
         run: flutter gen-l10n
 
       - name: Run build_runner
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Analyze
-        # analysis_options.yaml wires the architecture lint plugin through a
-        # `git:` source. Two separate facts, both measured on Flutter 3.44.9 /
-        # Dart 3.12.2:
-        #   1. The plugin itself now WORKS, and its findings are fatal.
-        #      `dart analyze` on a generated app carrying deliberate breaches
-        #      and NO other issue reported five architecture warnings across
-        #      four rules and exited 2 — the plugin's warnings alone stop the
-        #      command.
-        #      A second run carrying one breach per rule made all ELEVEN rules
-        #      report. With every probe removed the same command reported
-        #      nothing and exited 0.
-        #   2. `flutter analyze` surfaces NO analyzer-plugin diagnostic at
-        #      all. On the five-breach tree it answered `No issues found!` and
-        #      exited 0. On the eleven-breach tree it reported only the
-        #      ordinary `unused_import` and `directives_ordering` issues from
-        #      the very same probe files — not one architecture rule. The LSP
-        #      traffic log shows the plugin loading and being handed the
-        #      context root, and no `publishDiagnostics` for its findings.
-        #      That gap is upstream, not in this project.
-        # So this step remains the very_good_analysis gate; the architecture
-        # rules are enforced by `dart analyze` (and by review). Whether this
-        # gate should switch to, or gain, a `dart analyze` step is an open
-        # question for the project owner. Nobody has measured an IDE, so
-        # nothing here claims one.
         run: flutter analyze
 
       - name: Analyze (architecture rules)
-        # The architecture rules are gated HERE. `flutter analyze` surfaces no
-        # analyzer-plugin diagnostic on the pinned toolchain (measured — see
-        # the comment above), while `dart analyze` fails on any plugin
-        # warning: five deliberate breaches → exit 2; the clean generated app
-        # → exit 0. Both measured on Flutter 3.44.9 / Dart 3.12.2.
+        # The plugin is the app-local path under packages/.
         run: dart analyze
+
+      - name: Check project structure
+        run: dart run tool/check_structure_io.dart
 
       - name: Run tests
         # `flutter test` exits non-zero on a project that has no `test/` folder,

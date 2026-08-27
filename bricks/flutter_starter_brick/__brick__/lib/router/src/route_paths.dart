@@ -5,7 +5,7 @@
 /// so the trail never has to read a live address, which can carry data that
 /// must stay out of a recorded trail.
 ///
-/// TODO({{dev_name}}): Add your app-specific routes here following the same
+/// TODO({{dev_name.paramCase()}}): Add your app-specific routes here following the same
 /// pattern — path constant, name constant, and a `fromPath` arm.
 sealed class RoutePath {
   const RoutePath();

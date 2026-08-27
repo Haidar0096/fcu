@@ -23,21 +23,21 @@ class SplashScreen extends StatelessWidget {
   final VoidCallback onNavigateToRandomJokes;
 
   @override
-  Widget build(BuildContext context) => MultiBlocListener(
-    listeners: [
-      BlocListener<AppMetaDataCubit, AppMetaDataState>(
-        listener: _onAppMetaDataState,
-      ),
-      BlocListener<SplashCubit, SplashState>(listener: _onSplashState),
-    ],
-    child: RootScreenWidget(
-      applySafeArea: false,
-      body: Center(
+  Widget build(BuildContext context) => RootScreenWidget(
+    applySafeArea: false,
+    body: MultiBlocListener(
+      listeners: [
+        BlocListener<AppMetaDataCubit, AppMetaDataState>(
+          listener: _onAppMetaDataState,
+        ),
+        BlocListener<SplashCubit, SplashState>(listener: _onSplashState),
+      ],
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '{{proj_name.upperCase()}}',
+              context.appLocalizations.appName,
               style: context.typography?.primaryTitle.copyWith(
                 color: context.themeData.colorScheme.onSurface,
                 letterSpacing: SplashScreenDefaults.titleLetterSpacing,

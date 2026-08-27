@@ -1,4 +1,3 @@
-import 'dart:io' hide HttpResponse;
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart' as dio;
@@ -10,6 +9,7 @@ import 'package:{{proj_name}}/foundation/networking/src/dio_error_message_builde
 import 'package:{{proj_name}}/foundation/networking/src/http_client.dart';
 import 'package:{{proj_name}}/foundation/networking/src/http_response.dart';
 import 'package:{{proj_name}}/foundation/networking/src/network_failure.dart';
+import 'package:{{proj_name}}/foundation/networking/src/socket_exception.dart';
 
 /// An implementation of [HttpClient] that uses the Dio package for making
 /// HTTP requests. The dio object can be provided to the constructor to allow
@@ -325,7 +325,7 @@ class DioHttpClient extends HttpClient {
         // Check for network errors
         case dio.DioExceptionType.connectionError:
         case dio.DioExceptionType.unknown
-            when dioException.error is SocketException:
+            when isSocketException(dioException.error):
           return Result.failure(
             NetworkError(
               statusCode: statusCode,

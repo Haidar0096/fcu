@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:android_id/android_id.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:{{proj_name}}/foundation/app_meta_data/src/platform/platform_info.dart';
 
 /// Repository for device and application metadata retrieval.
 ///
@@ -32,9 +31,9 @@ class AppMetaDataRepository {
     }
 
     final deviceInfo = DeviceInfoPlugin();
-    if (Platform.isIOS) {
+    if (platformIsIos) {
       return (await deviceInfo.iosInfo).identifierForVendor;
-    } else if (Platform.isAndroid) {
+    } else if (platformIsAndroid) {
       return const AndroidId().getId();
     } else {
       return null;

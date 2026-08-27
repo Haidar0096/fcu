@@ -1,3 +1,12 @@
+# 4.4.1
+Released 2026-08-28 together with fcu CLI 4.4.0 (the new `--dev-name` option is a minor bump; the brick and CLI versions stay independent).
+- Corrected the 4.4.0 architecture-lint claim: the rules were declared through a `git:` plugin source, but the analyzer did not load that source, so generated apps did not enforce them.
+- Moved `architecture_lint_rules` into the brick at `packages/architecture_lint_rules` and wired each generated app to its own copy with `path:`. The tracked package lockfile ships with the copy.
+- Added 15 warning-level guardrails for vendor wrappers, Bloc boundaries and close guards, URLs and routes, DTO and transport leaks, UI conventions, suppression hygiene, and secret-shaped literals. Every rule can be disabled in plugin diagnostics, and vendor wrappers are configurable.
+- Added `tool/check_structure_io.dart` and a dedicated checks-workflow step to validate the generated app's folder and file-name layout.
+- Added `fcu create --dev-name`, sanitized the developer name used by template TODOs, removed the retired build-runner conflict flag, updated `json_annotation` to `^4.12.0`, and ignored iOS and macOS Podfile locks in newly initialized repositories.
+- Review fixes on top of the above: the pre-generation hook no longer fails when the output directory has no `lib/` yet (a fresh `mason make --output-dir` works); `no_locator_reads_in_bloc` also catches the `GetIt.I<T>()` and `getIt<T>()` call shapes; `no_secret_literals` recognizes every PEM private-key header (`-----BEGIN RSA PRIVATE KEY-----` included); the structure gate also checks an empty `fake_data/` home, an event file under a cubit, a `widgets/` folder where `ui/` is required, the kind folders inside a feature `shared/`, the `_mobile`/`_web`/`shared` platform-split group, a generated file without its declaring file, and the required root app widget; the package README shows the prefixed ignore form (`// ignore: architecture_lint_rules/<rule> -- reason`), which is the only form the analyzer honors for a plugin diagnostic; the generated `analysis_options.yaml` header names `dart analyze` as the command that runs the plugin.
+
 # 4.4.0
 - Three review rounds of fixes across the starter brick and the fcu generator:
   - Hardcoded UI values moved out of the widgets into companion defaults files: `splash_screen_defaults.dart`, `joke_card_defaults.dart`, `critical_error_screen_defaults.dart`, `alert_dialog_defaults.dart`, `status_banner_widget_defaults.dart`

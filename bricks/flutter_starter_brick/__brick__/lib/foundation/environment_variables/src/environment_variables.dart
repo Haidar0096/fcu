@@ -38,7 +38,7 @@ sealed class EnvironmentVariables {
 final class DevelopmentEnvironmentVariables extends EnvironmentVariables {
   const DevelopmentEnvironmentVariables() : super._();
 
-  // TODO({{dev_name}}): Update with your development API URL
+  // TODO({{dev_name.paramCase()}}): Update with your development API URL
   // Example API for demonstration - replace with your actual API
   @override
   String get backendBaseUrl => const String.fromEnvironment(
@@ -61,7 +61,7 @@ final class ProductionEnvironmentVariables extends EnvironmentVariables {
 
   @override
   String get backendBaseUrl {
-    // TODO({{dev_name}}): Update with your production API URL
+    // TODO({{dev_name.paramCase()}}): Update with your production API URL
     return 'https://api.chucknorris.io';
   }
 

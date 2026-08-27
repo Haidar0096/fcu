@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:{{proj_name}}/dependency_injection/dependency_injection.dart';
 import 'package:{{proj_name}}/foundation/app_meta_data/app_meta_data.dart';
 import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
+import 'package:{{proj_name}}/foundation/locator/locator.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 
 /// Builds the tree that sits under the app-wide blocs.
@@ -39,7 +39,7 @@ class _RootBlocsProviderState extends State<RootBlocsProvider> {
   @override
   Widget build(BuildContext context) => MultiBlocProvider(
     providers: [
-      // TODO({{dev_name}}): Add app-specific global blocs here
+      // TODO({{dev_name.paramCase()}}): Add app-specific global blocs here
       BlocProvider<LocalizationCubit>.value(value: _localizationCubit),
       BlocProvider<ThemeCubit>.value(value: _themeCubit),
       BlocProvider<AppMetaDataCubit>.value(value: _appMetaDataCubit),

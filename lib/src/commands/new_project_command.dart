@@ -8,6 +8,7 @@ typedef _FlutterProjectCreationData = ({
   String projectName,
   String projectDescription,
   String organization,
+  String devName,
   String iosLanguage,
   String androidLanguage,
   String template,
@@ -42,6 +43,10 @@ class NewProjectCommand extends Command<int> {
         _projectNameCommandOption.name,
         abbr: _projectNameCommandOption.abbr,
         help: _projectNameCommandOption.help,
+      )
+      ..addOption(
+        _developerNameCommandOption.name,
+        help: _developerNameCommandOption.help,
       )
       ..addOption(
         _iosLanguageCommandOption.name,
@@ -105,6 +110,13 @@ class NewProjectCommand extends Command<int> {
     help: 'Name for the project.',
     defaultsTo: 'my_app',
     prompt: 'Enter the project name:',
+  );
+
+  final CommandOption _developerNameCommandOption = const CommandOption(
+    name: 'dev-name',
+    help: 'Developer name passed to the starter brick.',
+    defaultsTo: 'developer',
+    prompt: 'What is your name?',
   );
 
   final CommandOption _iosLanguageCommandOption = const CommandOption(
@@ -267,6 +279,10 @@ class NewProjectCommand extends Command<int> {
       '# Android Kotlin metadata',
       '/android/.kotlin/',
       '',
+      '# CocoaPods lockfiles',
+      'ios/Podfile.lock',
+      'macos/Podfile.lock',
+      '',
       '# Deployment secrets',
       'scripts/upload_to_play_store/service_account_json_path',
       'scripts/upload_to_test_flight/api_key_name',
@@ -362,18 +378,12 @@ class NewProjectCommand extends Command<int> {
     // on the terminal and its `stderr` stream is not connected to read back.
     final masonMakeProcess = await Process.start(
       'mason',
-      [
-        'make',
-        'flutter_starter_brick',
-        '--on-conflict',
-        'overwrite',
-        '--proj_name',
-        creationData.projectName,
-        '--proj_desc',
-        creationData.projectDescription,
-        '--org_name',
-        creationData.organization,
-      ],
+      buildStarterBrickMakeArguments(
+        projectName: creationData.projectName,
+        projectDescription: creationData.projectDescription,
+        organization: creationData.organization,
+        developerName: creationData.devName,
+      ),
       workingDirectory: creationData.outputDirectory,
       mode: ProcessStartMode.inheritStdio,
     );
@@ -394,6 +404,7 @@ class NewProjectCommand extends Command<int> {
         '\n- Project Name: ${creationData.projectName}'
         '\n- Project Description: ${creationData.projectDescription}'
         '\n- Organization: ${creationData.organization}'
+        '\n- Developer Name: ${creationData.devName}'
         '\n- iOS Language: ${creationData.iosLanguage}'
         '\n- Android Language: ${creationData.androidLanguage}'
         '\n- Template: ${creationData.template}'
@@ -516,6 +527,13 @@ class NewProjectCommand extends Command<int> {
       useStarterBrick = false;
     }
 
+    final devName = useStarterBrick
+        ? _optionOrPrompt(
+            argName: _developerNameCommandOption.name,
+            promptForArg: _promptForDeveloperName,
+          )
+        : _developerNameCommandOption.defaultsTo;
+
     final initGitRepo = _flagOrPrompt(
       argName: _initializeGitRepoCommandFlag.name,
       promptForArg: _promptForInitializeGitRepo,
@@ -525,6 +543,7 @@ class NewProjectCommand extends Command<int> {
       projectName: projectName,
       projectDescription: projectDescription,
       organization: organization,
+      devName: devName,
       iosLanguage: iosLanguage,
       androidLanguage: androidLanguage,
       template: template,
@@ -549,6 +568,11 @@ class NewProjectCommand extends Command<int> {
   String _promptForProjectName() => _logger.prompt(
     _projectNameCommandOption.prompt,
     defaultValue: _projectNameCommandOption.defaultsTo,
+  );
+
+  String _promptForDeveloperName() => _logger.prompt(
+    _developerNameCommandOption.prompt,
+    defaultValue: _developerNameCommandOption.defaultsTo,
   );
 
   String _promptForIosLanguage() => _logger.chooseOne(
@@ -595,3 +619,24 @@ class NewProjectCommand extends Command<int> {
     defaultValue: _initializeGitRepoCommandFlag.defaultsTo,
   );
 }
+
+/// Builds the non-interactive variable arguments passed to the starter brick.
+List<String> buildStarterBrickMakeArguments({
+  required String projectName,
+  required String projectDescription,
+  required String organization,
+  required String developerName,
+}) => [
+  'make',
+  'flutter_starter_brick',
+  '--on-conflict',
+  'overwrite',
+  '--proj_name',
+  projectName,
+  '--proj_desc',
+  projectDescription,
+  '--org_name',
+  organization,
+  '--dev_name',
+  developerName,
+];

@@ -13,7 +13,7 @@
 abstract final class SensitiveDataSanitizer {
   // These are the entries that are sensitive in every app; they are the floor,
   // never the whole list.
-  // TODO({{dev_name}}): Add any custom sensitive headers specific to your API
+  // TODO({{dev_name.paramCase()}}): Add any custom sensitive headers specific to your API
   static const Set<String> _sensitiveHeaders = {
     'authorization',
     'proxy-authorization',
@@ -22,7 +22,7 @@ abstract final class SensitiveDataSanitizer {
     'x-api-key',
   };
 
-  // TODO({{dev_name}}): Add any custom sensitive fields specific to your API
+  // TODO({{dev_name.paramCase()}}): Add any custom sensitive fields specific to your API
   static const Set<String> _sensitiveBodyFields = {
     'password',
     'newpassword',

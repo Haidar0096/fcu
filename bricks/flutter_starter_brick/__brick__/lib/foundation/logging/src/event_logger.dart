@@ -8,7 +8,7 @@ class EventLogger {
     EventLoggerLevel? level,
     StackTrace? stackTrace,
   }) async {
-    // TODO({{dev_name}}): Implement this method to log events in your chosen
+    // TODO({{dev_name.paramCase()}}): Implement this method to log events in your chosen
     // reporting system.
   }
 }

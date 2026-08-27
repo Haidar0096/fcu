@@ -1,13 +1,12 @@
-# Run: flutter analyze
+# Run: dart analyze
+# The architecture plugin below fires under `dart analyze` only; `flutter analyze`
+# runs no analyzer plugin on Flutter 3.44.9 / Dart 3.12.2 (measured).
 
 include: package:very_good_analysis/analysis_options.yaml
 
 plugins:
   architecture_lint_rules:
-    git:
-      url: https://github.com/Haidar0096/fcu.git
-      path: packages/architecture_lint_rules
-      ref: production
+    path: packages/architecture_lint_rules
 
 analyzer:
   errors:
@@ -19,4 +18,5 @@ analyzer:
     avoid_catches_without_on_clauses: ignore
   exclude:
     - lib/**/*.g.dart
+    - packages/architecture_lint_rules/**
     - .iai/scratchpad/**

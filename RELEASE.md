@@ -20,8 +20,14 @@ To release a new version of the starter brick to BrickHub:
 
    ```bash
    cd bricks/flutter_starter_brick
+   mason publish --dry-run   # must say "No issues detected"
    mason publish
    ```
+
+   The bundle must stay under 2 MB. Mason bundles everything under
+   `__brick__`, git-ignored or not: a `.dart_tool/` left inside
+   `__brick__/packages/architecture_lint_rules/` by a `dart test` run there
+   adds about 50 MB and fails the dry run — delete it first.
 
 ## Releasing the CLI Tool (fcu)
 
@@ -47,15 +53,18 @@ the flow this repo uses.
 3. **Generate version info**
 
    ```bash
-   dart run build_runner build --delete-conflicting-outputs
+   dart run build_runner build
    ```
 
    This regenerates `lib/src/version.dart`. `test/src/version_test.dart`
    fails while that file is stale, so run `dart test` before opening the PR.
 
-4. **Update `CHANGELOG.md`** with the release notes and the release date —
-   `TBD` while the date is unknown, the exact date once it is known (on
-   release day a branch updates the date even if that is the only change).
+4. **Update the changelog** — `bricks/flutter_starter_brick/CHANGELOG.md`
+   is the repo's one changelog (there is no root `CHANGELOG.md`); a CLI
+   change gets its line under the brick version it ships with. Add the
+   release notes and the release date — `TBD` while the date is unknown,
+   the exact date once it is known (on release day a branch updates the
+   date even if that is the only change).
 
 5. **Open the release-prep PR into `development` and squash-merge it**
 

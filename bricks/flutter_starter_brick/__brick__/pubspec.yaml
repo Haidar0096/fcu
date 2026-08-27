@@ -21,7 +21,7 @@ flutter:
   generate: true
   assets:
     - assets/images/common/
-  fonts: # TODO({{dev_name}}): use your own fonts if needed
+  fonts: # TODO({{dev_name.paramCase()}}): use your own fonts if needed
     - family: montserrat
       fonts:
         - asset: assets/fonts/montserrat_bold.ttf
