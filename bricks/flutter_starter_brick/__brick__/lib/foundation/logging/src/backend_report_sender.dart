@@ -13,21 +13,21 @@ import 'package:{{proj_name}}/foundation/networking/networking.dart';
 /// of the three exists — is what keeps the circle open. It changes nothing
 /// about WHICH client the sender rides; that stays the dependency injection
 /// file's one line.
-typedef HttpClientResolver = HttpClient Function();
+typedef OnResolveHttpClientCallback = HttpClient Function();
 
 /// The sender that ships by default: it posts every report to the project's
 /// OWN receiver endpoint, through the app's own HTTP client — never a raw
 /// transport call, and never a bought service.
 final class BackendReportSender implements ReportSender {
   BackendReportSender({
-    required HttpClientResolver resolveHttpClient,
+    required OnResolveHttpClientCallback resolveHttpClient,
     required ParkedReportStore parkedReports,
     required String receiverPath,
   }) : _resolveHttpClient = resolveHttpClient,
        _parkedReports = parkedReports,
        _receiverPath = receiverPath;
 
-  final HttpClientResolver _resolveHttpClient;
+  final OnResolveHttpClientCallback _resolveHttpClient;
   final ParkedReportStore _parkedReports;
   final String _receiverPath;
 
@@ -60,6 +60,7 @@ final class BackendReportSender implements ReportSender {
       final result = await _resolveHttpClient().post<bool>(
         path: _receiverPath,
         body: report,
+        isMultipart: false,
         successResponseMapper: (_) => true,
       );
 

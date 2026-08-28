@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:{{proj_name}}/features/random_jokes/src/apis/jokes_api.dart';
-import 'package:{{proj_name}}/features/random_jokes/src/models/ui_models/ui_joke.dart';
+import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/apis/jokes_api.dart';
+import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/models/ui_models/ui_joke.dart';
 import 'package:{{proj_name}}/foundation/blocs/bloc_utils/bloc_utils.dart';
 import 'package:{{proj_name}}/foundation/ui/models/models.dart';
 
@@ -14,23 +14,29 @@ part 'jokes_state.dart';
 class JokesCubit extends Cubit<JokesState> with CubitUtils<JokesState> {
   JokesCubit({required JokesApi jokesApi})
     : _jokesApi = jokesApi,
-      super(const JokesInitial());
+      super(const JokesInitialState());
 
   final JokesApi _jokesApi;
 
   Future<void> fetchJoke() async {
     if (state.isLoading) return;
 
-    emitIfNotClosed(const JokesLoading());
+    emit(JokesLoadingState(lastGoodJoke: state.lastGoodJoke));
 
     final result = await _jokesApi.fetchRandomJoke();
+    if (isClosed) return;
 
     result.when(
       success: (jokeDto) {
-        emitIfNotClosed(JokesLoaded(jokeDto.toUiModel()));
+        emitIfNotClosed(JokesLoadedState(joke: jokeDto.toUiModel()));
       },
       failure: (failure) {
-        emitIfNotClosed(JokesFailed(UiNetworkFailure(failure)));
+        emitIfNotClosed(
+          JokesFailedState(
+            uiFailure: UiNetworkFailure(failure: failure),
+            lastGoodJoke: state.lastGoodJoke,
+          ),
+        );
       },
     );
   }

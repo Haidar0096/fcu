@@ -1,8 +1,8 @@
-/// Shared constants for dialog styling to ensure consistency
-/// across all dialog implementations.
+import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
+
+/// Shared constants for dialog styling.
 abstract final class DialogConstants {
-  static const double horizontalPadding = 16;
-  static const double verticalPadding = 8;
-  static const double formVerticalPadding = 16;
-  static const double buttonSpacing = 12;
+  static final double horizontalPadding = SpacingSize.spacing16.value;
+  static final double verticalPadding = SpacingSize.spacing8.value;
+  static final double formVerticalPadding = SpacingSize.spacing16.value;
 }

@@ -9,10 +9,9 @@ import 'package:{{proj_name}}/foundation/logging/src/flow_buffer.dart';
 ///
 /// WHAT IT RECORDS IS THE SCREEN'S NAME AND NOTHING ELSE — the compile-time
 /// name the route declares, read off the page's `name`. It never reads the
-/// live address: an address can carry a message or an identifier that must
-/// stay out of a recorded trail, and this app's own critical-error screen is
-/// exactly that shape — its message rides the address as a query parameter.
-/// Reading the address here would ship that message into every later report.
+/// live address: an address can carry an identifier that must stay out of a
+/// recorded trail. Reading the address here would ship it into every later
+/// report.
 ///
 /// It lives in the logging module rather than beside the router because
 /// everything that reaches a report is composed and stripped here; the router

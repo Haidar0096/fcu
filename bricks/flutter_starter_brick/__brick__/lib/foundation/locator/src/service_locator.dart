@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:get_it/get_it.dart';
+import 'service_registry.dart';
 
 /// Service locator that encapsulates dependency injection using GetIt.
 class ServiceLocator {
   const ServiceLocator._();
 
-  static final GetIt _getIt = GetIt.instance;
+  static final ServiceRegistry _getIt = ServiceRegistry.instance;
   static Completer<void>? _initializedCompleter;
 
   static Future<void> _initialize(
-    void Function(GetIt getIt) registerInstances,
+    void Function(ServiceRegistry getIt) registerInstances,
   ) async {
     if (_initializedCompleter != null) return _initializedCompleter!.future;
     _initializedCompleter = Completer<void>();
@@ -53,5 +53,5 @@ const serviceLocator = ServiceLocator._();
 
 /// Gives the one composition root temporary access to GetIt registration.
 Future<void> initializeServiceLocator(
-  void Function(GetIt getIt) registerInstances,
+  void Function(ServiceRegistry getIt) registerInstances,
 ) => ServiceLocator._initialize(registerInstances);

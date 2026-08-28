@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/ui/animations/animations.dart';
 import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
-/// Creates a custom transition builder for blur/dim effects
+part 'general_dialog_content.dart';
+
 RouteTransitionsBuilder _createBlurDimTransitionBuilder({
   required bool applyBlur,
   required bool applyDim,
 }) =>
     (context, animation, secondaryAnimation, child) => Stack(
       children: [
-        // Background blur/dim with fade animation only
         Positioned.fill(
           child: FadeTransition(
             opacity: animation,
@@ -19,9 +19,11 @@ RouteTransitionsBuilder _createBlurDimTransitionBuilder({
             ),
           ),
         ),
-        // Dialog content with scale animation
         ScaleTransition(
-          scale: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          scale: CurvedAnimation(
+            parent: animation,
+            curve: AnimationDefaults.curveEaseOut,
+          ),
           child: child,
         ),
       ],
@@ -40,16 +42,16 @@ RouteTransitionsBuilder _createBlurDimTransitionBuilder({
 Future<T?> showCustomGeneralDialog<T>({
   required BuildContext context,
   required Widget content,
-  bool barrierDismissible = true,
+  required bool barrierDismissible,
+  required bool applyBlur,
+  required bool applyDim,
   Color? backgroundColor,
   Color? barrierColor,
   Alignment? contentAlignment,
   void Function(BuildContext context)? onBarrierDismissed,
-  AppLifeCycleChangedCallback? onAppLifecycleStateChanged,
+  OnAppLifecycleChangedCallback? onAppLifecycleStateChanged,
   Duration? transitionDuration,
   RouteTransitionsBuilder? transitionBuilder,
-  bool applyBlur = false,
-  bool applyDim = false,
 }) async => showGeneralDialog(
   context: context,
   barrierColor: barrierColor ?? Colors.transparent,
@@ -69,78 +71,3 @@ Future<T?> showCustomGeneralDialog<T>({
         )
       : transitionBuilder ?? scaleTransitionBuilder,
 );
-
-class _CustomDialogContent extends StatefulWidget {
-  const _CustomDialogContent({
-    required this.content,
-    this.barrierDismissible = true,
-    this.backgroundColor,
-    this.contentAlignment,
-    this.onBarrierDismissed,
-    this.onAppLifecycleStateChanged,
-  });
-
-  final Widget content;
-  final bool barrierDismissible;
-  final Color? backgroundColor;
-  final Alignment? contentAlignment;
-  final void Function(BuildContext context)? onBarrierDismissed;
-  final AppLifeCycleChangedCallback? onAppLifecycleStateChanged;
-
-  @override
-  State<_CustomDialogContent> createState() => _CustomDialogContentState();
-}
-
-class _CustomDialogContentState extends State<_CustomDialogContent>
-    with WidgetsBindingObserver {
-  @override
-  void initState() {
-    WidgetsBinding.instance.addObserver(this);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final child = Stack(
-      children: [
-        if (widget.barrierDismissible)
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: () {
-                if (widget.onBarrierDismissed != null) {
-                  widget.onBarrierDismissed!.call(context);
-                } else if (Navigator.of(context).canPop()) {
-                  // Chosen deviation from go_router's context.canPop(): this
-                  // closes a dialog route on the Navigator stack, which is the
-                  // stack that has to be asked.
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-          ),
-        Align(
-          alignment: widget.contentAlignment ?? Alignment.center,
-          child: widget.content,
-        ),
-      ],
-    );
-
-    return PopScope(
-      canPop: widget.barrierDismissible,
-      child: Scaffold(
-        backgroundColor: widget.backgroundColor ?? Colors.transparent,
-        body: child,
-      ),
-    );
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) =>
-      widget.onAppLifecycleStateChanged?.call(state);
-}

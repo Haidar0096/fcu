@@ -1,5 +1,5 @@
 {
-  "BACKEND_BASE_URL": "https://api.chucknorris.io",
+  "BACKEND_BASE_URL": "https://api.chucknorris.io/",
   "REPORT_RECEIVER_PATH": "",
   "REPORT_SENDER_KIND": "ownBackend",
   "ENVIRONMENT": "development"

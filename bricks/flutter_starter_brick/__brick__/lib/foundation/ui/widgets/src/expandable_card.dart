@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:{{proj_name}}/foundation/ui/animations/animations.dart';
 
 /// A card widget that can expand/collapse with smooth animations.
 ///
@@ -13,7 +14,7 @@ import 'package:flutter/material.dart';
 ///
 /// ExpandableCard(
 ///   key: expandableKey,
-///   child: GestureDetector(
+///   child: InkWell(
 ///     onTap: () => expandableKey.currentState?.toggle(),
 ///     child: Text('Header'),
 ///   ),
@@ -24,10 +25,10 @@ class ExpandableCard extends StatefulWidget {
   const ExpandableCard({
     required this.child,
     required this.expandedChild,
+    required this.initiallyExpanded,
     this.onExpansionChanged,
-    this.initiallyExpanded = false,
-    this.duration = ExpandableCardDefaults.duration,
-    this.curve = ExpandableCardDefaults.curve,
+    this.duration,
+    this.curve,
     super.key,
   });
 
@@ -44,10 +45,10 @@ class ExpandableCard extends StatefulWidget {
   final bool initiallyExpanded;
 
   /// Animation duration
-  final Duration duration;
+  final Duration? duration;
 
   /// Animation curve
-  final Curve curve;
+  final Curve? curve;
 
   @override
   State<ExpandableCard> createState() => ExpandableCardState();
@@ -67,13 +68,13 @@ class ExpandableCardState extends State<ExpandableCard>
     super.initState();
     _isExpanded = widget.initiallyExpanded;
     _controller = AnimationController(
-      duration: widget.duration,
+      duration: widget.duration ?? ExpandableCardDefaults.duration,
       vsync: this,
       value: _isExpanded ? 1.0 : 0.0,
     );
     _expandAnimation = CurvedAnimation(
       parent: _controller,
-      curve: widget.curve,
+      curve: widget.curve ?? ExpandableCardDefaults.curve,
     );
   }
 
@@ -81,9 +82,9 @@ class ExpandableCardState extends State<ExpandableCard>
   void didUpdateWidget(ExpandableCard oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Update duration if changed
     if (widget.duration != oldWidget.duration) {
-      _controller.duration = widget.duration;
+      _controller.duration =
+          widget.duration ?? ExpandableCardDefaults.duration;
     }
   }
 
@@ -142,8 +143,8 @@ class ExpandableCardState extends State<ExpandableCard>
 }
 
 abstract final class ExpandableCardDefaults {
-  static const Duration duration = Duration(milliseconds: 300);
-  static const Curve curve = Curves.easeInOut;
+  static const Duration duration = AnimationDefaults.animationDuration;
+  static const Curve curve = AnimationDefaults.curveEaseInOut;
 
   /// Where the revealed child sits while the card grows: the directional
   /// form keeps the reveal correct under RTL.

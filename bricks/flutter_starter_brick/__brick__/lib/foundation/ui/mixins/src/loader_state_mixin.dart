@@ -14,11 +14,8 @@ import 'package:{{proj_name}}/foundation/ui/global_loader/global_loader.dart';
 /// }
 ///
 /// class _MyWidgetState extends State<MyWidget> with LoaderStateMixin {
-///   void _onButtonPressed() {
-///     changeLoaderVisibility(show: true);
-///     // ... do async work
-///     changeLoaderVisibility(show: false);
-///   }
+///   void _onState(BuildContext context, MyState state) =>
+///       changeLoaderVisibility(show: state.isLoading);
 /// }
 /// ```
 mixin LoaderStateMixin<T extends StatefulWidget> on State<T> {

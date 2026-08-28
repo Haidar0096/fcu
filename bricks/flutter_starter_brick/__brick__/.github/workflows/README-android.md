@@ -7,7 +7,7 @@ GitHub Actions workflow that builds an Android AAB and uploads it to Google Play
 - App already uploaded manually to Google Play Console at least once
 - Google Play service account with API access
 - Android signing keystore (.jks)
-- `setup-common-config.yml`'s Flutter version matches the `.fvmrc` pin at the project root, byte for byte (both ship pinned; move them together)
+- `setup-common-config.yml` reads the exact Flutter version from `.fvmrc`, its one home at the project root
 
 ## GitHub Secrets (5 required)
 
@@ -75,14 +75,14 @@ These must exist in the repo for the workflow to work:
 
 ## Shared Configuration
 
-Flutter version, Java version, and Java distribution are defined in `setup-common-config.yml`. Update versions there to change them for both Android and iOS workflows. The Flutter version there and the `.fvmrc` pin at the project root are the same version with two readers — change both in the same commit, never one alone.
+The Flutter version lives in `.fvmrc`; `setup-common-config.yml` reads it for both Android and iOS workflows. Java version and distribution live in `setup-common-config.yml`.
 
 ## Adapting for a New Project
 
 1. Copy `.github/workflows/deploy-android.yml` and `setup-common-config.yml`
 2. Copy `scripts/upload_to_play_store/` folder
 3. Set all 5 secrets listed above
-4. Update `setup-common-config.yml` and `.fvmrc` with the same correct Flutter version
+4. Update the Flutter version in `.fvmrc`
 5. Set the package name once, as `applicationId` in `android/app/build.gradle.kts` — the workflow reads it from there, so nothing in `deploy-android.yml` needs editing
 6. If your project uses native code requiring NDK, add an "Install NDK" step before the build
 7. If your `android/gradle.properties` has high memory settings (e.g., `-Xmx8G`), keep the "Configure Gradle memory for CI" step — CI runners only have 7GB RAM

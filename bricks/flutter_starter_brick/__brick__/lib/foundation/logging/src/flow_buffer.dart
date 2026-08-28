@@ -17,7 +17,8 @@ class FlowBuffer {
   /// How many actions the buffer holds before the oldest drops out.
   static const int capacity = 20;
 
-  final Queue<String> _actions = Queue<String>();
+  final Queue<({String name, DateTime occurredAt})> _actions =
+      Queue<({String name, DateTime occurredAt})>();
 
   /// Records [action] as the newest entry, dropping the oldest one once the
   /// buffer already holds [capacity] of them.
@@ -25,10 +26,11 @@ class FlowBuffer {
     if (_actions.length >= capacity) {
       _actions.removeFirst();
     }
-    _actions.addLast(action);
+    _actions.addLast((name: action, occurredAt: DateTime.now().toUtc()));
   }
 
   /// The buffered actions, oldest first, as a locked copy — a report can
   /// never hold a live view of a buffer that keeps changing under it.
-  List<String> get actions => List<String>.unmodifiable(_actions);
+  List<({String name, DateTime occurredAt})> get actions =>
+      List<({String name, DateTime occurredAt})>.unmodifiable(_actions);
 }

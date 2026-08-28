@@ -4,7 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:{{proj_name}}/foundation/app_meta_data/src/platform/platform_info.dart';
 import 'package:{{proj_name}}/foundation/app_meta_data/src/repositories/app_meta_data_repository.dart';
 import 'package:{{proj_name}}/foundation/blocs/bloc_utils/bloc_utils.dart';
-import 'package:{{proj_name}}/foundation/logging/logging.dart';
 
 part 'app_meta_data_state.dart';
 
@@ -21,18 +20,10 @@ class AppMetaDataCubit extends Cubit<AppMetaDataState>
     with CubitUtils<AppMetaDataState> {
   AppMetaDataCubit({
     required AppMetaDataRepository repository,
-    required AppLogger appLogger,
-    required ErrorLogger errorLogger,
   }) : _repository = repository,
-       _logger = appLogger,
-       _errorLogger = errorLogger,
-       super(const AppMetaDataInitial());
+       super(const AppMetaDataInitialState());
 
   final AppMetaDataRepository _repository;
-  final AppLogger _logger;
-  final ErrorLogger _errorLogger;
-
-  static const String _tag = 'AppMetaDataCubit';
 
   Completer<void>? _initCompleter;
 
@@ -43,43 +34,66 @@ class AppMetaDataCubit extends Cubit<AppMetaDataState>
   /// It can be called multiple times to re-populate the metadata if needed.
   Future<void> init() async {
     if (_initCompleter == null) {
-      _initCompleter = Completer<void>();
-      unawaited(_init());
+      final completer = Completer<void>();
+      _initCompleter = completer;
+      unawaited(_init(completer));
     }
     return _initCompleter!.future;
   }
 
-  Future<void> _init() async {
-    emit(const AppMetaDataLoading());
+  Future<void> _init(Completer<void> completer) async {
+    emit(const AppMetaDataLoadingState());
 
     try {
-      final deviceId = await _repository.getDeviceId();
+      final deviceIdResult = await _repository.getDeviceId();
+      if (isClosed) return;
+      final deviceIdOutcome = deviceIdResult.when(
+        success: (value) => (failed: false, value: value),
+        failure: (_) => (failed: true, value: null),
+      );
+      if (deviceIdOutcome.failed) {
+        emitIfNotClosed(const AppMetaDataLoadingFailedState());
+        return;
+      }
+
       final osType = platformOperatingSystem;
       final osVersion = platformOperatingSystemVersion;
 
-      final versionInfo = await _repository.getAppVersionInfo();
+      final versionResult = await _repository.getAppVersionInfo();
+      if (isClosed) return;
+      final versionOutcome = versionResult.when(
+        success: (value) => (failed: false, value: value),
+        failure: (_) => (failed: true, value: null),
+      );
+      if (versionOutcome.failed) {
+        emitIfNotClosed(const AppMetaDataLoadingFailedState());
+        return;
+      }
+      final versionInfo = versionOutcome.value!;
 
       emitIfNotClosed(
-        AppMetaDataLoaded(
-          deviceId: deviceId ?? '',
+        AppMetaDataLoadedState(
+          deviceId: deviceIdOutcome.value ?? '',
           osType: osType,
           osVersion: osVersion,
           appVersion: versionInfo.appVersion,
           buildNumber: versionInfo.buildNumber,
         ),
       );
-    } catch (error, stackTrace) {
-      final errorMessage = 'Error while initializing AppMetaDataCubit: $error';
-      _logger.log(errorMessage, tag: _tag);
-      await _errorLogger.recordError(
-        error: errorMessage,
-        stackTrace: stackTrace,
-      );
-
-      emitIfNotClosed(const AppMetaDataLoadingFailed());
     } finally {
-      _initCompleter!.complete();
-      _initCompleter = null;
+      _finishInitialization(completer);
     }
+  }
+
+  void _finishInitialization(Completer<void> completer) {
+    if (!completer.isCompleted) completer.complete();
+    if (identical(_initCompleter, completer)) _initCompleter = null;
+  }
+
+  @override
+  Future<void> close() {
+    final completer = _initCompleter;
+    if (completer != null) _finishInitialization(completer);
+    return super.close();
   }
 }

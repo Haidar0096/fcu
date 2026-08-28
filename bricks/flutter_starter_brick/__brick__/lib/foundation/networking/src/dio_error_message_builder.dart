@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart' as dio;
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
 
-/// Builds a detailed error message from a DioException for logging
-String buildDetailedErrorMessage(dio.DioException dioException, String path) {
+String buildDetailedErrorMessage({
+  required dio.DioException dioException,
+  required String path,
+}) {
   final sanitizedHeaders = SensitiveDataSanitizer.sanitizeHeaders(
     dioException.requestOptions.headers,
   );
@@ -12,20 +14,26 @@ String buildDetailedErrorMessage(dio.DioException dioException, String path) {
   final sanitizedResponseData = SensitiveDataSanitizer.sanitizeBody(
     dioException.response?.data,
   );
+  final sanitizedMessage = SensitiveDataSanitizer.sanitizeText(
+    '${dioException.message}',
+  );
 
   final buffer = StringBuffer()
     ..writeln('DioException for $path:')
     ..writeln('  Type: ${dioException.type}')
-    ..writeln('  Message: ${dioException.message}')
+    ..writeln('  Message: $sanitizedMessage')
     ..writeln('  Status Code: ${dioException.response?.statusCode}')
     ..writeln('  Response Data: $sanitizedResponseData')
     ..writeln('  Request Method: ${dioException.requestOptions.method}')
-    ..writeln('  Request Full Path: ${dioException.requestOptions.uri}')
+    ..writeln('  Request Path: $path')
     ..writeln('  Request Headers: $sanitizedHeaders')
     ..writeln('  Request Data: $sanitizedData');
 
   if (dioException.error != null) {
-    buffer.writeln('  Underlying Error: ${dioException.error}');
+    final sanitizedError = SensitiveDataSanitizer.sanitizeText(
+      '${dioException.error}',
+    );
+    buffer.writeln('  Underlying Error: $sanitizedError');
   }
 
   return buffer.toString();

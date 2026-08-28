@@ -11,29 +11,22 @@
 /// (Named `RequestDataSanitizer` while it only covered requests; the report
 /// strip is why it now carries the wider name and lives beside the loggers.)
 abstract final class SensitiveDataSanitizer {
-  // These are the entries that are sensitive in every app; they are the floor,
-  // never the whole list.
-  // TODO({{dev_name.paramCase()}}): Add any custom sensitive headers specific to your API
-  static const Set<String> _sensitiveHeaders = {
-    'authorization',
-    'proxy-authorization',
-    'cookie',
-    'set-cookie',
-    'x-api-key',
-  };
-
-  // TODO({{dev_name.paramCase()}}): Add any custom sensitive fields specific to your API
-  static const Set<String> _sensitiveBodyFields = {
+  // The shared starter list. Project-specific forbidden fields join this one
+  // home when they become known.
+  static const Set<String> _forbiddenFieldNames = {
     'password',
-    'newpassword',
-    'token',
-    'accesstoken',
-    'access_token',
-    'refreshtoken',
-    'refresh_token',
-    'secret',
-    'otp',
+    'passcode',
     'pin',
+    'token',
+    'authorization',
+    'cookie',
+    'secret',
+    'apikey',
+    'cardnumber',
+    'cvv',
+    'nationalid',
+    'email',
+    'phone',
   };
 
   static const _redactedValue = '[REDACTED]';
@@ -41,7 +34,7 @@ abstract final class SensitiveDataSanitizer {
   /// Every forbidden name, longest first so a name that contains a shorter
   /// one is still matched whole.
   static final List<String> _forbiddenNames =
-      <String>{..._sensitiveHeaders, ..._sensitiveBodyFields}.toList()
+      _forbiddenFieldNames.toList()
         ..sort((a, b) => b.length.compareTo(a.length));
 
   /// A forbidden field NAME standing as a whole word, the separator after it,
@@ -63,7 +56,7 @@ abstract final class SensitiveDataSanitizer {
     if (headers == null) return null;
 
     return headers.map((key, value) {
-      final isRedacted = _sensitiveHeaders.contains(key.toLowerCase());
+      final isRedacted = _isForbiddenKey(key);
       return MapEntry(key, isRedacted ? _redactedValue : value);
     });
   }
@@ -77,11 +70,9 @@ abstract final class SensitiveDataSanitizer {
     } else if (body is List) {
       return body.map(sanitizeBody).toList();
     } else if (body is String) {
-      // For form data or string bodies, check if it contains sensitive patterns
-      return _containsSensitiveData(body) ? _redactedValue : body;
+      return sanitizeText(body);
     }
 
-    // For other types (numbers, bools, etc.), return as-is
     return body;
   }
 
@@ -106,13 +97,12 @@ abstract final class SensitiveDataSanitizer {
 
   static Map<String, dynamic> _sanitizeMap(Map<String, dynamic> map) {
     return map.map((key, value) {
-      final isRedacted = _sensitiveBodyFields.contains(key.toLowerCase());
+      final isRedacted = _isForbiddenKey(key);
 
       if (isRedacted) {
         return MapEntry(key, _redactedValue);
       }
 
-      // Recursively sanitize nested objects
       if (value is Map<String, dynamic>) {
         return MapEntry(key, _sanitizeMap(value));
       } else if (value is List) {
@@ -123,8 +113,16 @@ abstract final class SensitiveDataSanitizer {
     });
   }
 
-  static bool _containsSensitiveData(String value) {
-    final lowerValue = value.toLowerCase();
-    return _sensitiveBodyFields.any(lowerValue.contains);
+  static bool _isForbiddenKey(String key) {
+    final normalizedKey = key.toLowerCase().replaceAll(
+      RegExp('[^a-z0-9]'),
+      '',
+    );
+    return _forbiddenFieldNames.any(
+      (forbiddenName) =>
+          normalizedKey == forbiddenName ||
+          normalizedKey.startsWith(forbiddenName) ||
+          normalizedKey.endsWith(forbiddenName),
+    );
   }
 }

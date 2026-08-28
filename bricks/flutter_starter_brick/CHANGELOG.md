@@ -1,3 +1,13 @@
+# 4.6.0
+Released 2026-08-28. The starter app was checked page by page against the mobile skill and changed wherever it strayed; the three sample features gained nothing and lost nothing. fcu CLI unchanged (4.4.1).
+- Post-generation hook: removes Flutter's placeholder test, wires the Android backup exclusions (`data_extraction_rules.xml`, `backup_rules.xml`) and the web URL strategy, runs `dart fix`/`dart format` after generation and a second `build_runner` pass, so a generated app is a no-op for `dart format`, `build_runner` and `gen-l10n`. The TODO reminder at the end is gone; TODO markers no longer ship in `lib/`.
+- The splash is a startup cover over the router, no longer a route; the app starts on the jokes screen behind it. The critical-error message rides hidden navigation data, never the address.
+- Environment values are read before the crash guard, so a missing required value stops the app at start naming the key.
+- Error reports carry the shared wire fields (`app`, `level`, `message`, `stack`, `correlationId`, `occurredAt`, `flow` of `{name, occurredAt}`), UTC dates, the `X-Correlation-Id` header, and the shared starter list of redacted field names; the report sender rides its own no-report HTTP client, so an upload failure cannot report itself.
+- Dependencies: the locator hides GetIt behind an owned `ServiceRegistry`; the app-metadata repository owns `android_id`, `device_info_plus`, `package_info_plus`, `uuid` and returns `Result`s; the transport wrapper owns Dio construction. Hydrated storage moved to the application-support folder.
+- Conventions: state classes carry the `State` suffix; every boolean and multi-parameter signature is named and required; the jokes feature lives under `features/random_jokes/random_jokes_screen/` and keeps the last good joke while loading or failed; the spacing scale is 4/8/16/24/32 with a shared `Spacing` widget; theme colors are named in one place; `.fvmrc` is the one Flutter version home, read by CI.
+- The base URL in `env/*.json` ends with `/` and API paths are relative.
+
 # 4.5.0
 Released 2026-08-28 together with fcu CLI 4.4.1 (the brick and CLI versions stay independent).
 - Replaced the per-environment Dart entry points with one `lib/main.dart` and committed `env/development.json` and `env/production.json` build settings. Run, build, CI, release, lint, and structure checks now use `--dart-define-from-file`; required missing values stop startup with the key named.

@@ -19,40 +19,41 @@ This app was generated from the Flutter Starter Brick (`flutter_starter_brick` f
 - **Error handling**: Global error logger
 - **Linting**: very_good_analysis package
 
+### Unsettled Project Facts
+
+- **Lock model**: Unsettled. Record the project answer before production.
+- **Native crash vendor**: Unsettled. No vendor has been selected.
+- **Dark mode**: Unsettled. The starter contains both themes; shipping policy
+  needs a project answer.
+- **Digit style**: Unsettled. Choose Western or local-script digits.
+
 ### Starter Features
 The brick ships with three example features in `lib/features/`:
 - `splash_screen/` — Splash with initialization
-- `random_jokes/` — Example feature with API
+- `random_jokes/random_jokes_screen/` — Example feature with API
 - `critical_error_screen/` — Unrecoverable-error screen
+
+### Starter Screen Choices
+
+- The splash cover and critical-error screen are centered full-screen states,
+  so neither uses the default fixed header/body/action composition.
+- The disposable random-jokes sample keeps its existing headerless body; a
+  product header requires the project's copy and design decision.
+- The random-jokes inline loader and persistent failure banner are provisional
+  smallest-visible choices until the project chooses its loading and failure
+  surfaces.
+- A shared wide-screen maximum is unsettled. Add the standard constrained
+  center only after the project chooses `ThemeDefaults.maxContentWidth`.
 
 ### Code Generation Dependencies
 - `json_serializable`: DTO serialization
 - `go_router_builder`: Type-safe routing
 
 ### Localization System
-- Supports English out of the box (Arabic structure ready)
+- Supports English and Arabic out of the box
 - ARB files in `resources/src/arb/`
 - Uses `flutter_localizations` package
 - Access via `context.appLocalizations.keyName`
-
-### Animation Extensions
-Widgets are animated through one extension, `withAnimations`, on `Widget` and on `List<Widget>` (`foundation/ui/animations/`):
-
-```dart
-// Single widget
-MyWidget().withAnimations(withFade: true, duration: Duration(seconds: 1))
-MyWidget().withAnimations(withScale: true)
-MyWidget().withAnimations(
-  withSlide: true,
-  slideDirection: SlideDirection.bottomToTop,
-)
-
-// List, with stagger
-[widget1, widget2, widget3].withAnimations(
-  staggered: true,
-  staggeredDelay: Duration(milliseconds: 100),
-)
-```
 
 ### BLoC Utilities
 
@@ -61,14 +62,16 @@ MyWidget().withAnimations(
 ```dart
 class MyCubit extends Cubit<MyState> with CubitUtils<MyState> {
   Future<void> loadData() async {
-    emitIfNotClosed(LoadingState());
-    // ... async work
-    emitIfNotClosed(LoadedState(data));
+    emit(const LoadingState());
+    final data = await loadFromOutsideWorld();
+    if (isClosed) return;
+    emitIfNotClosed(LoadedState(data: data));
   }
 }
 ```
 
-For `Bloc`s, `emitIfNotClosed(emit, state)` is also available — see the file in `lib/foundation/blocs/bloc_utils/src/`.
+For `Bloc`s, `emitIfNotClosed(emit: emit, state: state)` is also available —
+see the file in `lib/foundation/blocs/bloc_utils/src/`.
 
 ## Common Tasks
 

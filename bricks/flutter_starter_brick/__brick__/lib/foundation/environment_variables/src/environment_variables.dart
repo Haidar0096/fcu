@@ -5,17 +5,20 @@ import 'package:{{proj_name}}/foundation/logging/logging.dart';
 class EnvironmentVariables {
   /// Reads and validates the values supplied by the build.
   EnvironmentVariables()
-    : backendBaseUrl = _requiredValue(_backendBaseUrlKey, _backendBaseUrl),
+    : backendBaseUrl = _requiredValue(
+        key: _backendBaseUrlKey,
+        value: _backendBaseUrl,
+      ),
       reportReceiverPath = _reportReceiverPath,
       reportSenderKind = _requiredEnum(
-        _reportSenderKindKey,
-        _reportSenderKind,
-        ReportSenderKind.values,
+        key: _reportSenderKindKey,
+        name: _reportSenderKind,
+        values: ReportSenderKind.values,
       ),
       environment = _requiredEnum(
-        _environmentKey,
-        _environment,
-        Environment.values,
+        key: _environmentKey,
+        name: _environment,
+        values: Environment.values,
       );
 
   static const String _backendBaseUrlKey = 'BACKEND_BASE_URL';
@@ -67,15 +70,19 @@ class EnvironmentVariables {
   final Environment environment;
 }
 
-String _requiredValue(String key, String value) {
+String _requiredValue({required String key, required String value}) {
   if (value.isEmpty) {
     throw StateError('Missing required environment value: $key');
   }
   return value;
 }
 
-T _requiredEnum<T extends Enum>(String key, String name, List<T> values) {
-  final requiredName = _requiredValue(key, name);
+T _requiredEnum<T extends Enum>({
+  required String key,
+  required String name,
+  required List<T> values,
+}) {
+  final requiredName = _requiredValue(key: key, value: name);
   for (final value in values) {
     if (value.name == requiredName) return value;
   }

@@ -41,6 +41,19 @@ bool _addMacOsNetworkClientEntitlement(File file) {
   return true;
 }
 
+void _addAttributeIfMissing({
+  required XmlElement element,
+  required String name,
+  required String value,
+}) {
+  final exists = element.attributes.any(
+    (attribute) => attribute.name.toString() == name,
+  );
+  if (!exists) {
+    element.attributes.add(XmlAttribute(XmlName(name), value));
+  }
+}
+
 Future<void> run(HookContext context) async {
   Progress progress;
 
@@ -70,6 +83,19 @@ Future<void> run(HookContext context) async {
       'scripts/upload_to_play_store/upload_to_playstore.sh',
       'scripts/build_web/build_web.sh',
     ]),
+  );
+
+  await _executeCommand(
+    'Removing the generic Flutter placeholder test',
+    () async {
+      try {
+        final placeholder = File('test/widget_test.dart');
+        if (await placeholder.exists()) await placeholder.delete();
+        return ProcessResult(0, 0, 'Success', '');
+      } catch (error) {
+        return ProcessResult(0, 1, '', error.toString());
+      }
+    },
   );
 
   await _executeCommand(
@@ -119,11 +145,21 @@ Future<void> run(HookContext context) async {
   );
 
   await _executeCommand(
-    'Adding sdk dependencies',
+    'Adding flutter_localizations sdk dependency',
     () => Process.run('flutter', [
       'pub',
       'add',
       'flutter_localizations',
+      '--sdk=flutter',
+    ]),
+  );
+
+  await _executeCommand(
+    'Adding flutter_web_plugins sdk dependency',
+    () => Process.run('flutter', [
+      'pub',
+      'add',
+      'flutter_web_plugins',
       '--sdk=flutter',
     ]),
   );
@@ -139,6 +175,19 @@ Future<void> run(HookContext context) async {
         if (!file.existsSync()) return ProcessResult(0, 0, 'Success', '');
         final document = XmlDocument.parse(await file.readAsString());
         final manifestElement = document.findElements('manifest').first;
+        final applicationElement = manifestElement
+            .findElements('application')
+            .first;
+        _addAttributeIfMissing(
+          element: applicationElement,
+          name: 'android:dataExtractionRules',
+          value: '@xml/data_extraction_rules',
+        );
+        _addAttributeIfMissing(
+          element: applicationElement,
+          name: 'android:fullBackupContent',
+          value: '@xml/backup_rules',
+        );
         final internetPermission = XmlElement(
           XmlName('uses-permission'),
           [
@@ -194,7 +243,7 @@ Future<void> run(HookContext context) async {
     'Running build_runner',
     () => Process.run(
       'dart',
-      ['run', 'build_runner', 'build'],
+      ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
     ),
   );
 
@@ -208,13 +257,17 @@ Future<void> run(HookContext context) async {
     () => Process.run('dart', ['format', '.']),
   );
 
+  await _executeCommand(
+    'Synchronizing build_runner after formatting',
+    () => Process.run(
+      'dart',
+      ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
+    ),
+  );
+
   context.logger.success('🎉 Brick generated successfully!');
   context.logger.info(
     'Run the app with: flutter run '
     '--dart-define-from-file=env/development.json',
-  );
-  context.logger.warn(
-    'Do not forget to search the codebase for the TODOs'
-    ' and change them according to the project needs.',
   );
 }

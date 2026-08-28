@@ -4,6 +4,8 @@ import 'package:{{proj_name}}/foundation/ui/focus/focus.dart';
 import 'package:{{proj_name}}/foundation/ui/mixins/mixins.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 
+import 'spacing.dart';
+
 /// A customizable [TextFormField] with default styling and behavior.
 ///
 /// This widget provides a wide range of customization options for a text form
@@ -13,13 +15,18 @@ class CustomTextFormField extends StatefulWidget {
   ///
   /// Many parameters are optional and will use default values if not specified.
   const CustomTextFormField({
-    super.key,
-    this.enableSuggestions,
-    this.autocorrect,
-    this.scrollPadding = CustomTextFormFieldDefaults.scrollPadding,
+    required this.enableSuggestions,
+    required this.autocorrect,
+    required this.enabled,
+    required this.autofocus,
+    required this.obscureText,
+    required this.filled,
+    required this.isDense,
+    required this.isCollapsed,
+    required this.showErrorMessage,
+    this.scrollPadding,
     this.cursorColor,
     this.decoration,
-    this.enabled = CustomTextFormFieldDefaults.enabled,
     this.labelText,
     this.controller,
     this.focusNode,
@@ -27,45 +34,40 @@ class CustomTextFormField extends StatefulWidget {
     this.onChanged,
     this.height,
     this.width,
-    this.textInputAction = CustomTextFormFieldDefaults.textInputAction,
+    this.textInputAction,
     this.keyboardType,
     this.validator,
     this.hintText,
-    this.autofocus = CustomTextFormFieldDefaults.autofocus,
     this.cursorHeight,
-    this.cursorWidth = CustomTextFormFieldDefaults.cursorWidth,
+    this.cursorWidth,
     this.onTapOutside,
-    this.obscureText = CustomTextFormFieldDefaults.obscureText,
     this.suffixIcon,
-    this.contentPadding = CustomTextFormFieldDefaults.contentPadding,
+    this.contentPadding,
     this.style,
-    this.filled,
     this.fillColor,
-    this.textAlign = CustomTextFormFieldDefaults.textAlign,
+    this.textAlign,
     this.hintStyle,
     this.floatingLabelBehavior,
     this.labelStyle,
     this.suffixIconConstraints,
     this.inputFormatters,
-    this.maxLines = CustomTextFormFieldDefaults.maxLines,
+    this.maxLines,
     this.minLines,
     this.maxLength,
     this.contextMenuBuilder,
-    this.isDense,
-    this.isCollapsed,
-    this.showErrorMessage = CustomTextFormFieldDefaults.showErrorMessage,
     this.initialValue,
     this.disabledBorder,
+    super.key,
   });
 
   /// Whether to show input suggestions.
-  final bool? enableSuggestions;
+  final bool enableSuggestions;
 
   /// Whether to enable autocorrect.
-  final bool? autocorrect;
+  final bool autocorrect;
 
   /// The padding for scrollable ancestor widgets.
-  final EdgeInsets scrollPadding;
+  final EdgeInsets? scrollPadding;
 
   /// The color of the cursor.
   final Color? cursorColor;
@@ -99,7 +101,7 @@ class CustomTextFormField extends StatefulWidget {
   final double? width;
 
   /// The type of action button to use for the keyboard.
-  final TextInputAction textInputAction;
+  final TextInputAction? textInputAction;
 
   /// The type of keyboard to use for editing the text.
   final TextInputType? keyboardType;
@@ -119,7 +121,7 @@ class CustomTextFormField extends StatefulWidget {
   final double? cursorHeight;
 
   /// The width of the cursor.
-  final double cursorWidth;
+  final double? cursorWidth;
 
   /// Called when the user taps outside of the text field.
   final void Function(PointerDownEvent event)? onTapOutside;
@@ -131,19 +133,19 @@ class CustomTextFormField extends StatefulWidget {
   final Widget? suffixIcon;
 
   /// The padding for the input decoration's container.
-  final EdgeInsets contentPadding;
+  final EdgeInsets? contentPadding;
 
   /// The style to use for the text being edited.
   final TextStyle? style;
 
   /// If true, the decoration's container is filled with [fillColor].
-  final bool? filled;
+  final bool filled;
 
   /// The color to fill the decoration's container with, if [filled] is true.
   final Color? fillColor;
 
   /// How the text should be aligned horizontally.
-  final TextAlign textAlign;
+  final TextAlign? textAlign;
 
   /// The style to use for the [hintText].
   final TextStyle? hintStyle;
@@ -161,7 +163,7 @@ class CustomTextFormField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
 
   /// The maximum number of lines for the text to span, wrapping if necessary.
-  final int maxLines;
+  final int? maxLines;
 
   /// The minimum number of lines to occupy when the content is shorter.
   /// Expands from minLines to maxLines as user types.
@@ -175,10 +177,10 @@ class CustomTextFormField extends StatefulWidget {
 
   /// Whether the InputDecorator is part of a dense form
   /// (i.e., uses less vertical space).
-  final bool? isDense;
+  final bool isDense;
 
   /// Whether the decoration is collapsed (i.e., has no label).
-  final bool? isCollapsed;
+  final bool isCollapsed;
 
   /// Whether to show the error message when the field is invalid.
   final bool showErrorMessage;
@@ -193,6 +195,8 @@ class CustomTextFormField extends StatefulWidget {
   State<CustomTextFormField> createState() => CustomTextFormFieldState();
 }
 
+/// Public only so a form group can hold a `GlobalKey` and invoke [validate]
+/// without rebuilding the field.
 class CustomTextFormFieldState extends State<CustomTextFormField>
     with
         TickerProviderStateMixin<CustomTextFormField>,
@@ -227,7 +231,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
   Widget build(BuildContext context) {
     final suffixIconConstraints =
         widget.suffixIconConstraints ??
-        const BoxConstraints(
+        BoxConstraints(
           maxWidth:
               CustomTextFormFieldDefaults.suffixMaxSide +
               CustomTextFormFieldDefaults.suffixPaddingRight,
@@ -247,14 +251,14 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
           width: widget.width,
           height: widget.height,
           child: TextFormField(
-            enableSuggestions:
-                widget.enableSuggestions ??
-                CustomTextFormFieldDefaults.enableSuggestions,
-            autocorrect:
-                widget.autocorrect ?? CustomTextFormFieldDefaults.autocorrect,
-            scrollPadding: widget.scrollPadding,
+            enableSuggestions: widget.enableSuggestions,
+            autocorrect: widget.autocorrect,
+            scrollPadding:
+                widget.scrollPadding ??
+                CustomTextFormFieldDefaults.scrollPadding,
             cursorColor: widget.cursorColor,
-            maxLines: widget.maxLines,
+            maxLines:
+                widget.maxLines ?? CustomTextFormFieldDefaults.maxLines,
             minLines: widget.minLines,
             maxLength: widget.maxLength,
             enabled: widget.enabled,
@@ -264,7 +268,8 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
             inputFormatters: widget.inputFormatters,
             obscureText: widget.obscureText,
             controller: _effectiveController,
-            textAlign: widget.textAlign,
+            textAlign:
+                widget.textAlign ?? CustomTextFormFieldDefaults.textAlign,
             onTap: () => widget.focusNode?.requestFocus(),
             autofocus: widget.autofocus,
             style:
@@ -273,13 +278,14 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                   color: context.themeData.colorScheme.onSurface,
                 ),
             cursorHeight: widget.cursorHeight,
-            cursorWidth: widget.cursorWidth,
+            cursorWidth:
+                widget.cursorWidth ?? CustomTextFormFieldDefaults.cursorWidth,
             decoration:
                 widget.decoration ??
                 InputDecoration(
                   isDense: widget.isDense,
                   isCollapsed: widget.isCollapsed,
-                  filled: widget.filled ?? CustomTextFormFieldDefaults.filled,
+                  filled: widget.filled,
                   fillColor: fillColor,
                   suffixIcon: widget.suffixIcon,
                   suffixIconConstraints: suffixIconConstraints,
@@ -302,7 +308,9 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
                                   CustomTextFormFieldDefaults.hintTextOpacity,
                             ),
                       ),
-                  contentPadding: widget.contentPadding,
+                  contentPadding:
+                      widget.contentPadding ??
+                      CustomTextFormFieldDefaults.contentPadding,
                   enabledBorder: hasError
                       ? context.themeData.inputDecorationTheme.errorBorder
                       : context.themeData.inputDecorationTheme.enabledBorder,
@@ -321,7 +329,9 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
               autoValidate();
             },
             onFieldSubmitted: widget.onFieldSubmitted,
-            textInputAction: widget.textInputAction,
+            textInputAction:
+                widget.textInputAction ??
+                CustomTextFormFieldDefaults.textInputAction,
             onTapOutside: widget.onTapOutside ?? (_) => context.unfocus(),
           ),
         ),
@@ -333,22 +343,17 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
 
 abstract final class CustomTextFormFieldDefaults {
   static const double cursorWidth = 2;
-  static const double suffixPaddingRight = 20.0;
-  static const double suffixMaxSide = 23.0;
+  static final double suffixPaddingRight = SpacingSize.spacing16.value;
+  static const double suffixMaxSide = ThemeDefaults.iconSize;
   static const double hintTextOpacity = 0.6;
-  static const bool enableSuggestions = true;
-  static const bool autocorrect = true;
-  static const bool filled = true;
-  static const bool enabled = true;
-  static const bool autofocus = false;
-  static const bool obscureText = false;
-  static const bool showErrorMessage = true;
-  static const EdgeInsets scrollPadding = EdgeInsets.all(20);
+  static final EdgeInsets scrollPadding = EdgeInsets.all(
+    SpacingSize.spacing16.value,
+  );
   static const int maxLines = 1;
   static const TextAlign textAlign = TextAlign.start;
-  static const EdgeInsets contentPadding = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 12,
+  static final EdgeInsets contentPadding = EdgeInsets.symmetric(
+    horizontal: SpacingSize.spacing16.value,
+    vertical: SpacingSize.spacing8.value,
   );
   static const TextInputAction textInputAction = TextInputAction.next;
 }

@@ -20,36 +20,36 @@ const ColorScheme _colorScheme = ColorScheme(
   secondary: secondaryTeal,
   onSecondary: white,
   secondaryContainer: secondaryTealContainer,
-  onSecondaryContainer: Color(0xFF002D31),
+  onSecondaryContainer: onSecondaryFixed,
 
   tertiary: tertiaryAmber,
   onTertiary: black,
   tertiaryContainer: tertiaryAmberContainer,
-  onTertiaryContainer: Color(0xFF302100),
+  onTertiaryContainer: onTertiaryFixed,
 
   /* === Errors === */
   error: errorRed,
   onError: white,
-  errorContainer: Color(0xFFFFDAD6),
-  onErrorContainer: Color(0xFF410002),
+  errorContainer: lightErrorContainer,
+  onErrorContainer: lightOnErrorContainer,
 
   /* === Surfaces & backgrounds === */
   surface: lightSurface,
   onSurface: darkSurface,
-  onSurfaceVariant: Color(0xFF4E5866),
+  onSurfaceVariant: lightOnSurfaceVariant,
   inverseSurface: darkSurface,
   inversePrimary: primary,
   surfaceDim: lightSurface,
   surfaceBright: white,
   surfaceContainerLowest: white,
-  surfaceContainerLow: Color(0xFFF6F8FA),
+  surfaceContainerLow: lightSurfaceContainerLow,
   surfaceContainer: lightSurface,
-  surfaceContainerHigh: Color(0xFFEDEFF2),
-  surfaceContainerHighest: Color(0xFFE4E7EB),
+  surfaceContainerHigh: lightSurfaceContainerHigh,
+  surfaceContainerHighest: lightSurfaceContainerHighest,
 
   /* === Outlines / misc === */
   outline: outlineGrey,
-  outlineVariant: Color(0xFFBFC6CF),
+  outlineVariant: lightOutlineVariant,
   shadow: black,
   scrim: black,
 

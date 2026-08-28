@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 class BlurWidget extends StatelessWidget {
   const BlurWidget({
     required this.child,
+    required this.applyBlur,
+    this.blurIntensity,
     super.key,
-    this.applyBlur = true,
-    this.blurIntensity = BlurWidgetDefaults.blurIntensity,
   });
 
   final Widget child;
@@ -18,14 +18,14 @@ class BlurWidget extends StatelessWidget {
 
   /// The intensity of the blur effect. Higher values result in a stronger
   /// blur.
-  final double blurIntensity;
+  final double? blurIntensity;
 
   @override
   Widget build(BuildContext context) => applyBlur
       ? BackdropFilter(
           filter: ImageFilter.blur(
-            sigmaX: blurIntensity,
-            sigmaY: blurIntensity,
+            sigmaX: blurIntensity ?? BlurWidgetDefaults.blurIntensity,
+            sigmaY: blurIntensity ?? BlurWidgetDefaults.blurIntensity,
           ),
           child: child,
         )

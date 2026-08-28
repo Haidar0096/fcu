@@ -12,7 +12,7 @@ OutlinedButtonThemeData outlinedButtonThemeData(ColorScheme colorScheme) =>
             color:
                 states.contains(WidgetState.disabled)
                     ? colorScheme.onSurface.withValues(
-                      alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+                      alpha: ThemeDefaults.overlayAlpha,
                     )
                     : colorScheme.primary,
             width: ThemeDefaults.borderWidth,
@@ -36,7 +36,7 @@ OutlinedButtonThemeData outlinedButtonThemeData(ColorScheme colorScheme) =>
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) return null;
           return colorScheme.primary.withValues(
-            alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+            alpha: ThemeDefaults.overlayAlpha,
           );
         }),
         elevation: const WidgetStatePropertyAll(0),

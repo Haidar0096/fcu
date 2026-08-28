@@ -11,7 +11,10 @@ mixin BlocUtils<Event, State> on Bloc<Event, State> {
   /// This method is useful for safely emitting states in situations where
   /// the bloc might have been closed.
   @protected
-  void emitIfNotClosed(Emitter<State> emit, State state) {
+  void emitIfNotClosed({
+    required Emitter<State> emit,
+    required State state,
+  }) {
     if (!isClosed) {
       emit(state);
     }

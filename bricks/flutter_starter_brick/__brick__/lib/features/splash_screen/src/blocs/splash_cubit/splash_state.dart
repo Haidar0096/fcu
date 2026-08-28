@@ -6,18 +6,18 @@ sealed class SplashState {
 }
 
 /// Initial state when splash screen loads
-final class SplashInitial extends SplashState {
-  const SplashInitial();
+final class SplashInitialState extends SplashState {
+  const SplashInitialState();
 }
 
 /// State when splash initialization is complete and ready to navigate
-final class SplashComplete extends SplashState {
-  const SplashComplete();
+final class SplashCompleteState extends SplashState {
+  const SplashCompleteState();
 }
 
 /// State when a critical unrecoverable error occurs
-final class SplashCriticalError extends SplashState {
-  const SplashCriticalError({this.errorMessage});
+final class SplashCriticalErrorState extends SplashState {
+  const SplashCriticalErrorState({required this.errorMessage});
 
   final String? errorMessage;
 }

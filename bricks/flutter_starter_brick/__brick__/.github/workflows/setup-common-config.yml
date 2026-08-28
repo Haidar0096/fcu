@@ -1,10 +1,8 @@
 {{=<% %>=}}
 name: Setup common configuration
 
-# The Flutter version below is the SAME exact literal as the `.fvmrc` pin at the
-# project root — one version, two readers. Move both together, never one alone.
-# Inside this file each value is written once, in the step below, and every
-# other line reads it from there.
+# The Flutter version has one home: `.fvmrc` at the project root. This reusable
+# workflow reads that pin for every CI job. Java values live once below.
 
 on:
   workflow_call:
@@ -27,11 +25,14 @@ jobs:
       JAVA_VERSION: ${{ steps.values.outputs.JAVA_VERSION }}
       JAVA_DISTRIBUTION: ${{ steps.values.outputs.JAVA_DISTRIBUTION }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+
       - name: Set configuration
         id: values
         run: |
           {
-            echo "FLUTTER_VERSION=3.44.9"
+            echo "FLUTTER_VERSION=$(jq -r '.flutter' .fvmrc)"
             echo "JAVA_VERSION=17"
             echo "JAVA_DISTRIBUTION=temurin"
           } >> "$GITHUB_OUTPUT"

@@ -24,7 +24,7 @@ Future<T?> showFormDialog<T>({
   required VoidCallback? Function(StateSetter setState) onLeftButtonPressed,
   required String rightButtonText,
   required VoidCallback? Function(StateSetter setState) onRightButtonPressed,
-  bool barrierDismissible = true,
+  required bool barrierDismissible,
 }) async => showCustomGeneralDialog<T>(
   context: context,
   barrierColor: context.themeData.dialogTheme.barrierColor,
@@ -35,7 +35,7 @@ Future<T?> showFormDialog<T>({
     builder:
         (context, setState) => AlertDialog(
           title: Padding(
-            padding: const EdgeInsets.only(
+            padding: EdgeInsets.only(
               top: DialogConstants.verticalPadding,
             ),
             child: Center(
@@ -47,13 +47,13 @@ Future<T?> showFormDialog<T>({
               ),
             ),
           ),
-          contentPadding: const EdgeInsets.symmetric(
+          contentPadding: EdgeInsets.symmetric(
             horizontal: DialogConstants.horizontalPadding,
             vertical: DialogConstants.formVerticalPadding,
           ),
           content: SingleChildScrollView(child: formBuilder(context, setState)),
           actionsAlignment: MainAxisAlignment.center,
-          actionsPadding: const EdgeInsets.only(
+          actionsPadding: EdgeInsets.only(
             left: DialogConstants.horizontalPadding,
             right: DialogConstants.horizontalPadding,
             bottom: DialogConstants.horizontalPadding,
@@ -68,7 +68,7 @@ Future<T?> showFormDialog<T>({
                     onPressed: onLeftButtonPressed(setState),
                   ),
                 ),
-                const SizedBox(width: DialogConstants.buttonSpacing),
+                Spacing.horizontal(SpacingSize.spacing16),
                 Expanded(
                   child: MainButton(
                     text: rightButtonText.toUpperCase(),

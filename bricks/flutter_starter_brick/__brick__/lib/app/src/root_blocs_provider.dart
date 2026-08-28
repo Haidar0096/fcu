@@ -11,12 +11,12 @@ import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 ///
 /// The [BuildContext] it receives is a descendant of the providers below, so
 /// everything it builds can read them.
-typedef RootBlocsChildBuilder = Widget Function(BuildContext context);
+typedef OnBuildRootBlocsChildCallback = Widget Function(BuildContext context);
 
 class RootBlocsProvider extends StatefulWidget {
   const RootBlocsProvider({required this.builder, super.key});
 
-  final RootBlocsChildBuilder builder;
+  final OnBuildRootBlocsChildCallback builder;
 
   @override
   State<RootBlocsProvider> createState() => _RootBlocsProviderState();
@@ -39,7 +39,7 @@ class _RootBlocsProviderState extends State<RootBlocsProvider> {
   @override
   Widget build(BuildContext context) => MultiBlocProvider(
     providers: [
-      // TODO({{dev_name.paramCase()}}): Add app-specific global blocs here
+      // App-specific global blocs join this list when the project needs them.
       BlocProvider<LocalizationCubit>.value(value: _localizationCubit),
       BlocProvider<ThemeCubit>.value(value: _themeCubit),
       BlocProvider<AppMetaDataCubit>.value(value: _appMetaDataCubit),

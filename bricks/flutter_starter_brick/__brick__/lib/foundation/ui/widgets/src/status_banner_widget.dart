@@ -59,10 +59,8 @@ class StatusBannerWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Main content row
                 Row(
                   children: [
-                    // Icon or loading indicator
                     if (type == StatusBannerType.loading)
                       SizedBox(
                         width: StatusBannerWidgetDefaults.iconSize,
@@ -79,8 +77,7 @@ class StatusBannerWidget extends StatelessWidget {
                         color: colors.iconColor,
                         size: StatusBannerWidgetDefaults.iconSize,
                       ),
-                    SizedBox(width: SpacingSize.spacing16.value),
-                    // Message text
+                    Spacing.horizontal(SpacingSize.spacing16),
                     Expanded(
                       child: Text(
                         message,
@@ -91,12 +88,12 @@ class StatusBannerWidget extends StatelessWidget {
                     ),
                     // Add padding if dismiss button is shown to prevent overlap
                     if (onDismiss != null)
-                      SizedBox(width: SpacingSize.spacing24.value),
+                      Spacing.horizontal(SpacingSize.spacing24),
                   ],
                 ),
                 // Action button for interactive banners
                 if (onAction != null) ...[
-                  SizedBox(height: SpacingSize.spacing16.value),
+                  Spacing.vertical(SpacingSize.spacing16),
                   SizedBox(
                     width: double.infinity,
                     child: MainButton(
@@ -128,7 +125,7 @@ class StatusBannerWidget extends StatelessWidget {
                       padding: EdgeInsets.all(SpacingSize.spacing4.value),
                       child: Icon(
                         Icons.close,
-                        size: SpacingSize.spacing16.value,
+                        size: StatusBannerWidgetDefaults.dismissIconSize,
                         color: colors.textColor,
                       ),
                     ),

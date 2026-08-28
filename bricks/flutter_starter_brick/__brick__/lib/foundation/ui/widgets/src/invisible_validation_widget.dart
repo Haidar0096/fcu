@@ -39,6 +39,8 @@ class InvisibleValidationWidget<T> extends StatefulWidget {
       InvisibleValidationWidgetState<T>();
 }
 
+/// Public only so the owning input group can validate this non-field value
+/// through a `GlobalKey` without rebuilding it.
 class InvisibleValidationWidgetState<T>
     extends State<InvisibleValidationWidget<T>>
     with

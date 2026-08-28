@@ -17,12 +17,12 @@ extension WidgetExtension on Widget {
   /// Wraps the widget with a widget that animates with the default animation
   /// effects.
   Widget withAnimations({
+    required bool withSlide,
+    required bool withFade,
+    required bool withScale,
+    required bool withRotation,
     Key? key,
-    bool withSlide = false,
-    bool withFade = true,
-    bool withScale = false,
-    bool withRotation = false,
-    SlideDirection slideDirection = SlideDirection.topToBottom,
+    SlideDirection? slideDirection,
     Duration? duration,
     Duration? delay,
   }) {
@@ -42,7 +42,9 @@ extension WidgetExtension on Widget {
     }
 
     if (withSlide) {
-      final slideOffsets = _getSlideOffsets(slideDirection);
+      final slideOffsets = _getSlideOffsets(
+        slideDirection ?? SlideDirection.topToBottom,
+      );
       result = result.slide(
         begin: slideOffsets.begin,
         end: slideOffsets.end,
@@ -57,19 +59,23 @@ extension WidgetExtension on Widget {
 extension WidgetListExtension on List<Widget> {
   /// Wraps each widget in the list with default animation effects.
   List<Widget> withAnimations({
-    bool withSlide = false,
-    bool withFade = true,
-    bool withScale = false,
-    bool withRotation = false,
-    SlideDirection slideDirection = SlideDirection.topToBottom,
+    required bool withSlide,
+    required bool withFade,
+    required bool withScale,
+    required bool withRotation,
+    required bool staggered,
+    SlideDirection? slideDirection,
     Duration? duration,
-    bool staggered = false,
-    Duration staggeredDelay = const Duration(milliseconds: 50),
+    Duration? staggeredDelay,
   }) {
     return asMap().entries.map((entry) {
       final index = entry.key;
       final widget = entry.value;
-      final delay = staggered ? (staggeredDelay * index) : null;
+      final delay = staggered
+          ? ((staggeredDelay ??
+                    AnimationDefaults.animationDurationVeryShort) *
+                index)
+          : null;
 
       return widget.withAnimations(
         withSlide: withSlide,

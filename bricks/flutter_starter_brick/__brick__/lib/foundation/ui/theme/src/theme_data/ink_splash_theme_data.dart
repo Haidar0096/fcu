@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/defaults.dart';
 
 /// Ink splash theme configuration for Material ink effects.
 ///
@@ -14,10 +15,18 @@ abstract final class InkSplashThemeData {
   /// - Focus: 12% opacity for keyboard focus
   static InkSplashColors fromColorScheme(ColorScheme colorScheme) =>
       InkSplashColors(
-        splashColor: colorScheme.primary.withValues(alpha: 0.12),
-        highlightColor: colorScheme.primary.withValues(alpha: 0.08),
-        hoverColor: colorScheme.primary.withValues(alpha: 0.04),
-        focusColor: colorScheme.primary.withValues(alpha: 0.12),
+        splashColor: colorScheme.primary.withValues(
+          alpha: ThemeDefaults.overlayAlpha,
+        ),
+        highlightColor: colorScheme.primary.withValues(
+          alpha: ThemeDefaults.overlayAlpha,
+        ),
+        hoverColor: colorScheme.primary.withValues(
+          alpha: ThemeDefaults.overlayAlpha,
+        ),
+        focusColor: colorScheme.primary.withValues(
+          alpha: ThemeDefaults.overlayAlpha,
+        ),
       );
 }
 

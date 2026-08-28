@@ -7,6 +7,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:{{proj_name}}/app/app.dart';
 import 'package:{{proj_name}}/dependency_injection/dependency_injection.dart';
+import 'package:{{proj_name}}/foundation/app_meta_data/app_meta_data.dart';
 import 'package:{{proj_name}}/foundation/environment_variables/environment_variables.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:{{proj_name}}/foundation/locator/locator.dart';
@@ -14,6 +15,8 @@ import 'package:{{proj_name}}/foundation/ui/global_loader/global_loader.dart';
 import 'package:{{proj_name}}/foundation/ui/navigation/navigation.dart';
 
 Future<void> main() async {
+  // The build's values are read before any error road exists: a missing
+  // required value must stop the app here, loudly, never be swallowed.
   final environmentVariables = EnvironmentVariables();
 
   await runZonedGuarded<Future<void>>(
@@ -24,11 +27,17 @@ Future<void> main() async {
       ErrorLogger.registerErrorHandlers(_resolveErrorLogger);
 
       WidgetsFlutterBinding.ensureInitialized();
+      configureUrlStrategy();
 
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]);
+      // No push, analytics, or store service needs boot-time initialization.
+
+      if (platformIsAndroid || platformIsIos) {
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+      // Desktop and web skip the phone-only orientation lock.
 
       await SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.manual,
@@ -40,13 +49,16 @@ Future<void> main() async {
       HydratedBloc.storage = await HydratedStorage.build(
         storageDirectory: kIsWeb
             ? HydratedStorageDirectory.web
-            : HydratedStorageDirectory((await getTemporaryDirectory()).path),
+            : HydratedStorageDirectory(
+                (await getApplicationSupportDirectory()).path,
+              ),
       );
 
       await initializeDependencies(environmentVariables);
 
       GlobalLoader.init(
         appLogger: serviceLocator.get<AppLogger>(),
+        errorLogger: serviceLocator.get<ErrorLogger>(),
         rootNavigatorKey: rootNavigatorKey,
       );
 
@@ -55,6 +67,7 @@ Future<void> main() async {
       // the launch up, and it surfaces nothing either way.
       unawaited(serviceLocator.get<ErrorLogger>().sendParkedReports());
 
+      // No additional project-specific boot service is known yet.
       runApp(const RootAppWidget());
     },
     (error, stackTrace) {

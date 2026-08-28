@@ -19,7 +19,12 @@ class CriticalErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => RootScreenWidget(
     applySafeArea: false,
-    canPop: false, // Disable back navigation completely
+    canPop: false,
+    resizeToAvoidBottomInset: true,
+    applyTopSafeArea: true,
+    applyBottomSafeArea: true,
+    applyStartSafeArea: true,
+    applyEndSafeArea: true,
     body: Center(
       child: Padding(
         padding: const EdgeInsets.all(ThemeDefaults.screenContentPadding),
@@ -31,7 +36,7 @@ class CriticalErrorScreen extends StatelessWidget {
               size: CriticalErrorScreenDefaults.iconSize,
               color: context.themeData.colorScheme.error,
             ),
-            SizedBox(height: SpacingSize.spacing24.value),
+            Spacing.vertical(SpacingSize.spacing24),
             Text(
               context.appLocalizations.criticalErrorTitle,
               style: context.typography?.primaryTitle.copyWith(
@@ -39,7 +44,7 @@ class CriticalErrorScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: SpacingSize.spacing16.value),
+            Spacing.vertical(SpacingSize.spacing16),
             Text(
               errorMessage ?? context.appLocalizations.criticalErrorFullMessage,
               style: context.typography?.bodyText.copyWith(

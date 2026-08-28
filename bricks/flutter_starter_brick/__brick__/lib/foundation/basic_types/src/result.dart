@@ -1,9 +1,9 @@
 sealed class Result<F, S> {
   const Result();
 
-  factory Result.success(S data) => Success._(data);
+  factory Result.success({required S data}) => Success._(data: data);
 
-  factory Result.failure(F data) => Failure._(data);
+  factory Result.failure({required F data}) => Failure._(data: data);
 
   T when<T>({
     required T Function(S data) success,
@@ -13,8 +13,8 @@ sealed class Result<F, S> {
   /// Transforms the success value if present, otherwise passes
   /// through the failure as is.
   Result<F, S2> mapSuccess<S2>(S2 Function(S data) transform) => when(
-    success: (data) => Result.success(transform(data)),
-    failure: Result.failure,
+    success: (data) => Result.success(data: transform(data)),
+    failure: (data) => Result.failure(data: data),
   );
 
   Future<T> whenAsync<T>({
@@ -23,8 +23,8 @@ sealed class Result<F, S> {
   });
 }
 
-class Success<S> extends Result<Never, S> {
-  const Success._(this.data);
+final class Success<S> extends Result<Never, S> {
+  const Success._({required this.data});
 
   final S data;
 
@@ -44,8 +44,8 @@ class Success<S> extends Result<Never, S> {
   String toString() => 'Success{data: $data}';
 }
 
-class Failure<F> extends Result<F, Never> {
-  const Failure._(this.data);
+final class Failure<F> extends Result<F, Never> {
+  const Failure._({required this.data});
 
   final F data;
 

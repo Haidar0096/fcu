@@ -14,24 +14,24 @@ const ColorScheme _darkColorScheme = ColorScheme(
   primary: primary,
   surfaceTint: primary,
   onPrimary: white,
-  primaryContainer: Color(0xFF24315D),
+  primaryContainer: onPrimaryFixedVariant,
   onPrimaryContainer: primaryContainer,
 
   secondary: secondaryTeal,
   onSecondary: white,
-  secondaryContainer: Color(0xFF004D54),
+  secondaryContainer: onSecondaryFixedVariant,
   onSecondaryContainer: secondaryTealContainer,
 
   tertiary: tertiaryAmber,
   onTertiary: black,
-  tertiaryContainer: Color(0xFF6E4B00),
+  tertiaryContainer: onTertiaryFixedVariant,
   onTertiaryContainer: tertiaryAmberContainer,
 
   /* === Errors === */
-  error: Color(0xFFFFB4AB),
-  onError: Color(0xFF690005),
-  errorContainer: Color(0xFF93000A),
-  onErrorContainer: Color(0xFFFFDAD6),
+  error: darkError,
+  onError: darkOnError,
+  errorContainer: darkErrorContainer,
+  onErrorContainer: darkOnErrorContainer,
 
   /* === Surfaces & backgrounds === */
   surface: darkBackground,
@@ -44,8 +44,8 @@ const ColorScheme _darkColorScheme = ColorScheme(
   surfaceContainerLowest: black,
   surfaceContainerLow: darkBackground,
   surfaceContainer: mutedGray,
-  surfaceContainerHigh: Color(0xFF2A2E35),
-  surfaceContainerHighest: Color(0xFF343941),
+  surfaceContainerHigh: darkSurfaceContainerHigh,
+  surfaceContainerHighest: darkSurfaceContainerHighest,
 
   /* === Outlines / misc === */
   outline: outlineGrey,
