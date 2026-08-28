@@ -13,16 +13,20 @@ import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:{{proj_name}}/foundation/networking/networking.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 
-void registerInstances(GetIt getIt, {required Environment environment}) {
+void registerInstances(
+  GetIt getIt, {
+  required EnvironmentVariables environmentVariables,
+}) {
   getIt
-    ..registerLazySingleton<Environment>(() => environment)
+    ..registerLazySingleton<Environment>(() => environmentVariables.environment)
+    ..registerLazySingleton<EnvironmentVariables>(() => environmentVariables)
     ..registerLazySingleton<AppLogger>(() => const AppLogger())
     ..registerLazySingleton<FlowBuffer>(FlowBuffer.new)
     ..registerLazySingleton<ErrorLogger>(
       () => ErrorLogger(
         reportSender: getIt.get(),
         flowBuffer: getIt.get(),
-        appShortName: getIt.get<EnvironmentVariables>().appShortName,
+        appShortName: EnvironmentVariables.appShortName,
       ),
     )
     ..registerLazySingleton<EventLogger>(() => const EventLogger())
@@ -47,12 +51,6 @@ void registerInstances(GetIt getIt, {required Environment environment}) {
         errorLogger: getIt.get(),
       );
     }, dispose: (bloc) => bloc.close())
-    ..registerLazySingleton<EnvironmentVariables>(
-      () => switch (getIt.get<Environment>()) {
-        Environment.development => const DevelopmentEnvironmentVariables(),
-        Environment.production => const ProductionEnvironmentVariables(),
-      },
-    )
     ..registerFactory<HttpClient>(
       () => BackendHttpClient(
         baseUrl: getIt.get<EnvironmentVariables>().backendBaseUrl,

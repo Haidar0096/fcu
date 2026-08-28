@@ -13,5 +13,8 @@ For release process and building, see [RELEASE.md](RELEASE.md).
    flutter pub get
    flutter gen-l10n
    dart run build_runner build
-   flutter run
+   flutter run --dart-define-from-file=env/development.json
    ```
+
+Use `env/production.json` for the production environment. The committed files
+hold build settings only; this app holds no secrets.

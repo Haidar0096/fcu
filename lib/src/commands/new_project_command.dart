@@ -251,6 +251,10 @@ class NewProjectCommand extends Command<int> {
         await _initGitRepo(creationData);
       }
 
+      if (creationData.useStarterBrick) {
+        _logger.info(buildStarterNextSteps(creationData.outputDirectory));
+      }
+
       return ExitCode.success.code;
     } catch (error) {
       _progress?.fail();
@@ -640,3 +644,9 @@ List<String> buildStarterBrickMakeArguments({
   '--dev_name',
   developerName,
 ];
+
+/// Builds the next steps printed after a starter app is generated.
+String buildStarterNextSteps(String outputDirectory) =>
+    'Next steps:'
+    '\ncd $outputDirectory'
+    '\nflutter run --dart-define-from-file=env/development.json';

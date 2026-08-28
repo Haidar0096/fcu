@@ -87,8 +87,8 @@ const _fakeDataRegistryPath = '/lib/fake_data/src/fake_data_registry.dart';
 ///
 /// A file inside a src/ folder belongs to the module owning that src/. Any
 /// other file under lib/ belongs to the folder it sits in (a barrel, a
-/// composition-root file), and a file directly under lib/ (main_common.dart,
-/// main_<environment>.dart) belongs to no module at all.
+/// composition-root file), and the main.dart file directly under lib/ belongs
+/// to no module at all.
 String? _moduleOfFile(String filePath) {
   final srcMatch = RegExp(r'lib/([^/]+(?:/[^/]+)*?)/src/').firstMatch(filePath);
   if (srcMatch != null) return srcMatch.group(1);

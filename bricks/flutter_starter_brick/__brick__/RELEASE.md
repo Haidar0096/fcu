@@ -78,7 +78,7 @@ Releases are triggered via GitHub Actions:
 1. Go to the repository on GitHub → **Actions** tab
 2. Select **Deploy Android to Play Store** or **Deploy iOS to TestFlight**
 3. Click **Run workflow**
-4. Select the environment (`development` or `production` — the same two names the `main_<environment>.dart` entry points carry)
+4. Select the environment (`development` or `production` — the same two names the `env/<environment>.json` files carry)
 5. Click **Run workflow** to start the build and upload
 
 Shared configuration (Flutter version, Java version) lives in `setup-common-config.yml`. Update versions there to change them for both platforms. Its Flutter version and the `.fvmrc` pin at the project root are one version with two readers — they move together, in the same commit.

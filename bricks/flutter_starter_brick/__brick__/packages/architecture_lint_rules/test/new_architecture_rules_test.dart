@@ -329,13 +329,14 @@ class NoBackendUrlLiteralsRuleTest extends AnalysisRuleTest {
     ]);
   }
 
-  Future<void> test_backendUrlInEnvironmentVariables_isQuiet() async {
+  Future<void> test_backendUrlInEnvironmentVariables_reports() async {
     const source =
         "class EnvironmentVariables { static const apiUrl = 'https://api.example.com'; }";
-    newFile('$testPackageLibPath/environment_variables.dart', source);
-    await assertNoDiagnosticsInFile(
-      '$testPackageLibPath/environment_variables.dart',
-    );
+    final path = '$testPackageLibPath/environment_variables.dart';
+    newFile(path, source);
+    await assertDiagnosticsInFile(path, [
+      lint(source.indexOf("'https"), "'https://api.example.com'".length),
+    ]);
   }
 }
 

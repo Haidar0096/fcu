@@ -37,7 +37,7 @@ foundation modules, and best practices built-in.
 - [✓] **Build Scripts**: APK generation for all architectures and environments
 - [✓] **TestFlight Upload**: Automated iOS distribution script
 - [✓] **GitHub Actions**: PR checks (format, analyze, test, build) plus Play Store and TestFlight deploy workflows
-- [✓] **Architecture Plugin**: 26 warning rules ship inside every app and load through `path: packages/architecture_lint_rules`
+- [✓] **Architecture Plugin**: 25 warning rules ship inside every app and load through `path: packages/architecture_lint_rules`
 - [✓] **Structure Gate**: `dart run tool/check_structure_io.dart` checks the real folder and file-name layout
 
 ## Project Structure
@@ -62,9 +62,10 @@ lib/
 │   └── validators/        # Form validators
 ├── resources/              # Assets, fonts, translations
 ├── router/                 # Type-safe navigation
-├── main_development.dart   # Development entry point
-├── main_production.dart    # Production entry point
-└── main_common.dart        # Shared initialization
+└── main.dart                # Single entry point and initialization
+env/
+├── development.json        # Development build settings
+└── production.json         # Production build settings
 ```
 
 ## Key Patterns
@@ -81,7 +82,7 @@ lib/
 2. Run `flutter pub get` to install dependencies
 3. Run `flutter gen-l10n` to generate the localizations
 4. Run `dart run build_runner build` for code generation
-5. Choose your environment and run: `flutter run -t lib/main_development.dart`
+5. Run: `flutter run --dart-define-from-file=env/development.json`
 
 ## Documentation
 

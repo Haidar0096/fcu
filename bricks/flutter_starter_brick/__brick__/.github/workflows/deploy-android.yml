@@ -43,10 +43,6 @@ jobs:
           echo "version_name=$android_version_name" >> "$GITHUB_OUTPUT"
           echo "build_number=$android_build_number" >> "$GITHUB_OUTPUT"
 
-      - name: Determine main file
-        id: main_file
-        run: echo "main_file=lib/main_${{ inputs.environment }}.dart" >> "$GITHUB_OUTPUT"
-
       - name: Read the package name
         id: package
         # Read the same applicationId gradle signs and the local upload script
@@ -89,7 +85,7 @@ jobs:
             --release \
             --build-name="${{ steps.versions.outputs.version_name }}" \
             --build-number="${{ steps.versions.outputs.build_number }}" \
-            -t "${{ steps.main_file.outputs.main_file }}"
+            --dart-define-from-file="env/${{ inputs.environment }}.json"
 
       - name: Set up Python
         uses: actions/setup-python@v6.2.0

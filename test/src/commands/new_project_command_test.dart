@@ -23,4 +23,11 @@ void main() {
     expect(optionIndex, isNonNegative);
     expect(arguments[optionIndex + 1], 'Jane Doe');
   });
+
+  test('starter next steps pass the development environment file', () {
+    expect(
+      buildStarterNextSteps('sample_app'),
+      contains('flutter run --dart-define-from-file=env/development.json'),
+    );
+  });
 }

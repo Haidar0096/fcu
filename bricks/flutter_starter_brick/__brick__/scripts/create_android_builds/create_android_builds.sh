@@ -54,13 +54,13 @@ get_build_cmd() {
     local version_code="$2"
     local target_platform="$3"
     local target_server="$4"
-    local main_file="lib/main_${target_server}.dart"
+    local environment_file="$PROJECT_ROOT/env/$target_server.json"
 
     echo "fvm flutter build apk --release \
 --target-platform=\"$target_platform\" \
 --build-name=\"$version\" \
 --build-number=\"$version_code\" \
--t \"$main_file\""
+--dart-define-from-file=\"$environment_file\""
 }
 
 # Function to get output APK path
@@ -118,7 +118,7 @@ echo "🚧 Building AAB version $version_formatted for Google Play Store"
 aab_build_cmd="fvm flutter build appbundle --release \
 --build-name=\"$version\" \
 --build-number=\"$version_code\" \
--t \"lib/main_production.dart\""
+--dart-define-from-file=\"$PROJECT_ROOT/env/production.json\""
 
 echo "🔧 Executing: $aab_build_cmd"
 eval "$aab_build_cmd" || error_exit "AAB build failed for production"

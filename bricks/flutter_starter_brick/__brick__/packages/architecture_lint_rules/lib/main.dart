@@ -8,7 +8,7 @@
 /// - The barrel as the only door (no direct src/ imports)
 /// - Layer boundaries (foundation, features, resources, router, app)
 /// - Composition roots (dependency_injection, fake_data)
-/// - Entry point restrictions (main_common.dart, main_*.dart files)
+/// - Entry point restrictions (the single main.dart file)
 library;
 
 import 'package:analysis_server_plugin/plugin.dart';
@@ -19,8 +19,7 @@ import 'package:architecture_lint_rules/src/rules/fake_data_import_restrictions_
 import 'package:architecture_lint_rules/src/rules/features_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/foundation_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/guard_post_await_bloc_emits_rule.dart';
-import 'package:architecture_lint_rules/src/rules/main_common_import_restrictions_rule.dart';
-import 'package:architecture_lint_rules/src/rules/main_environment_files_import_restrictions_rule.dart';
+import 'package:architecture_lint_rules/src/rules/main_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/no_backend_url_literals_rule.dart';
 import 'package:architecture_lint_rules/src/rules/no_dto_in_ui_or_bloc_state_rule.dart';
 import 'package:architecture_lint_rules/src/rules/no_feature_cross_imports_rule.dart';
@@ -63,8 +62,7 @@ class ArchitectureLintPlugin extends Plugin {
     registry.registerWarningRule(AppImportRestrictionsRule());
     registry.registerWarningRule(DependencyInjectionImportRestrictionsRule());
     registry.registerWarningRule(FakeDataImportRestrictionsRule());
-    registry.registerWarningRule(MainCommonImportRestrictionsRule());
-    registry.registerWarningRule(MainEnvironmentFilesImportRestrictionsRule());
+    registry.registerWarningRule(MainImportRestrictionsRule());
     registry.registerWarningRule(VendorImportsStayInWrappersRule());
     registry.registerWarningRule(NoLocatorReadsInBlocRule());
     registry.registerWarningRule(NoFlutterUiInBlocRule());
