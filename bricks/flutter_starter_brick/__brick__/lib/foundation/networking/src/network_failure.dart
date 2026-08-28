@@ -4,10 +4,10 @@ import 'package:{{proj_name}}/foundation/networking/src/status_codes.dart';
 @immutable
 sealed class NetworkFailure {
   const NetworkFailure({
-    this.statusCode,
-    this.message,
-    this.code,
-    this.backendCorrelationId,
+    required this.statusCode,
+    required this.message,
+    required this.code,
+    required this.backendCorrelationId,
   });
 
   /// HTTP status code returned by the server (e.g., 404, 500)
@@ -61,10 +61,10 @@ sealed class NetworkFailure {
 
 final class NetworkError extends NetworkFailure {
   const NetworkError({
-    super.statusCode,
-    super.message,
-    super.code,
-    super.backendCorrelationId,
+    required super.statusCode,
+    required super.message,
+    required super.code,
+    required super.backendCorrelationId,
   });
 
   @override
@@ -78,10 +78,10 @@ final class NetworkError extends NetworkFailure {
 
 final class ServerError extends NetworkFailure {
   const ServerError({
-    super.statusCode,
-    super.message,
-    super.code,
-    super.backendCorrelationId,
+    required super.statusCode,
+    required super.message,
+    required super.code,
+    required super.backendCorrelationId,
   });
 
   @override
@@ -95,10 +95,10 @@ final class ServerError extends NetworkFailure {
 
 final class TimeoutError extends NetworkFailure {
   const TimeoutError({
-    super.statusCode,
-    super.message,
-    super.code,
-    super.backendCorrelationId,
+    required super.statusCode,
+    required super.message,
+    required super.code,
+    required super.backendCorrelationId,
   });
 
   @override
@@ -112,10 +112,10 @@ final class TimeoutError extends NetworkFailure {
 
 final class CancelError extends NetworkFailure {
   const CancelError({
-    super.statusCode,
-    super.message,
-    super.code,
-    super.backendCorrelationId,
+    required super.statusCode,
+    required super.message,
+    required super.code,
+    required super.backendCorrelationId,
   });
 
   @override
@@ -129,10 +129,10 @@ final class CancelError extends NetworkFailure {
 
 final class UnknownError extends NetworkFailure {
   const UnknownError({
-    super.statusCode,
-    super.message,
-    super.code,
-    super.backendCorrelationId,
+    required super.statusCode,
+    required super.message,
+    required super.code,
+    required super.backendCorrelationId,
   });
 
   @override

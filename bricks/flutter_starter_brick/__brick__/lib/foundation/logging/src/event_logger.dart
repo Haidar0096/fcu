@@ -1,17 +1,29 @@
-/// A singleton class that handles event logging.
+import 'package:flutter/foundation.dart';
+import 'package:{{proj_name}}/foundation/logging/src/sensitive_data_sanitizer.dart';
+
 class EventLogger {
   const EventLogger();
 
-  /// Logs the given event into the reporting system.
-  Future<void> recordEvent({
+  static const String _tag = 'EventLogger';
+
+  void recordEvent({
     required String message,
-    EventLoggerLevel? level,
+    required EventLoggerLevel level,
     StackTrace? stackTrace,
-  }) async {
-    // TODO({{dev_name.paramCase()}}): Implement this method to log events in your chosen
-    // reporting system.
+  }) {
+    if (!kDebugMode) return;
+
+    final timestamp = DateTime.now().toIso8601String();
+    final sanitizedMessage = SensitiveDataSanitizer.sanitizeText(message);
+    debugPrint('[$timestamp] [${level.name}] [$_tag] $sanitizedMessage');
+
+    if (stackTrace != null) {
+      final sanitizedStack = SensitiveDataSanitizer.sanitizeText(
+        stackTrace.toString(),
+      );
+      debugPrint('[$timestamp] [${level.name}] [$_tag] $sanitizedStack');
+    }
   }
 }
 
-/// The level of an event that will be recorded by the [EventLogger]
 enum EventLoggerLevel { debug, info, error }

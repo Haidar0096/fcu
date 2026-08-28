@@ -2,6 +2,7 @@
 
 arb-dir: lib/resources/src/arb
 template-arb-file: app_en.arb
+output-dir: lib/resources/src/arb
 output-localization-file: app_localizations.dart
 nullable-getter: false
 # The generated Dart lands in lib/ and is committed, so the code-check gate's

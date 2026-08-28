@@ -13,7 +13,7 @@ import 'package:{{proj_name}}/foundation/logging/src/sensitive_data_sanitizer.da
 /// runs, so the road that reports has to CHECK its tools rather than demand
 /// them: a lookup that throws inside an error handler turns a reportable
 /// failure into a crash.
-typedef ErrorLoggerResolver = ErrorLogger? Function();
+typedef OnResolveErrorLoggerCallback = ErrorLogger? Function();
 
 /// The ONE class every report leaves the app through.
 ///
@@ -68,22 +68,28 @@ class ErrorLogger {
   /// [ErrorLogger]: each channel resolves the live logger through
   /// [resolveErrorLogger] at the moment a failure arrives, and a failure
   /// raised before there is one still reaches the console.
-  static void registerErrorHandlers(ErrorLoggerResolver resolveErrorLogger) {
+  static void registerErrorHandlers(
+    OnResolveErrorLoggerCallback resolveErrorLogger,
+  ) {
     FlutterError.onError = (errorDetails) => _handleFlutterError(
-      errorDetails,
-      resolveErrorLogger,
+      errorDetails: errorDetails,
+      resolveErrorLogger: resolveErrorLogger,
     );
     PlatformDispatcher.instance.onError = (error, stackTrace) =>
-        _handlePlatformError(error, stackTrace, resolveErrorLogger);
+        _handlePlatformError(
+          error: error,
+          stackTrace: stackTrace,
+          resolveErrorLogger: resolveErrorLogger,
+        );
     if (!kIsWeb) {
       _addIsolateErrorListener(resolveErrorLogger);
     }
   }
 
-  static void _handleFlutterError(
-    FlutterErrorDetails errorDetails,
-    ErrorLoggerResolver resolveErrorLogger,
-  ) {
+  static void _handleFlutterError({
+    required FlutterErrorDetails errorDetails,
+    required OnResolveErrorLoggerCallback resolveErrorLogger,
+  }) {
     FlutterError.dumpErrorToConsole(errorDetails);
     unawaited(
       resolveErrorLogger()?.recordError(
@@ -94,11 +100,11 @@ class ErrorLogger {
     FlutterError.presentError(errorDetails);
   }
 
-  static bool _handlePlatformError(
-    Object error,
-    StackTrace stackTrace,
-    ErrorLoggerResolver resolveErrorLogger,
-  ) {
+  static bool _handlePlatformError({
+    required Object error,
+    required StackTrace stackTrace,
+    required OnResolveErrorLoggerCallback resolveErrorLogger,
+  }) {
     debugPrint('Platform error: $error\n$stackTrace');
     unawaited(
       resolveErrorLogger()?.recordError(error: error, stackTrace: stackTrace),
@@ -107,7 +113,7 @@ class ErrorLogger {
   }
 
   static void _addIsolateErrorListener(
-    ErrorLoggerResolver resolveErrorLogger,
+    OnResolveErrorLoggerCallback resolveErrorLogger,
   ) {
     Isolate.current.addErrorListener(
       RawReceivePort((List<dynamic> errorData) {
@@ -133,13 +139,33 @@ class ErrorLogger {
   /// carries it here. It is never minted on the device, and a failure with
   /// no backend call behind it leaves it null.
   ///
-  /// [level] is `error` for the ordinary road. A caller reporting something
-  /// worth knowing that did not fail passes `info` instead.
   Future<void> recordError({
     required dynamic error,
     StackTrace? stackTrace,
     String? backendCorrelationId,
-    ErrorReportLevel level = ErrorReportLevel.error,
+  }) => _record(
+    value: error,
+    level: ErrorReportLevel.error,
+    stackTrace: stackTrace,
+    backendCorrelationId: backendCorrelationId,
+  );
+
+  Future<void> recordInfo({
+    required dynamic info,
+    StackTrace? stackTrace,
+    String? backendCorrelationId,
+  }) => _record(
+    value: info,
+    level: ErrorReportLevel.info,
+    stackTrace: stackTrace,
+    backendCorrelationId: backendCorrelationId,
+  );
+
+  Future<void> _record({
+    required dynamic value,
+    required ErrorReportLevel level,
+    required StackTrace? stackTrace,
+    required String? backendCorrelationId,
   }) async {
     // A debug build composes and sends nothing. The console still carries the
     // failure; only the report road is off.
@@ -153,17 +179,22 @@ class ErrorLogger {
     // called, so no unstripped shape can reach a sender. The backend strips
     // a second time on arrival; the sender is never trusted.
     final report = ErrorReportDto(
-      appShortName: _appShortName,
+      app: _appShortName,
       level: level,
-      message: SensitiveDataSanitizer.sanitizeText('$error'),
-      occurredAt: DateTime.now(),
-      flow: List<String>.unmodifiable(
-        _flowBuffer.actions.map(SensitiveDataSanitizer.sanitizeText),
+      message: SensitiveDataSanitizer.sanitizeText('$value'),
+      stack: SensitiveDataSanitizer.sanitizeText(
+        (stackTrace ?? StackTrace.current).toString(),
       ),
-      stackTrace: stackTrace == null
-          ? null
-          : SensitiveDataSanitizer.sanitizeText(stackTrace.toString()),
-      backendCorrelationId: backendCorrelationId,
+      correlationId: backendCorrelationId,
+      occurredAt: DateTime.now().toUtc(),
+      flow: List<Map<String, dynamic>>.unmodifiable(
+        _flowBuffer.actions.map(
+          (action) => Map<String, dynamic>.unmodifiable({
+            'name': SensitiveDataSanitizer.sanitizeText(action.name),
+            'occurredAt': action.occurredAt.toIso8601String(),
+          }),
+        ),
+      ),
     );
 
     await _runInsideReportRoad(() => _reportSender.send(report));

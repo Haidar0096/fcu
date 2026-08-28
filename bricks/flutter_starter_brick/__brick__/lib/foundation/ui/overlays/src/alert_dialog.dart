@@ -11,11 +11,11 @@ Future<void> showAlertDialog({
   required BuildContext context,
   required String title,
   required String message,
+  required bool barrierDismissible,
+  required bool autoDismissOnAction,
   String? actionText,
   VoidCallback? onAction,
   Widget? icon,
-  bool barrierDismissible = true,
-  bool autoDismissOnAction = true,
 }) async => showCustomGeneralDialog<void>(
   context: context,
   barrierColor: context.themeData.dialogTheme.barrierColor,
@@ -23,13 +23,13 @@ Future<void> showAlertDialog({
   applyBlur: true,
   applyDim: true,
   content: AlertDialog(
-    contentPadding: const EdgeInsets.only(
+    contentPadding: EdgeInsets.only(
       left: AlertDialogDefaults.horizontalPadding,
       right: AlertDialogDefaults.horizontalPadding,
       top: AlertDialogDefaults.contentTopPadding,
       bottom: AlertDialogDefaults.contentBottomPadding,
     ),
-    actionsPadding: const EdgeInsets.only(
+    actionsPadding: EdgeInsets.only(
       left: AlertDialogDefaults.horizontalPadding,
       right: AlertDialogDefaults.horizontalPadding,
       bottom: AlertDialogDefaults.actionsBottomPadding,
@@ -39,17 +39,21 @@ Future<void> showAlertDialog({
       children: [
         if (icon != null) ...[
           icon,
-          SizedBox(height: SpacingSize.spacing24.value),
+          Spacing.vertical(SpacingSize.spacing24),
         ],
         Text(
           title,
-          style: context.themeData.textTheme.headlineSmall,
+          style: context.typography?.primaryTitle.copyWith(
+            color: context.themeData.colorScheme.onSurface,
+          ),
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: SpacingSize.spacing16.value),
+        Spacing.vertical(SpacingSize.spacing16),
         Text(
           message,
-          style: context.themeData.textTheme.bodyMedium,
+          style: context.typography?.bodyText.copyWith(
+            color: context.themeData.colorScheme.onSurface,
+          ),
           textAlign: TextAlign.center,
         ),
       ],

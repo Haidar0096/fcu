@@ -9,16 +9,16 @@ import 'package:flutter/material.dart';
 class CustomElevatedButton extends StatelessWidget {
   const CustomElevatedButton({
     required this.onPressed,
-    super.key,
     this.text,
     this.child,
     this.width,
     this.height,
-    this.textAlign = CustomElevatedButtonDefaults.textAlign,
+    this.textAlign,
     this.maxLines,
-    this.textOverflow = CustomElevatedButtonDefaults.textOverflow,
+    this.textOverflow,
     this.textStyle,
     this.style,
+    super.key,
   }) : assert(
          text == null || child == null,
          'Provide either text or child, not both',
@@ -50,7 +50,7 @@ class CustomElevatedButton extends StatelessWidget {
   final int? maxLines;
 
   /// How visual overflow should be handled for the text.
-  final TextOverflow textOverflow;
+  final TextOverflow? textOverflow;
 
   /// The style to use for the text.
   final TextStyle? textStyle;
@@ -70,9 +70,10 @@ class CustomElevatedButton extends StatelessWidget {
           Text(
             text!,
             style: textStyle,
-            textAlign: textAlign,
+            textAlign: textAlign ?? CustomElevatedButtonDefaults.textAlign,
             maxLines: maxLines,
-            overflow: textOverflow,
+            overflow:
+                textOverflow ?? CustomElevatedButtonDefaults.textOverflow,
           ),
     ),
   );

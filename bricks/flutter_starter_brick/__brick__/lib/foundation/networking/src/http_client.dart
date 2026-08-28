@@ -13,10 +13,13 @@ import 'package:{{proj_name}}/foundation/networking/src/network_failure.dart';
 /// 1. When sending data, [total] is the request body length.
 /// 2. When receiving data, [total] will be -1 if the size of the response body,
 ///    typically with no `content-length` header.
-typedef ProgressCallback = void Function(int count, int total);
+typedef OnProgressCallback = void Function(int count, int total);
 
 /// An interface specifying the contract for making HTTP requests.
 abstract class HttpClient {
+  /// Correlation id from the most recent successful response, when present.
+  String? get lastSuccessfulCorrelationId;
+
   /// Makes a GET request to the specified [path].
   ///
   /// - [path]: The URL path for the request.
@@ -51,7 +54,7 @@ abstract class HttpClient {
     required String path,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
     Object? body,
-    bool isMultipart = false,
+    required bool isMultipart,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
@@ -95,7 +98,7 @@ abstract class HttpClient {
     required String path,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
     Object? body,
-    bool isMultipart = false,
+    required bool isMultipart,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
@@ -141,13 +144,13 @@ abstract class HttpClient {
     required String path,
     required String filePath,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
-    String fieldName = 'file',
+    String? fieldName,
     Map<String, dynamic>? additionalFields,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
     bool Function(int? statusCode)? responseStatusCodeValidator,
-    ProgressCallback? onSendProgress,
+    OnProgressCallback? onSendProgress,
     CancelToken? cancelToken,
   });
 
@@ -172,13 +175,13 @@ abstract class HttpClient {
     required Uint8List bytes,
     required String filename,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
-    String fieldName = 'file',
+    String? fieldName,
     Map<String, dynamic>? additionalFields,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
     bool Function(int? statusCode)? responseStatusCodeValidator,
-    ProgressCallback? onSendProgress,
+    OnProgressCallback? onSendProgress,
     CancelToken? cancelToken,
   });
 }

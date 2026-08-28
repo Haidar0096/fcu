@@ -1,1 +1,1 @@
-export 'src/router.dart' show router;
+export 'src/router.dart' show StartupCoverGoRouterExtension, router;

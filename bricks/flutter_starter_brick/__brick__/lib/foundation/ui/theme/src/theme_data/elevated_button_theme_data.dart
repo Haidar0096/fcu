@@ -9,7 +9,7 @@ ElevatedButtonThemeData elevatedButtonThemeData(ColorScheme colorScheme) =>
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
             return colorScheme.onSurface.withValues(
-              alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+              alpha: ThemeDefaults.overlayAlpha,
             );
           }
           return colorScheme.surface;
@@ -19,7 +19,7 @@ ElevatedButtonThemeData elevatedButtonThemeData(ColorScheme colorScheme) =>
             color:
                 states.contains(WidgetState.disabled)
                     ? colorScheme.onSurface.withValues(
-                      alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+                      alpha: ThemeDefaults.overlayAlpha,
                     )
                     : colorScheme.onSurface,
             width: ThemeDefaults.borderWidth,
@@ -43,7 +43,7 @@ ElevatedButtonThemeData elevatedButtonThemeData(ColorScheme colorScheme) =>
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) return null;
           return colorScheme.primary.withValues(
-            alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+            alpha: ThemeDefaults.overlayAlpha,
           );
         }),
         elevation: const WidgetStatePropertyAll(0),

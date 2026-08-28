@@ -40,7 +40,7 @@ class DestructiveButton extends StatelessWidget {
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) return null;
           return context.themeData.colorScheme.onError.withValues(
-            alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+            alpha: ThemeDefaults.overlayAlpha,
           );
         }),
         shape: WidgetStatePropertyAll(

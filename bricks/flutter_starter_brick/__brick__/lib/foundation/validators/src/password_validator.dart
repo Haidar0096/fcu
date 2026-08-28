@@ -1,5 +1,5 @@
-String? validatePassword(
-  String? value, {
+String? validatePassword({
+  required String? value,
   required String emptyPasswordErrorMessage,
   required String passwordTooShortErrorMessage,
   required String passwordRequiresLowercaseErrorMessage,

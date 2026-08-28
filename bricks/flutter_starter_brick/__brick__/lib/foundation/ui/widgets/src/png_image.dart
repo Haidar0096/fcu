@@ -11,8 +11,8 @@ extension PngImagesExtension on PngImages {
     double? width,
     double? height,
     Color? color,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
+    BoxFit? fit,
+    AlignmentGeometry? alignment,
     String? semanticLabel,
   }) => Image.asset(
     path,
@@ -20,8 +20,8 @@ extension PngImagesExtension on PngImages {
     width: width,
     height: height,
     color: color,
-    fit: fit,
-    alignment: alignment,
+    fit: fit ?? BoxFit.contain,
+    alignment: alignment ?? Alignment.center,
     semanticLabel: semanticLabel,
   );
 }

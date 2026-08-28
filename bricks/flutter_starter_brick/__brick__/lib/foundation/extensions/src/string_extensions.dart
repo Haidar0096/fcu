@@ -1,7 +1,7 @@
 import 'package:path/path.dart' as path;
 
 /// Extensions for String and String? types
-extension NullableStringExtensions on String? {
+extension NullableStringExtension on String? {
   /// Returns true if string is not null and not empty (after trimming),
   /// false otherwise
   bool get isNotNullOrEmpty => this != null && this!.trim().isNotEmpty;
@@ -11,7 +11,7 @@ extension NullableStringExtensions on String? {
 }
 
 /// Extensions for file path operations on String
-extension FilePathExtensions on String {
+extension FilePathExtension on String {
   /// Returns the file extension in lowercase without the dot
   /// (e.g., "pdf", "png")
   String get fileExtension =>

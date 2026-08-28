@@ -25,7 +25,7 @@ TextButtonThemeData textButtonThemeData(ColorScheme colorScheme) =>
         overlayColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) return null;
           return colorScheme.primary.withValues(
-            alpha: ThemeDefaults.buttonDisabledOverlayAlpha,
+            alpha: ThemeDefaults.overlayAlpha,
           );
         }),
         elevation: const WidgetStatePropertyAll(0),

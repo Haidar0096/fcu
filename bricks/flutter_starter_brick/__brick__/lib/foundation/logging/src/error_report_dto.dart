@@ -19,13 +19,13 @@ enum ErrorReportLevel { info, error }
 @JsonSerializable(createFactory: false)
 final class ErrorReportDto {
   const ErrorReportDto({
-    required this.appShortName,
+    required this.app,
     required this.level,
     required this.message,
+    required this.stack,
+    required this.correlationId,
     required this.occurredAt,
     required this.flow,
-    this.stackTrace,
-    this.backendCorrelationId,
   });
 
   /// The short name of the app that sent this report.
@@ -33,7 +33,7 @@ final class ErrorReportDto {
   /// The project's report table takes reports from every app it owns — the
   /// phone app, the website, an admin panel — so without this a phone crash
   /// and a website crash are one undifferentiated pile.
-  final String appShortName;
+  final String app;
 
   /// How serious this report is.
   final ErrorReportLevel level;
@@ -42,21 +42,18 @@ final class ErrorReportDto {
   /// log line stay recognizable as the same failure.
   final String message;
 
+  /// Where the failure came from.
+  final String stack;
+
+  /// The backend-minted id for the request behind this report, when one
+  /// exists.
+  final String? correlationId;
+
   /// When the failure happened on the device.
   final DateTime occurredAt;
 
   /// The last actions the user took before the failure, oldest first.
-  final List<String> flow;
-
-  /// Where the failure came from. A synthesized failure carries the caller's
-  /// current stack rather than nothing.
-  final String? stackTrace;
-
-  /// The id the project's backend put on the response behind this failure,
-  /// so the report can be joined to the request that produced it. The app
-  /// never mints one: a failure with no backend call behind it leaves this
-  /// empty.
-  final String? backendCorrelationId;
+  final List<Map<String, dynamic>> flow;
 
   /// The body of the request that carries this report.
   Map<String, dynamic> toJson() => _$ErrorReportDtoToJson(this);

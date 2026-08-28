@@ -1,5 +1,5 @@
 export 'src/blur_widget.dart';
-export 'src/common_typedefs.dart';
+export 'src/on_app_lifecycle_changed_callback.dart';
 export 'src/custom_elevated_button.dart';
 export 'src/custom_radio_button.dart';
 export 'src/custom_text_form_field.dart';
@@ -14,5 +14,6 @@ export 'src/root_screen_widget.dart';
 export 'src/secondary_button.dart';
 export 'src/sliding_banner.dart';
 export 'src/spacing.dart';
+export 'src/spacing_widget.dart';
 export 'src/status_banner_widget.dart';
 export 'src/status_banner_widget_defaults.dart';

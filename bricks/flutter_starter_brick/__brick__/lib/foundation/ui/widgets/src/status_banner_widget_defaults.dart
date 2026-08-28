@@ -1,5 +1,6 @@
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
-import 'package:{{proj_name}}/foundation/ui/widgets/src/spacing.dart';
+
+import 'spacing.dart';
 
 /// Design values owned by the status banner.
 abstract final class StatusBannerWidgetDefaults {
@@ -9,6 +10,10 @@ abstract final class StatusBannerWidgetDefaults {
 
   /// The spinner's stroke at [iconSize] — any thicker and the ring closes up.
   static const double spinnerStrokeWidth = 2;
+
+  /// Keeps the dismiss glyph below the shared small-icon size.
+  static double get dismissIconSize =>
+      ThemeDefaults.smallIconSize - SpacingSize.spacing4.value;
 
   /// Half the smallest spacing step, so the shadow reads as a lift rather
   /// than a second edge under the banner.

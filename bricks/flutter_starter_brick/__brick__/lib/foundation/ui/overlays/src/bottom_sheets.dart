@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
+part 'bottom_sheet_content.dart';
+
 Future<T?> showCustomBottomSheet<T>({
   required BuildContext context,
-  bool isDismissible = true,
-  bool enableDrag = true,
+  required bool isDismissible,
+  required bool enableDrag,
   Color? backgroundColor,
   Widget? content,
-  AppLifeCycleChangedCallback? onAppLifecycleStateChanged,
+  OnAppLifecycleChangedCallback? onAppLifecycleStateChanged,
 }) async => showModalBottomSheet<T>(
   context: context,
   isDismissible: isDismissible,
@@ -27,39 +29,3 @@ Future<T?> showCustomBottomSheet<T>({
   ),
   barrierColor: context.themeData.defaultScrim,
 );
-
-class _CustomBottomSheetContent extends StatefulWidget {
-  const _CustomBottomSheetContent({
-    required this.content,
-    this.onAppLifecycleStateChanged,
-  });
-
-  final Widget content;
-  final AppLifeCycleChangedCallback? onAppLifecycleStateChanged;
-
-  @override
-  State<_CustomBottomSheetContent> createState() =>
-      _CustomBottomSheetContentState();
-}
-
-class _CustomBottomSheetContentState extends State<_CustomBottomSheetContent>
-    with WidgetsBindingObserver {
-  @override
-  void initState() {
-    WidgetsBinding.instance.addObserver(this);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.content;
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) =>
-      widget.onAppLifecycleStateChanged?.call(state);
-}

@@ -5,10 +5,6 @@
 ///
 /// Usage example:
 /// ```dart
-/// // Using the enum to get the asset path:
-/// Image.asset(PngImages.placeholderImage.path)
-///
-/// // Or using the extension method:
 /// PngImages.placeholderImage.toWidget(width: 100, height: 100)
 /// ```
 enum PngImages {

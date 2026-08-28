@@ -13,26 +13,23 @@ part 'splash_state.dart';
 /// second action (a forced-update check, a session restore) can sit in an
 /// async gap beside the splash timer.
 class SplashCubit extends Cubit<SplashState> with CubitUtils<SplashState> {
-  SplashCubit() : super(const SplashInitial());
+  SplashCubit() : super(const SplashInitialState());
 
   /// How long the splash stays up once the metadata has arrived.
   static const Duration _splashDuration = Duration(milliseconds: 1500);
 
   Timer? _splashTimer;
 
-  /// Called when app metadata is loaded - starts splash timer
   void onMetadataLoaded() => _startSplashTimer();
 
-  /// Called when app metadata loading fails - emits critical error state
-  void onMetadataLoadingFailed({String? errorMessage}) =>
-      emitIfNotClosed(SplashCriticalError(errorMessage: errorMessage));
+  void onMetadataLoadingFailed({required String? errorMessage}) =>
+      emit(SplashCriticalErrorState(errorMessage: errorMessage));
 
-  /// Starts 1.5 second timer before completing splash
   void _startSplashTimer() {
     _cancelSplashTimer();
     _splashTimer = Timer(
       _splashDuration,
-      () => emitIfNotClosed(const SplashComplete()),
+      () => emitIfNotClosed(const SplashCompleteState()),
     );
   }
 

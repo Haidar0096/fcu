@@ -13,9 +13,9 @@ class DimWidget extends StatelessWidget {
   /// The [child] parameter must not be null.
   const DimWidget({
     required this.child,
-    super.key,
-    this.applyDim = true,
+    required this.applyDim,
     this.dimColor,
+    super.key,
   });
 
   /// The widget below this widget in the tree.

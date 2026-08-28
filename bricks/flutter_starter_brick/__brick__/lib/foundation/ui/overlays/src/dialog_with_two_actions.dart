@@ -19,8 +19,8 @@ Future<T?> showDialogWithTwoActions<T>({
   required VoidCallback? leftButtonOnPressed,
   required String rightButtonText,
   required VoidCallback? rightButtonOnPressed,
-  bool barrierDismissible = true,
-  bool rightButtonIsDestructive = false,
+  required bool barrierDismissible,
+  required bool rightButtonIsDestructive,
 }) async => showCustomGeneralDialog<T>(
   context: context,
   barrierColor: context.themeData.dialogTheme.barrierColor,
@@ -29,7 +29,7 @@ Future<T?> showDialogWithTwoActions<T>({
   applyDim: true,
   content: AlertDialog(
     title: Padding(
-      padding: const EdgeInsets.only(top: DialogConstants.verticalPadding),
+      padding: EdgeInsets.only(top: DialogConstants.verticalPadding),
       child: Center(
         child: Text(
           title,
@@ -40,14 +40,14 @@ Future<T?> showDialogWithTwoActions<T>({
       ),
     ),
     content: Padding(
-      padding: const EdgeInsets.symmetric(
+      padding: EdgeInsets.symmetric(
         horizontal: DialogConstants.horizontalPadding,
         vertical: DialogConstants.verticalPadding,
       ),
       child: body,
     ),
     actionsAlignment: MainAxisAlignment.center,
-    actionsPadding: const EdgeInsets.only(
+    actionsPadding: EdgeInsets.only(
       left: DialogConstants.horizontalPadding,
       right: DialogConstants.horizontalPadding,
       bottom: DialogConstants.horizontalPadding,
@@ -62,7 +62,7 @@ Future<T?> showDialogWithTwoActions<T>({
               onPressed: leftButtonOnPressed,
             ),
           ),
-          const SizedBox(width: DialogConstants.buttonSpacing),
+          Spacing.horizontal(SpacingSize.spacing16),
           Expanded(
             child:
                 rightButtonIsDestructive

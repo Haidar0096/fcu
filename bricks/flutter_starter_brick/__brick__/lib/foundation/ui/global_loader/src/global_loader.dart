@@ -8,7 +8,13 @@ import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
 /// Global loader singleton for managing app-wide loading overlays.
 class GlobalLoader {
-  GlobalLoader._({required this.appLogger, required this.rootNavigatorKey});
+  GlobalLoader._({
+    required AppLogger appLogger,
+    required ErrorLogger errorLogger,
+    required GlobalKey<NavigatorState> rootNavigatorKey,
+  }) : _appLogger = appLogger,
+       _errorLogger = errorLogger,
+       _rootNavigatorKey = rootNavigatorKey;
 
   static const String _tag = 'GlobalLoader';
 
@@ -27,16 +33,19 @@ class GlobalLoader {
   /// Initializes the global loader singleton.
   static void init({
     required AppLogger appLogger,
+    required ErrorLogger errorLogger,
     required GlobalKey<NavigatorState> rootNavigatorKey,
   }) {
     _instance = GlobalLoader._(
       appLogger: appLogger,
+      errorLogger: errorLogger,
       rootNavigatorKey: rootNavigatorKey,
     );
   }
 
-  final AppLogger appLogger;
-  final GlobalKey<NavigatorState> rootNavigatorKey;
+  final AppLogger _appLogger;
+  final ErrorLogger _errorLogger;
+  final GlobalKey<NavigatorState> _rootNavigatorKey;
   OverlayEntry? _loadingOverlay;
   Timer? _hideTimer;
 
@@ -45,23 +54,25 @@ class GlobalLoader {
     _hideTimer?.cancel();
     _hideTimer = null;
 
-    final context = rootNavigatorKey.currentContext;
+    final context = _rootNavigatorKey.currentContext;
 
     if (context == null) {
-      appLogger.log('Tried to show loader using a null context', tag: _tag);
+      _appLogger.log(
+        message: 'Tried to show loader using a null context',
+        tag: _tag,
+      );
       return;
     }
 
     if (Overlay.maybeOf(context) == null) {
-      appLogger.log(
-        'Tried to show loader on a context that is not attached to an'
+      _appLogger.log(
+        message: 'Tried to show loader on a context that is not attached to an'
         ' overlay',
         tag: _tag,
       );
       return;
     }
 
-    // If loader already exists and is mounted, don't create a new one
     if (_loadingOverlay != null) {
       if (_loadingOverlay!.mounted) {
         return;
@@ -79,13 +90,15 @@ class GlobalLoader {
             );
 
         return BlurWidget(
+          applyBlur: true,
           child: DimWidget(
+            applyDim: true,
             child: Center(
               child: ListView(
                 shrinkWrap: true,
                 children: [
                   const Center(child: LoaderWidget()),
-                  SizedBox(height: SpacingSize.spacing24.value),
+                  Spacing.vertical(SpacingSize.spacing24),
                   if (loadingText != null)
                     Center(
                       child: Text(
@@ -114,8 +127,20 @@ class GlobalLoader {
         if (_loadingOverlay!.mounted) {
           try {
             _loadingOverlay!.remove();
-          } catch (e) {
-            appLogger.log('Error removing loader overlay: $e', tag: _tag);
+          } catch (error, stackTrace) {
+            final message = 'Failed to remove the global loader overlay: '
+                '$error';
+            _appLogger.log(
+              message: message,
+              tag: _tag,
+              stackTrace: stackTrace,
+            );
+            unawaited(
+              _errorLogger.recordError(
+                error: message,
+                stackTrace: stackTrace,
+              ),
+            );
           }
         }
         _loadingOverlay = null;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:{{proj_name}}/features/random_jokes/src/models/ui_models/ui_joke.dart';
-import 'package:{{proj_name}}/features/random_jokes/src/ui/joke_card_defaults.dart';
+import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/models/ui_models/ui_joke.dart';
+import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/ui/joke_card_defaults.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 

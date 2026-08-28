@@ -18,15 +18,23 @@ class DioHttpClient extends HttpClient {
   DioHttpClient({
     required dio.Dio client,
     required AppLogger appLogger,
-    required ErrorLogger errorLogger,
+    required ErrorLogger? errorLogger,
+    required bool reportsFailures,
     this.serverErrorMessageParser,
-  }) : _client = client,
+  }) : assert(
+         !reportsFailures || errorLogger != null,
+         'A failure-reporting client requires an ErrorLogger.',
+       ),
+       _client = client,
        _appLogger = appLogger,
-       _errorLogger = errorLogger;
+       _errorLogger = errorLogger,
+       _reportsFailures = reportsFailures;
 
   final dio.Dio _client;
   final AppLogger _appLogger;
-  final ErrorLogger _errorLogger;
+  final ErrorLogger? _errorLogger;
+  final bool _reportsFailures;
+  String? _lastSuccessfulCorrelationId;
 
   static const String _tag = 'DioHttpClient';
 
@@ -34,11 +42,14 @@ class DioHttpClient extends HttpClient {
   /// every response — success and error alike. Reading it here is the one
   /// place the id enters the app: this is where a transport failure is
   /// classified, so this is where the id joins the failure it belongs to.
-  static const String _correlationIdHeader = 'x-correlation-id';
+  static const String _correlationIdHeader = 'X-Correlation-Id';
 
   /// A function that parses error response and returns message and code.
   final ({String? message, String? code})? Function(dynamic response)?
   serverErrorMessageParser;
+
+  @override
+  String? get lastSuccessfulCorrelationId => _lastSuccessfulCorrelationId;
 
   @override
   Future<Result<NetworkFailure, S>> get<S>({
@@ -52,6 +63,7 @@ class DioHttpClient extends HttpClient {
   }) => _request(
     path: path,
     method: 'GET',
+    isMultipart: false,
     successResponseMapper: successResponseMapper,
     queryParameters: queryParameters,
     additionalHeaders: additionalHeaders,
@@ -65,7 +77,7 @@ class DioHttpClient extends HttpClient {
     required String path,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
     Object? body,
-    bool isMultipart = false,
+    required bool isMultipart,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
@@ -97,6 +109,7 @@ class DioHttpClient extends HttpClient {
   }) => _request(
     path: path,
     method: 'PUT',
+    isMultipart: false,
     successResponseMapper: successResponseMapper,
     body: body,
     queryParameters: queryParameters,
@@ -111,7 +124,7 @@ class DioHttpClient extends HttpClient {
     required String path,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
     Object? body,
-    bool isMultipart = false,
+    required bool isMultipart,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
@@ -142,6 +155,7 @@ class DioHttpClient extends HttpClient {
   }) => _request(
     path: path,
     method: 'DELETE',
+    isMultipart: false,
     successResponseMapper: successResponseMapper,
     queryParameters: queryParameters,
     additionalHeaders: additionalHeaders,
@@ -155,25 +169,29 @@ class DioHttpClient extends HttpClient {
     required String path,
     required String filePath,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
-    String fieldName = 'file',
+    String? fieldName,
     Map<String, dynamic>? additionalFields,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
     bool Function(int? statusCode)? responseStatusCodeValidator,
-    ProgressCallback? onSendProgress,
+    OnProgressCallback? onSendProgress,
     CancelToken? cancelToken,
   }) async {
     final fileName = filePath.baseName;
 
     final formData = dio.FormData.fromMap({
-      fieldName: await dio.MultipartFile.fromFile(filePath, filename: fileName),
+      fieldName ?? 'file': await dio.MultipartFile.fromFile(
+        filePath,
+        filename: fileName,
+      ),
       ...?additionalFields,
     });
 
     return _request(
       path: path,
       method: 'POST',
+      isMultipart: false,
       body: formData,
       successResponseMapper: successResponseMapper,
       queryParameters: queryParameters,
@@ -191,23 +209,27 @@ class DioHttpClient extends HttpClient {
     required Uint8List bytes,
     required String filename,
     required S Function(HttpResponse<dynamic> response) successResponseMapper,
-    String fieldName = 'file',
+    String? fieldName,
     Map<String, dynamic>? additionalFields,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
     bool Function(int? statusCode)? responseStatusCodeValidator,
-    ProgressCallback? onSendProgress,
+    OnProgressCallback? onSendProgress,
     CancelToken? cancelToken,
   }) {
     final formData = dio.FormData.fromMap({
-      fieldName: dio.MultipartFile.fromBytes(bytes, filename: filename),
+      fieldName ?? 'file': dio.MultipartFile.fromBytes(
+        bytes,
+        filename: filename,
+      ),
       ...?additionalFields,
     });
 
     return _request(
       path: path,
       method: 'POST',
+      isMultipart: false,
       body: formData,
       successResponseMapper: successResponseMapper,
       queryParameters: queryParameters,
@@ -230,9 +252,9 @@ class DioHttpClient extends HttpClient {
     Map<String, dynamic>? additionalHeaders,
     Map<String, dynamic>? replacementHeaders,
     Object? body,
-    bool isMultipart = false,
+    required bool isMultipart,
     bool Function(int? statusCode)? responseStatusCodeValidator,
-    ProgressCallback? onSendProgress,
+    OnProgressCallback? onSendProgress,
     CancelToken? cancelToken,
   }) async {
     if (additionalHeaders != null && replacementHeaders != null) {
@@ -247,7 +269,6 @@ class DioHttpClient extends HttpClient {
         headers.addAll(additionalHeaders);
       }
 
-      // Convert body to FormData if multipart is requested
       final requestBody = isMultipart && body != null
           ? dio.FormData.fromMap(body as Map<String, dynamic>)
           : body;
@@ -258,7 +279,6 @@ class DioHttpClient extends HttpClient {
         validateStatus: responseStatusCodeValidator,
       );
 
-      // Extract Dio's CancelToken from our wrapper
       if (cancelToken != null && cancelToken is! DioCancelToken) {
         throw ArgumentError(
           'DioHttpClient requires DioCancelToken implementation',
@@ -275,9 +295,11 @@ class DioHttpClient extends HttpClient {
         cancelToken: dioCancelToken,
       );
 
-      return Result.success(successResponseMapper(response.toHttpResponse));
+      _lastSuccessfulCorrelationId = _readCorrelationId(response);
+      return Result.success(
+        data: successResponseMapper(response.toHttpResponse),
+      );
     } on dio.DioException catch (dioException) {
-      // Parse error data once
       final errorData = serverErrorMessageParser?.call(
         dioException.response?.data,
       );
@@ -289,7 +311,7 @@ class DioHttpClient extends HttpClient {
       // dashboard.
       if (dioException.type == dio.DioExceptionType.cancel) {
         return Result.failure(
-          CancelError(
+          data: CancelError(
             statusCode: statusCode,
             message: errorData?.message,
             code: errorData?.code,
@@ -298,36 +320,37 @@ class DioHttpClient extends HttpClient {
         );
       }
 
-      // Log detailed error information before converting to NetworkFailure
-      final errorDetails = buildDetailedErrorMessage(dioException, path);
-      _appLogger.log(errorDetails, tag: _tag);
-      await _errorLogger.recordError(
-        error: errorDetails,
-        stackTrace: dioException.stackTrace,
-        backendCorrelationId: correlationId,
+      final errorDetails = buildDetailedErrorMessage(
+        dioException: dioException,
+        path: path,
       );
+      _appLogger.log(message: errorDetails, tag: _tag);
+      if (_reportsFailures) {
+        await _errorLogger!.recordError(
+          error: errorDetails,
+          stackTrace: dioException.stackTrace,
+          backendCorrelationId: correlationId,
+        );
+      }
 
-      // Handle dio exceptions
       switch (dioException.type) {
-        // Check for timeout errors
         case dio.DioExceptionType.sendTimeout:
         case dio.DioExceptionType.receiveTimeout:
         case dio.DioExceptionType.connectionTimeout:
         case dio.DioExceptionType.transformTimeout:
           return Result.failure(
-            TimeoutError(
+            data: TimeoutError(
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
               backendCorrelationId: correlationId,
             ),
           );
-        // Check for network errors
         case dio.DioExceptionType.connectionError:
         case dio.DioExceptionType.unknown
             when isSocketException(dioException.error):
           return Result.failure(
-            NetworkError(
+            data: NetworkError(
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
@@ -336,7 +359,7 @@ class DioHttpClient extends HttpClient {
           );
         case dio.DioExceptionType.cancel:
           return Result.failure(
-            CancelError(
+            data: CancelError(
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
@@ -346,7 +369,7 @@ class DioHttpClient extends HttpClient {
         case dio.DioExceptionType.badCertificate:
         case dio.DioExceptionType.badResponse:
           return Result.failure(
-            ServerError(
+            data: ServerError(
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
@@ -355,7 +378,7 @@ class DioHttpClient extends HttpClient {
           );
         case dio.DioExceptionType.unknown:
           return Result.failure(
-            UnknownError(
+            data: UnknownError(
               statusCode: statusCode,
               message: errorData?.message,
               code: errorData?.code,
@@ -364,17 +387,23 @@ class DioHttpClient extends HttpClient {
           );
       }
     } catch (error, stackTrace) {
-      // Log general errors that aren't DioExceptions
       final errorMessage = 'Non-DioException error for $method $path: $error';
-      _appLogger.log(errorMessage, tag: _tag);
-      await _errorLogger.recordError(
-        error: errorMessage,
-        stackTrace: stackTrace,
-      );
+      _appLogger.log(message: errorMessage, tag: _tag);
+      if (_reportsFailures) {
+        await _errorLogger!.recordError(
+          error: errorMessage,
+          stackTrace: stackTrace,
+        );
+      }
 
       final errorData = serverErrorMessageParser?.call(error);
       return Result.failure(
-        UnknownError(message: errorData?.message, code: errorData?.code),
+        data: UnknownError(
+          statusCode: null,
+          message: errorData?.message,
+          code: errorData?.code,
+          backendCorrelationId: null,
+        ),
       );
     }
   }

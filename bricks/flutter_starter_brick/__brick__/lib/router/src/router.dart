@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:{{proj_name}}/features/critical_error_screen/critical_error_screen.dart';
-import 'package:{{proj_name}}/features/random_jokes/random_jokes.dart';
+import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/random_jokes_screen.dart';
 import 'package:{{proj_name}}/features/splash_screen/splash_screen.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:{{proj_name}}/foundation/locator/locator.dart';
@@ -14,6 +14,7 @@ import 'package:{{proj_name}}/router/src/route_paths.dart';
 import 'package:{{proj_name}}/router/src/platform_page.dart';
 
 part 'router.g.dart';
+part 'startup_cover.dart';
 
 const String _tag = 'router';
 
@@ -21,18 +22,24 @@ const String _tag = 'router';
 ///
 /// The loggers are resolved with `tryGet` so a missing one cannot turn a
 /// reportable failure into a crash on the error path itself.
-void _reportRouteFailure(String message, StackTrace stackTrace) {
-  serviceLocator.tryGet<AppLogger>()?.log(message, tag: _tag);
+void _reportRouteFailure({
+  required String message,
+  required StackTrace stackTrace,
+}) {
+  serviceLocator.tryGet<AppLogger>()?.log(message: message, tag: _tag);
   final errorLogger = serviceLocator.tryGet<ErrorLogger>();
   if (errorLogger != null) {
     unawaited(errorLogger.recordError(error: message, stackTrace: stackTrace));
   }
 }
 
+/// Tells the app shell that startup no longer needs its cover.
+typedef OnStartupCoverCompleteCallback = void Function();
+
 final GoRouter router = GoRouter(
   navigatorKey: rootNavigatorKey,
   routes: $appRoutes,
-  initialLocation: SplashRoutePath.path,
+  initialLocation: RandomJokesRoutePath.path,
   debugLogDiagnostics: kDebugMode,
   // The screen trail: every report carries the screens the user visited
   // before the failure. The observer reads the NAME each page below declares
@@ -46,19 +53,17 @@ final GoRouter router = GoRouter(
     try {
       RoutePath.fromPath(currentPath);
     } catch (error, stackTrace) {
-      // A bad address is real breakage: it is reported before the user lands
-      // on the fallback screen. The full address is named alongside the
-      // matched location, which can be a shorter prefix of it.
+      // A bad address is real breakage. Only its path is reported: query data
+      // and hidden navigation data never enter a recorded trail.
       _reportRouteFailure(
-        'Unrecognized route address ${state.uri} '
+        message: 'Unrecognized route path ${state.uri.path} '
         '(matched location: $currentPath): $error',
-        stackTrace,
+        stackTrace: stackTrace,
       );
       return CriticalErrorRoutePath.path;
     }
 
-    // TODO({{dev_name.paramCase()}}): Add the auth guard here when authentication is
-    // implemented.
+    // Add the auth guard here when authentication is implemented.
     //
     // Access control lives in this ONE redirect and nowhere else, decided off
     // the route's own auth fact. The starter ships without it on purpose and
@@ -70,7 +75,7 @@ final GoRouter router = GoRouter(
     // here that reads both. Nothing is written here as ready-to-uncomment
     // code, because none of the names it would use exists yet.
 
-    // If all checks above passed, let the app go to the requested route
+    // The route is known and this starter has no auth-dependent state.
     return null;
   },
   onException: (context, state, router) {
@@ -78,54 +83,35 @@ final GoRouter router = GoRouter(
     // from: a redirect target that matches nothing, a redirect loop, or an
     // initial deep link blocked with no route left to fall back to.
     _reportRouteFailure(
-      'Routing failed for address: ${state.uri}',
-      StackTrace.current,
+      message: 'Routing failed for path: ${state.uri.path}',
+      stackTrace: StackTrace.current,
     );
     router.go(CriticalErrorRoutePath.path);
   },
 );
 
-@TypedGoRoute<SplashScreenRoute>(path: SplashRoutePath.path)
-@immutable
-class SplashScreenRoute extends GoRouteData with $SplashScreenRoute {
-  const SplashScreenRoute();
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) =>
-      platformPage<void>(
-        pageKey: state.pageKey,
-        screenName: SplashRoutePath.name,
-        child: BlocProvider(
-          create: (_) => serviceLocator.get<SplashCubit>(),
-          child: SplashScreen(
-            onNavigateToCriticalError: ({required String message}) {
-              if (context.mounted) {
-                CriticalErrorScreenRoute(errorMessage: message).go(context);
-              }
-            },
-            onNavigateToRandomJokes: () {
-              if (context.mounted) {
-                const RandomJokesScreenRoute().go(context);
-              }
-            },
-          ),
-        ),
-      );
+/// Adds the router-owned startup cover to the router API used by the app shell.
+extension StartupCoverGoRouterExtension on GoRouter {
+  Widget startupCover({
+    required OnStartupCoverCompleteCallback onStartupComplete,
+  }) => _StartupCover(onStartupComplete: onStartupComplete);
 }
 
 @TypedGoRoute<CriticalErrorScreenRoute>(path: CriticalErrorRoutePath.path)
 @immutable
 class CriticalErrorScreenRoute extends GoRouteData
     with $CriticalErrorScreenRoute {
-  const CriticalErrorScreenRoute({this.errorMessage});
-  final String? errorMessage;
+  const CriticalErrorScreenRoute({this.$extra});
+
+  /// Hidden navigation data. Error text never rides the route address.
+  final String? $extra;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
       platformPage<void>(
         pageKey: state.pageKey,
         screenName: CriticalErrorRoutePath.name,
-        child: CriticalErrorScreen(errorMessage: errorMessage),
+        child: CriticalErrorScreen(errorMessage: $extra),
       );
 }
 

@@ -5,7 +5,8 @@ import 'package:{{proj_name}}/foundation/ui/mixins/mixins.dart';
 
 @immutable
 class UiNetworkFailure implements DisplayableUiModelMixin {
-  const UiNetworkFailure(this._failure);
+  const UiNetworkFailure({required NetworkFailure failure})
+    : _failure = failure;
 
   final NetworkFailure _failure;
 
