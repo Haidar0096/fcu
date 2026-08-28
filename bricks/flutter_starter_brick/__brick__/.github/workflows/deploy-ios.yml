@@ -37,10 +37,6 @@ jobs:
           echo "version_name=$ios_version_name" >> "$GITHUB_OUTPUT"
           echo "build_number=$ios_build_number" >> "$GITHUB_OUTPUT"
 
-      - name: Determine main file
-        id: main_file
-        run: echo "main_file=lib/main_${{ inputs.environment }}.dart" >> "$GITHUB_OUTPUT"
-
       - name: Install Flutter dependencies
         run: flutter pub get
 
@@ -88,7 +84,7 @@ jobs:
             --release \
             --build-name="${{ steps.versions.outputs.version_name }}" \
             --build-number="${{ steps.versions.outputs.build_number }}" \
-            -t "${{ steps.main_file.outputs.main_file }}" \
+            --dart-define-from-file="env/${{ inputs.environment }}.json" \
             --export-options-plist=ios/ci/ExportOptions.plist
 
       - name: Upload to TestFlight

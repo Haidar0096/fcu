@@ -70,7 +70,8 @@ These must exist in the repo for the workflow to work:
 | `versions` | Contains `android_version_name` and `android_build_number` (shell variable format: `android_version_name=0.0.1`) |
 | `android/app/build.gradle.kts` | Release signing config must read from `key.properties` (see `scripts/upload_to_play_store/README.md` — "Android Signing Setup") |
 | `scripts/upload_to_play_store/upload_to_playstore.py` | Python script that uploads AAB via Google Play API |
-| `lib/main_development.dart`, `lib/main_production.dart` | Entry points for dev and prod environments |
+| `lib/main.dart` | Single app entry point |
+| `env/development.json`, `env/production.json` | Build settings for the two environments |
 
 ## Shared Configuration
 

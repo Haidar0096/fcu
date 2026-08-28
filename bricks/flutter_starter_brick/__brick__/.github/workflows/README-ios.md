@@ -85,7 +85,8 @@ These must exist in the repo for the workflow to work:
 |------|---------|
 | `versions` | Contains `ios_version_name` and `ios_build_number` (shell variable format: `ios_version_name=0.0.1`) |
 | `ios/ci/ExportOptions.plist` | Manual signing config for CI export — must have Team ID and profile name filled in (see below) |
-| `lib/main_development.dart`, `lib/main_production.dart` | Entry points for dev and prod environments |
+| `lib/main.dart` | Single app entry point |
+| `env/development.json`, `env/production.json` | Build settings for the two environments |
 
 ## Xcode Signing Setup
 

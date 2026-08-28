@@ -209,6 +209,10 @@ Future<void> run(HookContext context) async {
   );
 
   context.logger.success('🎉 Brick generated successfully!');
+  context.logger.info(
+    'Run the app with: flutter run '
+    '--dart-define-from-file=env/development.json',
+  );
   context.logger.warn(
     'Do not forget to search the codebase for the TODOs'
     ' and change them according to the project needs.',

@@ -154,7 +154,7 @@ mason bundle -t universal
 cd generated_app
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
-flutter run
+flutter run --dart-define-from-file=env/development.json
 ```
 
 ## Build Scripts
@@ -219,7 +219,7 @@ Located at `packages/architecture_lint_rules/`. Dart Analyzer Plugin (uses `anal
 | `foundation_import_restrictions` | foundation/ can only import resources/ and other foundation/ | None |
 | `features_import_restrictions` | features/ can only import foundation/, resources/, fake_data/, features/ | None |
 | `router_import_restrictions` | router/ can import features/, foundation/, resources/, dependency_injection/, router/ | None |
-| `main_environment_files_import_restrictions` | main_*.dart can only import foundation/, main_common.dart | None |
+| `main_import_restrictions` | main.dart can only import app/, dependency_injection/, foundation/, resources/ | None |
 
 **Critical: the composition-root exception:**
 The `no_src_imports` rule exempts the three composition roots — `dependency_injection/`, `router/` and `fake_data/` — which CAN import from any /src/ folder. This is architecturally correct: they compose the app, so they need to know about the internal implementations they wire together.

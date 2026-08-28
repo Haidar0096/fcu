@@ -43,22 +43,22 @@ var x = App();
     );
   }
 
-  Future<void> test_importFromMainCommon_violation() async {
-    newFile('$testPackageLibPath/main_common.dart', 'void mainCommon() {}');
+  Future<void> test_importFromMain_violation() async {
+    newFile('$testPackageLibPath/main.dart', 'void main() {}');
 
     newFile(
       '$testPackageLibPath/dependency_injection/src/register_instances.dart',
       r'''
-import 'package:test/main_common.dart';
+import 'package:test/main.dart';
 
-void x() => mainCommon();
+void x() => main();
 ''',
     );
 
     await assertDiagnosticsInFile(
       '$testPackageLibPath/dependency_injection/src/register_instances.dart',
       [
-        lint(0, 39, messageContainsAll: [_message]),
+        lint(0, 32, messageContainsAll: [_message]),
       ],
     );
   }

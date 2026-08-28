@@ -67,14 +67,12 @@ jobs:
         # native target. `fcu create` picks each project's platforms, so the
         # gate builds no platform in particular - this command needs no
         # platform folder at all. It does NOT cover a platform's own
-        # toolchain: a web project adds `flutter build web` here (the web
-        # compiler is the only thing that catches a `dart:io` import), and an
+        # toolchain: a web project adds `flutter build web
+        # --dart-define-from-file=env/development.json` here (the web compiler
+        # is the only thing that catches a `dart:io` import), and an
         # Android or iOS target adds its build plus, for Android, the Java
         # setup step the deploy lane carries.
         #
-        # The `-t` target below names one environment, because
-        # `flutter build bundle` otherwise defaults to `lib/main.dart`, which
-        # this project does not ship. A project that renames or drops the
-        # `development` environment updates this one line to an entry point it
-        # really has, or the gate goes red for a reason unrelated to its code.
-        run: flutter build bundle -t lib/main_development.dart
+        # The development file supplies every environment value to the single
+        # lib/main.dart entry point.
+        run: flutter build bundle --dart-define-from-file=env/development.json

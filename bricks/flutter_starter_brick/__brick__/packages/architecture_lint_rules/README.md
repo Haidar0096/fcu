@@ -18,7 +18,7 @@ Restart the Dart analysis server after changing plugin configuration.
 
 ## Project switches
 
-All 26 rules are warning rules and are enabled by default. The official analyzer-plugin `diagnostics` map can disable any rule for one project. For example:
+All 25 rules are warning rules and are enabled by default. The official analyzer-plugin `diagnostics` map can disable any rule for one project. For example:
 
 ```yaml
 plugins:
@@ -66,13 +66,12 @@ Every diagnostic below has `WARNING` severity.
 - `app_import_restrictions`: app imports only app, dependency injection, foundation, resources, and router project code.
 - `dependency_injection_import_restrictions`: dependency injection imports only its composition dependencies.
 - `fake_data_import_restrictions`: fake data imports only fake data, features, foundation, and resources project code.
-- `main_common_import_restrictions`: `main_common.dart` imports only app, dependency injection, foundation, and resources project code.
-- `main_environment_files_import_restrictions`: `main_<environment>.dart` imports only foundation and `main_common.dart` project code.
+- `main_import_restrictions`: `main.dart` imports only app, dependency injection, foundation, and resources project code.
 - `vendor_imports_stay_in_wrappers`: configured vendor and SDK imports stay in their owned wrappers.
 - `no_locator_reads_in_bloc`: a Bloc or Cubit cannot read GetIt or a locator.
 - `no_flutter_ui_in_bloc`: a Bloc or Cubit cannot import Flutter UI, name `BuildContext`, or call navigation APIs.
 - `guard_post_await_bloc_emits`: a Bloc or Cubit with an asynchronous gap carries a close-guard mixin and uses `emitIfNotClosed` after `await`.
-- `no_backend_url_literals`: backend URL literals stay in `EnvironmentVariables`.
+- `no_backend_url_literals`: backend URL literals cannot live anywhere in Dart source.
 - `no_route_path_literals`: route path literals stay in the `RoutePath` family.
 - `no_dto_in_ui_or_bloc_state`: widgets and Bloc state cannot name a `*Dto` type.
 - `no_transport_imports_in_ui`: UI files cannot import API, networking, transport, or `NetworkFailure` code.
@@ -108,7 +107,7 @@ dart analyze
 dart test
 ```
 
-The test suite covers all 11 module-boundary rules and all 15 starter guardrails. The guardrail suite includes a firing and quiet case per rule, a vendor-setting case, and a diagnostics off-switch case.
+The test suite covers all 10 module-boundary rules and all 15 starter guardrails. The guardrail suite includes a firing and quiet case per rule, a vendor-setting case, and a diagnostics off-switch case.
 
 References:
 

@@ -8,6 +8,7 @@ void main() {
   final root = Directory.current.absolute;
   _rootPath = root.path;
   final lib = Directory('${root.path}/lib');
+  _checkEnvironmentFiles(root);
   if (!lib.existsSync()) {
     _add('lib', 1, 'the app must have a lib/ tree');
     _finish();
@@ -61,28 +62,38 @@ void _checkTopLevel(Directory lib) {
   if (fakeData.existsSync() && _allFiles(fakeData).isEmpty) {
     _add('lib/fake_data', 1, 'an empty home is omitted');
   }
-  if (!files.contains('main_common.dart')) {
-    _add('lib/main_common.dart', 1, 'shared entry point is missing');
-  }
-  final environmentMains = files.where(
-    (name) =>
-        name.startsWith('main_') &&
-        name.endsWith('.dart') &&
-        name != 'main_common.dart',
-  );
-  if (environmentMains.isEmpty) {
-    _add(
-      'lib/main_<environment>.dart',
-      1,
-      'an environment entry point is missing',
-    );
+  if (!files.contains('main.dart')) {
+    _add('lib/main.dart', 1, 'the single entry point is missing');
   }
   for (final file in files) {
-    final isAllowedMain =
-        file == 'main_common.dart' ||
-        (file.startsWith('main_') && file.endsWith('.dart'));
-    if (!isAllowedMain) {
+    if (file != 'main.dart') {
       _add('lib/$file', 1, 'unexpected file at the lib/ root');
+    }
+  }
+}
+
+void _checkEnvironmentFiles(Directory root) {
+  final env = Directory('${root.path}/env');
+  if (!env.existsSync()) {
+    _add('env', 1, 'the build environment folder is missing');
+    return;
+  }
+
+  const requiredFiles = {'development.json', 'production.json'};
+  final entries = _visibleEntries(env);
+  final files = {
+    for (final entry in entries.whereType<File>()) _name(entry.path),
+  };
+  for (final file in requiredFiles.difference(files)) {
+    _add('env/$file', 1, 'required build environment file is missing');
+  }
+  for (final entry in entries) {
+    if (entry is! File || !_name(entry.path).endsWith('.json')) {
+      _add(
+        _relative(entry.path),
+        1,
+        'env/ contains JSON environment files only',
+      );
     }
   }
 }

@@ -123,13 +123,13 @@ var x = Fakes();
     );
   }
 
-  Future<void> test_importFromMainCommon_violation() async {
-    newFile('$testPackageLibPath/main_common.dart', 'void mainCommon() {}');
+  Future<void> test_importFromMain_violation() async {
+    newFile('$testPackageLibPath/main.dart', 'void main() {}');
 
     newFile('$testPackageLibPath/foundation/ui/src/theme.dart', r'''
-import 'package:test/main_common.dart';
+import 'package:test/main.dart';
 
-void x() => mainCommon();
+void x() => main();
 ''');
 
     await assertDiagnosticsInFile(
@@ -137,7 +137,7 @@ void x() => mainCommon();
       [
         lint(
           0,
-          39,
+          32,
           messageContainsAll: [
             'foundation/ can only import from resources/ or other foundation subfolders.',
           ],

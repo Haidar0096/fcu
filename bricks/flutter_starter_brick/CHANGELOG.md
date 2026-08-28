@@ -1,3 +1,8 @@
+# 4.5.0
+Released 2026-08-28 together with fcu CLI 4.4.1 (the brick and CLI versions stay independent).
+- Replaced the per-environment Dart entry points with one `lib/main.dart` and committed `env/development.json` and `env/production.json` build settings. Run, build, CI, release, lint, and structure checks now use `--dart-define-from-file`; required missing values stop startup with the key named.
+- fcu CLI 4.4.1: `fcu create` now prints `flutter run --dart-define-from-file=env/development.json` as the next step for a generated starter app.
+
 # 4.4.1
 Released 2026-08-28 together with fcu CLI 4.4.0 (the new `--dev-name` option is a minor bump; the brick and CLI versions stay independent).
 - Corrected the 4.4.0 architecture-lint claim: the rules were declared through a `git:` plugin source, but the analyzer did not load that source, so generated apps did not enforce them.

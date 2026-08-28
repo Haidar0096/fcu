@@ -4,14 +4,14 @@
 # See README.md for detailed setup instructions.
 #
 # Usage:
-#   ./upload_to_testflight.sh development  # builds main_development.dart
-#   ./upload_to_testflight.sh production   # builds main_production.dart
+#   ./upload_to_testflight.sh development  # uses env/development.json
+#   ./upload_to_testflight.sh production   # uses env/production.json
 
 # Check for environment argument
 if [[ -z "$1" ]]; then
     echo "❌ Usage: $0 <development|production>"
-    echo "   development - builds lib/main_development.dart"
-    echo "   production  - builds lib/main_production.dart"
+    echo "   development - builds with env/development.json"
+    echo "   production  - builds with env/production.json"
     exit 1
 fi
 
@@ -26,12 +26,11 @@ case "$ENVIRONMENT" in
         ;;
 esac
 
-main_file="lib/main_$ENVIRONMENT.dart"
-
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 VERSIONS_FILE="$PROJECT_ROOT/versions"
+ENVIRONMENT_FILE="$PROJECT_ROOT/env/$ENVIRONMENT.json"
 
 # Source the versions file
 if [[ -f "$VERSIONS_FILE" ]]; then
@@ -80,7 +79,7 @@ fvm flutter build ipa \
     --release \
     --build-name="$ios_version_name" \
     --build-number="$ios_build_number" \
-    -t "$main_file" \
+    --dart-define-from-file="$ENVIRONMENT_FILE" \
     --export-options-plist="$PROJECT_ROOT/ios/ci/ExportOptions.plist" || {
     echo "❌ Build failed"
     exit 1

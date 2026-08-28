@@ -187,19 +187,19 @@ var x = ClipboardService();
     ]);
   }
 
-  Future<void> test_mainCommonImportingSrc_violation() async {
+  Future<void> test_mainImportingSrc_violation() async {
     newFile(
       '$testPackageLibPath/foundation/clipboard/src/clipboard_service.dart',
       'class ClipboardService {}',
     );
 
-    newFile('$testPackageLibPath/main_common.dart', r'''
+    newFile('$testPackageLibPath/main.dart', r'''
 import 'package:test/foundation/clipboard/src/clipboard_service.dart';
 
 var x = ClipboardService();
 ''');
 
-    await assertDiagnosticsInFile('$testPackageLibPath/main_common.dart', [
+    await assertDiagnosticsInFile('$testPackageLibPath/main.dart', [
       lint(
         0,
         70,

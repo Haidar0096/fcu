@@ -5,14 +5,14 @@
 # versions present at the project root.
 #
 # Usage:
-#   ./upload_to_playstore.sh development  # builds main_development.dart
-#   ./upload_to_playstore.sh production   # builds main_production.dart
+#   ./upload_to_playstore.sh development  # uses env/development.json
+#   ./upload_to_playstore.sh production   # uses env/production.json
 
 # Check for environment argument
 if [[ -z "$1" ]]; then
     echo "❌ Usage: $0 <development|production>"
-    echo "   development - builds lib/main_development.dart"
-    echo "   production  - builds lib/main_production.dart"
+    echo "   development - builds with env/development.json"
+    echo "   production  - builds with env/production.json"
     exit 1
 fi
 
@@ -27,13 +27,12 @@ case "$ENVIRONMENT" in
         ;;
 esac
 
-main_file="lib/main_$ENVIRONMENT.dart"
-
 # Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 VERSIONS_FILE="$PROJECT_ROOT/versions"
 ANDROID_DIR="$PROJECT_ROOT/android"
+ENVIRONMENT_FILE="$PROJECT_ROOT/env/$ENVIRONMENT.json"
 
 # Source the versions file
 if [[ -f "$VERSIONS_FILE" ]]; then
@@ -80,7 +79,7 @@ fvm flutter build appbundle \
     --release \
     --build-name="$android_version_name" \
     --build-number="$android_build_number" \
-    -t "$main_file" || {
+    --dart-define-from-file="$ENVIRONMENT_FILE" || {
     echo "❌ Build failed"
     exit 1
 }
