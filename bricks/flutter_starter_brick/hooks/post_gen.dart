@@ -111,7 +111,7 @@ Future<void> run(HookContext context) async {
         // 5.10.0 is the floor: `DioExceptionType.transformTimeout`, which the
         // networking client switches on, does not exist before it.
         'dio:^5.10.0',
-        'json_annotation:^4.10.0',
+        'json_annotation:^4.12.0',
         'shared_preferences:^2.5.4',
         'uuid:^4.5.2'
       ],
@@ -194,7 +194,7 @@ Future<void> run(HookContext context) async {
     'Running build_runner',
     () => Process.run(
       'dart',
-      ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
+      ['run', 'build_runner', 'build'],
     ),
   );
 

@@ -1,18 +1,17 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:{{proj_name}}/dependency_injection/dependency_injection.dart';
 import 'package:{{proj_name}}/features/critical_error_screen/critical_error_screen.dart';
 import 'package:{{proj_name}}/features/random_jokes/random_jokes.dart';
 import 'package:{{proj_name}}/features/splash_screen/splash_screen.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
+import 'package:{{proj_name}}/foundation/locator/locator.dart';
 import 'package:{{proj_name}}/foundation/ui/navigation/navigation.dart';
 import 'package:{{proj_name}}/router/src/route_paths.dart';
+import 'package:{{proj_name}}/router/src/platform_page.dart';
 
 part 'router.g.dart';
 
@@ -58,7 +57,7 @@ final GoRouter router = GoRouter(
       return CriticalErrorRoutePath.path;
     }
 
-    // TODO({{dev_name}}): Add the auth guard here when authentication is
+    // TODO({{dev_name.paramCase()}}): Add the auth guard here when authentication is
     // implemented.
     //
     // Access control lives in this ONE redirect and nowhere else, decided off
@@ -86,28 +85,6 @@ final GoRouter router = GoRouter(
   },
 );
 
-/// Returns a [Page] based on the platform.
-///
-/// [screenName] is the route's own compile-time name constant. It rides the
-/// page so `ScreenTrailObserver` can record it without ever reading the live
-/// address.
-Page<T> _getPageByPlatform<T>({
-  required Widget child,
-  required LocalKey pageKey,
-  required String screenName,
-}) {
-  if (kIsWeb) {
-    return NoTransitionPage(child: child, key: pageKey, name: screenName);
-  }
-  if (Platform.isAndroid) {
-    return MaterialPage(child: child, key: pageKey, name: screenName);
-  }
-  if (Platform.isIOS || Platform.isMacOS) {
-    return CupertinoPage(child: child, key: pageKey, name: screenName);
-  }
-  return MaterialPage(child: child, key: pageKey, name: screenName);
-}
-
 @TypedGoRoute<SplashScreenRoute>(path: SplashRoutePath.path)
 @immutable
 class SplashScreenRoute extends GoRouteData with $SplashScreenRoute {
@@ -115,7 +92,7 @@ class SplashScreenRoute extends GoRouteData with $SplashScreenRoute {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
-      _getPageByPlatform<void>(
+      platformPage<void>(
         pageKey: state.pageKey,
         screenName: SplashRoutePath.name,
         child: BlocProvider(
@@ -145,7 +122,7 @@ class CriticalErrorScreenRoute extends GoRouteData
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
-      _getPageByPlatform<void>(
+      platformPage<void>(
         pageKey: state.pageKey,
         screenName: CriticalErrorRoutePath.name,
         child: CriticalErrorScreen(errorMessage: errorMessage),
@@ -158,7 +135,7 @@ class RandomJokesScreenRoute extends GoRouteData with $RandomJokesScreenRoute {
   const RandomJokesScreenRoute();
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
-      _getPageByPlatform<void>(
+      platformPage<void>(
         pageKey: state.pageKey,
         screenName: RandomJokesRoutePath.name,
         child: BlocProvider(

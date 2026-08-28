@@ -1,8 +1,6 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
+import 'package:{{proj_name}}/foundation/ui/widgets/src/platform_navigation.dart';
 
 /// A widget that represents a screen with common properties and functionality.
 ///
@@ -123,8 +121,7 @@ class RootScreenWidget extends StatelessWidget {
     }
 
     if (canPop != null) {
-      // Check web first to avoid Platform calls on web
-      if (kIsWeb || !Platform.isIOS) {
+      if (!usesCupertinoBackGesture) {
         // For non-iOS devices, use the default WillPopScope
         result = PopScope(canPop: canPop!, child: result);
       } else {

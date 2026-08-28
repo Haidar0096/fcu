@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:bloc/bloc.dart';
-import 'package:flutter/foundation.dart';
+import 'package:{{proj_name}}/foundation/app_meta_data/src/platform/platform_info.dart';
 import 'package:{{proj_name}}/foundation/app_meta_data/src/repositories/app_meta_data_repository.dart';
 import 'package:{{proj_name}}/foundation/blocs/bloc_utils/bloc_utils.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
@@ -55,8 +54,8 @@ class AppMetaDataCubit extends Cubit<AppMetaDataState>
 
     try {
       final deviceId = await _repository.getDeviceId();
-      final osType = kIsWeb ? 'web' : Platform.operatingSystem;
-      final osVersion = kIsWeb ? 'n/a' : Platform.operatingSystemVersion;
+      final osType = platformOperatingSystem;
+      final osVersion = platformOperatingSystemVersion;
 
       final versionInfo = await _repository.getAppVersionInfo();
 

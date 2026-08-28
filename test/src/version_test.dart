@@ -17,7 +17,7 @@ void main() {
       versionMatch!.group(1),
       reason:
           'lib/src/version.dart is stale. Regenerate it with '
-          '`dart run build_runner build --delete-conflicting-outputs`.',
+          '`dart run build_runner build`.',
     );
   });
 }

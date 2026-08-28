@@ -71,7 +71,7 @@ echo "📦 Preparing project..."
 fvm flutter clean || { echo "❌ flutter clean failed"; exit 1; }
 fvm flutter pub get || { echo "❌ flutter pub get failed"; exit 1; }
 fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; exit 1; }
-fvm dart run build_runner build --delete-conflicting-outputs || { echo "❌ build_runner failed"; exit 1; }
+fvm dart run build_runner build || { echo "❌ build_runner failed"; exit 1; }
 (cd "$PROJECT_ROOT/ios" && pod install) || { echo "❌ pod install failed"; exit 1; }
 
 # Build IPA

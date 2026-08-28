@@ -14,9 +14,15 @@ Future<void> run(HookContext context) async {
     progress.complete();
   }
 
-  // Delete the lib directory to avoid conflicts with the generated code
+  // Delete the lib directory `flutter create` wrote so it cannot conflict
+  // with the generated code. Mason runs this hook inside the output
+  // directory; a fresh output directory has no lib/ yet, so the delete is
+  // skipped rather than failing the generation.
   await _executeCommand(
     'Deleting lib directory',
-    () async => Directory('lib').deleteSync(recursive: true),
+    () async {
+      final lib = Directory('lib');
+      if (lib.existsSync()) lib.deleteSync(recursive: true);
+    },
   );
 }

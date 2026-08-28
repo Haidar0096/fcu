@@ -13,18 +13,32 @@ library;
 
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
-
 import 'package:architecture_lint_rules/src/rules/app_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/dependency_injection_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/fake_data_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/features_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/foundation_import_restrictions_rule.dart';
+import 'package:architecture_lint_rules/src/rules/guard_post_await_bloc_emits_rule.dart';
 import 'package:architecture_lint_rules/src/rules/main_common_import_restrictions_rule.dart';
 import 'package:architecture_lint_rules/src/rules/main_environment_files_import_restrictions_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_backend_url_literals_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_dto_in_ui_or_bloc_state_rule.dart';
 import 'package:architecture_lint_rules/src/rules/no_feature_cross_imports_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_flutter_form_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_flutter_ui_in_bloc_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_framework_colors_in_ui_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_hardcoded_ui_strings_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_locator_reads_in_bloc_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_route_path_literals_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_secret_literals_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_snackbar_outside_banner_rule.dart';
 import 'package:architecture_lint_rules/src/rules/no_src_imports_rule.dart';
+import 'package:architecture_lint_rules/src/rules/no_transport_imports_in_ui_rule.dart';
+import 'package:architecture_lint_rules/src/rules/require_root_screen_widget_rule.dart';
+import 'package:architecture_lint_rules/src/rules/require_scoped_ignores_rule.dart';
 import 'package:architecture_lint_rules/src/rules/resources_cannot_import_rule.dart';
 import 'package:architecture_lint_rules/src/rules/router_import_restrictions_rule.dart';
+import 'package:architecture_lint_rules/src/rules/vendor_imports_stay_in_wrappers_rule.dart';
 
 /// Top-level plugin variable - REQUIRED by Analysis Server.
 ///
@@ -51,5 +65,20 @@ class ArchitectureLintPlugin extends Plugin {
     registry.registerWarningRule(FakeDataImportRestrictionsRule());
     registry.registerWarningRule(MainCommonImportRestrictionsRule());
     registry.registerWarningRule(MainEnvironmentFilesImportRestrictionsRule());
+    registry.registerWarningRule(VendorImportsStayInWrappersRule());
+    registry.registerWarningRule(NoLocatorReadsInBlocRule());
+    registry.registerWarningRule(NoFlutterUiInBlocRule());
+    registry.registerWarningRule(GuardPostAwaitBlocEmitsRule());
+    registry.registerWarningRule(NoBackendUrlLiteralsRule());
+    registry.registerWarningRule(NoRoutePathLiteralsRule());
+    registry.registerWarningRule(NoDtoInUiOrBlocStateRule());
+    registry.registerWarningRule(NoTransportImportsInUiRule());
+    registry.registerWarningRule(NoFrameworkColorsInUiRule());
+    registry.registerWarningRule(NoSnackbarOutsideBannerRule());
+    registry.registerWarningRule(NoFlutterFormRule());
+    registry.registerWarningRule(RequireRootScreenWidgetRule());
+    registry.registerWarningRule(NoHardcodedUiStringsRule());
+    registry.registerWarningRule(RequireScopedIgnoresRule());
+    registry.registerWarningRule(NoSecretLiteralsRule());
   }
 }

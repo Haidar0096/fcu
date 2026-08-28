@@ -13,6 +13,6 @@ cd "$PROJECT_ROOT" || { echo "Failed to cd to $PROJECT_ROOT"; exit 1; }
 
 flutter clean
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 dart pub global activate --source=path "$PROJECT_ROOT"
 fcu --help

@@ -52,7 +52,7 @@ Verifying a mobile release means installing the BUILT artifact on a real device 
 
 ## Store timing facts
 
-TODO({{dev_name}}): record this project's real store timings here once they are known — App Store review delay, Google Play review delay, and whether production rollout is staged (and over how many days). These decide when a release can actually be promoted, so they belong beside the flow rather than in someone's memory.
+TODO({{dev_name.paramCase()}}): record this project's real store timings here once they are known — App Store review delay, Google Play review delay, and whether production rollout is staged (and over how many days). These decide when a release can actually be promoted, so they belong beside the flow rather than in someone's memory.
 
 ## Rollback
 
@@ -62,7 +62,7 @@ A store build that has shipped cannot be un-shipped. Going back to the last good
 2. In the `versions` file, put the last good version name back and raise the build number above the bad build's — the stores reject a build number that is not higher
 3. Merge the prep branch and run the same GitHub Actions workflows
 4. Promote the new build in the Google Play Console and App Store Connect, and halt or reduce the bad build's rollout there
-5. TODO({{dev_name}}): record any rollback step specific to this project here (data migrations, feature flags, server-side switches)
+5. TODO({{dev_name.paramCase()}}): record any rollback step specific to this project here (data migrations, feature flags, server-side switches)
 
 ## Merge strategy
 

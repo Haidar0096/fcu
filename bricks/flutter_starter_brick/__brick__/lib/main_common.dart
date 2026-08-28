@@ -9,6 +9,7 @@ import 'package:{{proj_name}}/app/app.dart';
 import 'package:{{proj_name}}/dependency_injection/dependency_injection.dart';
 import 'package:{{proj_name}}/foundation/environments/environments.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
+import 'package:{{proj_name}}/foundation/locator/locator.dart';
 import 'package:{{proj_name}}/foundation/ui/global_loader/global_loader.dart';
 import 'package:{{proj_name}}/foundation/ui/navigation/navigation.dart';
 
@@ -40,7 +41,7 @@ Future<void> mainCommon(Environment env) async {
             : HydratedStorageDirectory((await getTemporaryDirectory()).path),
       );
 
-      await ServiceLocator.init(environment: env);
+      await initializeDependencies(env);
 
       GlobalLoader.init(
         appLogger: serviceLocator.get<AppLogger>(),

@@ -100,7 +100,7 @@ echo "📦 Preparing project..."
 fvm flutter clean || error_exit "flutter clean failed"
 fvm flutter pub get || error_exit "flutter pub get failed"
 fvm flutter gen-l10n || error_exit "flutter gen-l10n failed"
-fvm dart run build_runner build --delete-conflicting-outputs || error_exit "build_runner failed"
+fvm dart run build_runner build || error_exit "build_runner failed"
 
 # Build APKs for all combinations of servers and platforms
 echo "📦 Building APKs for all environments and architectures..."

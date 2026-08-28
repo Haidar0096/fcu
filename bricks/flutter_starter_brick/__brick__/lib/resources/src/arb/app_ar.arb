@@ -7,6 +7,7 @@
   "unknownErrorMessage": "حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى.",
   "continueButton": "متابعة",
   "retry": "إعادة المحاولة",
+  "appName": "{{proj_name.titleCase()}}",
   "appTagline": "شعار التطبيق",
   "criticalErrorTitle": "حدث خطأ ما",
   "criticalErrorMessage": "حدث خطأ خطير ولا يمكن للتطبيق المتابعة.",

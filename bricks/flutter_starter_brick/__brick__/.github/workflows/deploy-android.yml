@@ -81,7 +81,7 @@ jobs:
         run: flutter gen-l10n
 
       - name: Run build_runner
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build
 
       - name: Build AAB
         run: |
