@@ -26,6 +26,13 @@ This app was generated from the Flutter Starter Brick (`flutter_starter_brick` f
 - **Dark mode**: Unsettled. The starter contains both themes; shipping policy
   needs a project answer.
 - **Digit style**: Unsettled. Choose Western or local-script digits.
+- **Token renewal wiring**: Unsettled. The renewal endpoint path and the shape
+  the server hands a new token set back in are the project's own; the shipped
+  `unwiredAuthTokenRenewal` stops with a message naming both.
+- **Auth-excluded paths**: Empty. Add the endings of the sign-in and renewal
+  endpoints to `AuthExcludedPaths` when this project adds login.
+- **Backend meta headers**: Empty. Add the header names the project's server
+  reads to `BackendMetaHeaders`.
 
 ### Starter Features
 The brick ships with three example features in `lib/features/`:
@@ -42,8 +49,9 @@ The brick ships with three example features in `lib/features/`:
 - The random-jokes inline loader and persistent failure banner are provisional
   smallest-visible choices until the project chooses its loading and failure
   surfaces.
-- A shared wide-screen maximum is unsettled. Add the standard constrained
-  center only after the project chooses `ThemeDefaults.maxContentWidth`.
+- A shared wide-screen maximum is unsettled: the starter names no maximum
+  width, and none is guessed. Add the constrained center only after the
+  project chooses that number and gives it a name in `ThemeDefaults`.
 
 ### Code Generation Dependencies
 - `json_serializable`: DTO serialization
@@ -55,23 +63,19 @@ The brick ships with three example features in `lib/features/`:
 - Uses `flutter_localizations` package
 - Access via `context.appLocalizations.keyName`
 
-### BLoC Utilities
+### Where the architecture is written down
 
-`foundation/blocs/bloc_utils/` ships a `CubitUtils<State>` mixin that gives `Cubit` classes safe state emission via `emitIfNotClosed`. Use it on every Cubit to avoid emitting after `close()`:
+The named backend clients and the chain the logged-in one runs, the token
+pieces in `foundation/authentication/`, and the close-guard mixins in
+`foundation/blocs/bloc_utils/` are the starter's architecture, and the
+architecture is the `mobile` skill's — this file repeats none of it. Two
+project-side facts that are this app's own:
 
-```dart
-class MyCubit extends Cubit<MyState> with CubitUtils<MyState> {
-  Future<void> loadData() async {
-    emit(const LoadingState());
-    final data = await loadFromOutsideWorld();
-    if (isClosed) return;
-    emitIfNotClosed(LoadedState(data: data));
-  }
-}
-```
-
-For `Bloc`s, `emitIfNotClosed(emit: emit, state: state)` is also available —
-see the file in `lib/foundation/blocs/bloc_utils/src/`.
+- Which client each API takes is named in
+  `dependency_injection/src/register_instances.dart`, never inside an API
+  class.
+- What each file of the transport module holds is listed in
+  `foundation/networking/src/README.md`.
 
 ## Common Tasks
 

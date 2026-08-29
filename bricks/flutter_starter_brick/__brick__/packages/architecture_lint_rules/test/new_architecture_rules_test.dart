@@ -297,8 +297,8 @@ class LoginCubit {
 
   Future<void> test_closeGuardAndGuardedEmit_areQuiet() async {
     const source = r'''
-mixin CubitUtils { void emitIfNotClosed(Object value) {} }
-class LoginCubit with CubitUtils {
+mixin CubitUtilsMixin { void emitIfNotClosed(Object value) {} }
+class LoginCubit with CubitUtilsMixin {
   Future<void> load() async {
     await fetch();
     emitIfNotClosed(1);

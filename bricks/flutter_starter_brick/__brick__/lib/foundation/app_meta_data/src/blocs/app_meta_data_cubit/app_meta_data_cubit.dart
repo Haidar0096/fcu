@@ -17,7 +17,7 @@ part 'app_meta_data_state.dart';
 /// second run impossible while the first is in flight. A matrix becomes needed
 /// the moment a second action can sit in an async gap beside it.
 class AppMetaDataCubit extends Cubit<AppMetaDataState>
-    with CubitUtils<AppMetaDataState> {
+    with CubitUtilsMixin<AppMetaDataState> {
   AppMetaDataCubit({
     required AppMetaDataRepository repository,
   }) : _repository = repository,

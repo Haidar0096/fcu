@@ -137,6 +137,20 @@ Future<void> run(HookContext context) async {
         // 5.10.0 is the floor: `DioExceptionType.transformTimeout`, which the
         // networking client switches on, does not exist before it.
         'dio:^5.10.0',
+        // The one secure store: the auth token plumbing is the only class
+        // that imports it, and the Android backup rules already exclude its
+        // files from device backup.
+        //
+        // The 10.x line, chosen by running rather than by reading. On the 9.x
+        // line a macOS run printed that `flutter_secure_storage_macos` does
+        // not support Swift Package Manager, which a later Flutter turns into
+        // an error; 10.x replaces that plugin with
+        // `flutter_secure_storage_darwin`, which does. The newer 11.x line
+        // cannot be resolved beside this app's `package_info_plus`: it needs
+        // `win32 ^6`, `package_info_plus ^9` needs `win32 ^5`. The API this
+        // app uses — a const constructor and `read`, `write`, `delete` by key
+        // — is the same on 9, 10 and 11.
+        'flutter_secure_storage:^10.3.1',
         'json_annotation:^4.12.0',
         'shared_preferences:^2.5.4',
         'uuid:^4.5.2'

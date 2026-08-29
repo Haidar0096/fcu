@@ -4,8 +4,8 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
-/// A base class for Blocs that provides utility methods.
-mixin BlocUtils<Event, State> on Bloc<Event, State> {
+/// A mixin for Blocs that provides utility methods.
+mixin BlocUtilsMixin<Event, State> on Bloc<Event, State> {
   /// Emits the [state] if the bloc is not closed. Otherwise, does nothing.
   ///
   /// This method is useful for safely emitting states in situations where

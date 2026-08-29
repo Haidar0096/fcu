@@ -72,9 +72,9 @@ bool _hasCloseGuardMixin(ClassDeclaration declaration) {
   if (names == null) return false;
   return names.any(
     (name) =>
-        name == 'BlocUtils' ||
-        name == 'CubitUtils' ||
-        name == 'HydratedCubitUtils' ||
+        name == 'BlocUtilsMixin' ||
+        name == 'CubitUtilsMixin' ||
+        name == 'HydratedCubitUtilsMixin' ||
         name.contains('CloseGuard'),
   );
 }

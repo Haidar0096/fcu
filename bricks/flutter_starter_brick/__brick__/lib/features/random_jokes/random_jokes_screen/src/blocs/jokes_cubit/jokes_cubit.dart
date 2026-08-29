@@ -11,7 +11,7 @@ part 'jokes_state.dart';
 /// Conflict matrix: none — fetching a joke is the only action and the entry
 /// guard below drops a second one. A matrix becomes needed the moment a second
 /// action (a save, a share) can sit in an async gap beside the fetch.
-class JokesCubit extends Cubit<JokesState> with CubitUtils<JokesState> {
+class JokesCubit extends Cubit<JokesState> with CubitUtilsMixin<JokesState> {
   JokesCubit({required JokesApi jokesApi})
     : _jokesApi = jokesApi,
       super(const JokesInitialState());

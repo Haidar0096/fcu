@@ -30,7 +30,7 @@ class _JokesBody extends StatelessWidget {
             ),
           StatusBannerWidget(
             type: StatusBannerType.error,
-            message: uiFailure.getDisplayText(context),
+            message: uiFailure.getDisplayText(context.appLocalizations),
             actionText: context.appLocalizations.retry,
             onAction: onFetchJoke,
           ),

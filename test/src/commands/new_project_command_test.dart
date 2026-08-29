@@ -30,4 +30,11 @@ void main() {
       contains('flutter run --dart-define-from-file=env/development.json'),
     );
   });
+
+  test('generated repositories ignore the full IAI folder', () {
+    final lines = buildProjectGitIgnoreAddition().split('\n');
+
+    expect(lines, contains('.iai/'));
+    expect(lines, isNot(contains('.iai/scratchpad/')));
+  });
 }

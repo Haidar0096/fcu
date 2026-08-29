@@ -64,8 +64,10 @@ Future<void> showAlertDialog({
           // Chosen deviation from go_router's context.canPop(): this closes a
           // dialog route on the Navigator stack, which is the stack that has
           // to be asked.
+          // The guard and the pop go through the same navigator, named the
+          // same way, so a reader cannot mistake them for two stacks.
           if (autoDismissOnAction && Navigator.of(context).canPop()) {
-            Navigator.pop(context);
+            Navigator.of(context).pop();
           }
           onAction?.call();
         },

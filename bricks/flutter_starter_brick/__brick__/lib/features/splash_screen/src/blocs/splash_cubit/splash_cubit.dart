@@ -12,7 +12,7 @@ part 'splash_state.dart';
 /// entry points are mutually exclusive. A matrix becomes needed the moment a
 /// second action (a forced-update check, a session restore) can sit in an
 /// async gap beside the splash timer.
-class SplashCubit extends Cubit<SplashState> with CubitUtils<SplashState> {
+class SplashCubit extends Cubit<SplashState> with CubitUtilsMixin<SplashState> {
   SplashCubit() : super(const SplashInitialState());
 
   /// How long the splash stays up once the metadata has arrived.

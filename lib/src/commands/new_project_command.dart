@@ -269,33 +269,7 @@ class NewProjectCommand extends Command<int> {
       ' commit...',
     );
 
-    final gitIgnoreLines = [
-      '\n# Generated files',
-      '**/dependency_injection.config.dart',
-      '**/**.g.dart',
-      // The route table is reviewed like hand-written code, so it is tracked.
-      '!lib/router/src/router.g.dart',
-      '**/**.freezed.dart',
-      '',
-      '# IAI',
-      '.iai/scratchpad/',
-      '',
-      '# Android Kotlin metadata',
-      '/android/.kotlin/',
-      '',
-      '# CocoaPods lockfiles',
-      'ios/Podfile.lock',
-      'macos/Podfile.lock',
-      '',
-      '# Deployment secrets',
-      'scripts/upload_to_play_store/service_account_json_path',
-      'scripts/upload_to_test_flight/api_key_name',
-      'scripts/upload_to_test_flight/issuer_id',
-      '',
-      '# Fastlane generated files',
-      'android/fastlane/report.xml',
-      'android/fastlane/README.md',
-    ].join('\n');
+    final gitIgnoreLines = buildProjectGitIgnoreAddition();
     final addToGitIgnoreResult = await Process.run('bash', [
       '-c',
       'echo "$gitIgnoreLines" >> .gitignore',
@@ -623,6 +597,35 @@ class NewProjectCommand extends Command<int> {
     defaultValue: _initializeGitRepoCommandFlag.defaultsTo,
   );
 }
+
+/// Builds the lines appended to a generated project's `.gitignore`.
+String buildProjectGitIgnoreAddition() => [
+  '\n# Generated files',
+  '**/dependency_injection.config.dart',
+  '**/**.g.dart',
+  // The route table is reviewed like hand-written code, so it is tracked.
+  '!lib/router/src/router.g.dart',
+  '**/**.freezed.dart',
+  '',
+  '# IAI',
+  '.iai/',
+  '',
+  '# Android Kotlin metadata',
+  '/android/.kotlin/',
+  '',
+  '# CocoaPods lockfiles',
+  'ios/Podfile.lock',
+  'macos/Podfile.lock',
+  '',
+  '# Deployment secrets',
+  'scripts/upload_to_play_store/service_account_json_path',
+  'scripts/upload_to_test_flight/api_key_name',
+  'scripts/upload_to_test_flight/issuer_id',
+  '',
+  '# Fastlane generated files',
+  'android/fastlane/report.xml',
+  'android/fastlane/README.md',
+].join('\n');
 
 /// Builds the non-interactive variable arguments passed to the starter brick.
 List<String> buildStarterBrickMakeArguments({

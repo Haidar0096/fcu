@@ -37,7 +37,7 @@ foundation modules, and best practices built-in.
 - [✓] **Build Scripts**: APK generation for all architectures and environments
 - [✓] **TestFlight Upload**: Automated iOS distribution script
 - [✓] **GitHub Actions**: PR checks (format, analyze, test, build) plus Play Store and TestFlight deploy workflows
-- [✓] **Architecture Plugin**: 25 warning rules ship inside every app and load through `path: packages/architecture_lint_rules`
+- [✓] **Architecture Plugin**: 26 warning rules ship inside every app and load through `path: packages/architecture_lint_rules`
 - [✓] **Structure Gate**: `dart run tool/check_structure_io.dart` checks the real folder and file-name layout
 
 ## Project Structure
@@ -53,6 +53,7 @@ lib/
 │   ├── random_jokes/           # Example feature
 │   └── critical_error_screen/  # Unrecoverable-error screen
 ├── foundation/              # Core reusable modules
+│   ├── authentication/     # Token store, renewal coordinator, renewal outcomes
 │   ├── blocs/              # Base cubits and utilities
 │   ├── environments/       # Environment configuration
 │   ├── l10n/              # Localization
@@ -91,7 +92,6 @@ Every generated project includes a pre-configured `.iai/` skeleton with `.iai/do
 - Starter feature list (splash, random jokes, critical error)
 - Code generation dependency choices
 - Localization setup
-- Animation extensions
 - Common task workflows (modifying error handling, etc.)
 
 Universal Flutter/Dart architecture and patterns are provided by the global `mobile` skill in the IAI agent system, with the Flutter mechanics under `mobile/flutter/`.

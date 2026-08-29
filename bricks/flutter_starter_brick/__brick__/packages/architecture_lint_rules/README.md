@@ -18,7 +18,7 @@ Restart the Dart analysis server after changing plugin configuration.
 
 ## Project switches
 
-All 25 rules are warning rules and are enabled by default. The official analyzer-plugin `diagnostics` map can disable any rule for one project. For example:
+All 26 rules are warning rules and are enabled by default. The official analyzer-plugin `diagnostics` map can disable any rule for one project. For example:
 
 ```yaml
 plugins:
@@ -49,9 +49,26 @@ The built-in defaults are:
 
 - `dio` and `http`: `foundation/networking`
 - `f_logs`, `logger`, `logging`, `loggy`, `talker`, and `talker_flutter`: `foundation/logging`
+- `flutter_secure_storage`: `foundation/authentication`
 - `flutter_svg`: `resources/src/images.dart`
 - `dart:io`: files whose names end in `_io.dart`
 - `provider`, `riverpod`, `flutter_riverpod`, `hooks_riverpod`, and `riverpod_annotation`: nowhere
+
+## Api-client setting
+
+`apis_take_their_declared_client` checks the composition root only, and only for the API classes a project declares. Which client an API takes is the project's own answer, so nothing is assumed:
+
+```yaml
+architecture_lint_rules:
+  api_http_clients:
+    ProfileApi: loggedInBackendHttpClient
+```
+
+The built-in default is the one wiring the starter itself ships:
+
+- `JokesApi`: `publicBackendHttpClient`
+
+An entry here replaces the built-in one of the same name. An API that is not declared is not checked.
 
 ## Rules
 
@@ -82,6 +99,7 @@ Every diagnostic below has `WARNING` severity.
 - `no_hardcoded_ui_strings`: direct `Text` strings and named label strings come from localization.
 - `require_scoped_ignores`: `ignore_for_file` is forbidden and a line ignore includes ` -- ` followed by a reason.
 - `no_secret_literals`: Dart source cannot contain literals shaped like real keys, tokens, private keys, or high-entropy values assigned to secret-named fields.
+- `apis_take_their_declared_client`: inside `lib/dependency_injection/`, a declared API is built with exactly one named HTTP client, and it is the one declared for it.
 
 Rules intentionally match only the named syntax and location. Ambiguous code stays quiet.
 
@@ -107,7 +125,7 @@ dart analyze
 dart test
 ```
 
-The test suite covers all 10 module-boundary rules and all 15 starter guardrails. The guardrail suite includes a firing and quiet case per rule, a vendor-setting case, and a diagnostics off-switch case.
+The test suite covers all 10 module-boundary rules and all 16 starter guardrails. The guardrail suite includes a firing and quiet case per rule, a vendor-setting case, an api-client-setting case, and a diagnostics off-switch case.
 
 References:
 

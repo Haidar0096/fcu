@@ -49,6 +49,7 @@ const Map<String, List<String>> _defaultWrappers = {
   'dio': ['foundation/networking'],
   'f_logs': ['foundation/logging'],
   'flutter_riverpod': [],
+  'flutter_secure_storage': ['foundation/authentication'],
   'flutter_svg': ['resources/src/images.dart'],
   'hooks_riverpod': [],
   'http': ['foundation/networking'],
