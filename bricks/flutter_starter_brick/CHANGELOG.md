@@ -1,5 +1,16 @@
-# 4.7.0 (Unreleased)
-Release date: TBD. A minor bump: a generated app gains capabilities and a dependency and loses nothing. The fcu CLI advances to 4.4.2.
+# 4.7.1
+Release date: 2026-08-30. A patch: two fixes found by the 4.7.0 release
+proof app; nothing is added or removed.
+- Fixed: `onException` in the generated router read `error.stackTrace`
+  on a value the analyzer could not promote, an analyze-blocking error
+  in every generated app. The local now has the declared type `Object?`
+  so the `is Error` test promotes it.
+- Fixed: a doc comment in the parked-report store referenced a parameter
+  name that is not in scope; it now names the returned record field in
+  plain words.
+
+# 4.7.0
+Release date: 2026-08-30. A minor bump: a generated app gains capabilities and a dependency and loses nothing. The fcu CLI advances to 4.4.2.
 - The starter now ships THREE named backend HTTP clients from birth, before any login exists: two application/API lanes plus one dedicated report-upload client. The public application client carries no token (the token renewal itself rides it, so a renewal can never trigger another renewal), and the logged-in application client runs one fixed written chain — meta headers, proactive early renewal, attach bearer, reactive renew-once-and-retry on refusal — with every step skipping the shared auth-excluded path list. Token handling stays inside that chain: the bearer step attaches the current token, and the reactive retry replaces it with the renewed token; no screen, bloc or API class ever sets the header. Renewal is single-flight through one shared coordinator: concurrent attempts join the one in flight, and its outcome is one of three that are never collapsed — new token, the server says the token is dead, or the renewal could not reach the server. Each API names its one client in the dependency injection file; the sample jokes API keeps the public one. The token pieces live in the new `foundation/authentication/` module, the transport steps in `foundation/networking/`, and the client gains a builder that is handed the transport instance so the retry step can send a refused request again on the client that carried it. What the starter refuses to guess ships unset and says so: the renewal endpoint path and the shape the server answers a renewal in (the shipped renewal stops with a message naming both), the auth-excluded path list (empty), and the app's meta headers (empty). `flutter_secure_storage` joins the generated app as the one secure store — the Android backup rules already excluded its files — and its current import lives only in `foundation/authentication/src/auth_token_store.dart`, the file the vendor lint rule permits.
 - The three close-guard mixins take the `Mixin` suffix, so a type's name says what it is: `CubitUtils` becomes `CubitUtilsMixin`, `BlocUtils` becomes `BlocUtilsMixin`, and `HydratedCubitUtils` becomes `HydratedCubitUtilsMixin` by the same rule. Their files carry the suffix too; the module folder and its barrel keep the name `bloc_utils`. The lint rule that recognizes a close guard by name and its test name the new types. A project copying code out of a 4.7.0 app meets the new names, not the old ones.
 - Fixed: a request refused for a dead token was sent again carrying that same dead token, and the retry could fire a second renewal presenting a refresh credential the first one had already spent — which a server answers by logging the user out. The retry now carries the renewed set on its own request, and the early-renewal step leaves a retried request alone. A test on the built chain proves both, and fails on the old code.

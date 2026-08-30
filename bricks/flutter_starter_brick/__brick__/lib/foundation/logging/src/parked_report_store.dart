@@ -46,7 +46,8 @@ class ParkedReportStore {
 
   /// Returns the oldest report without clearing it.
   ///
-  /// [encoded] is the exact stored record the acknowledgement must present;
+  /// The returned `encoded` is the exact stored record the acknowledgement
+  /// must present;
   /// a racing or duplicate drain can therefore never remove a different
   /// report.
   Future<({String encoded, Map<String, dynamic> report})?> peek() =>
