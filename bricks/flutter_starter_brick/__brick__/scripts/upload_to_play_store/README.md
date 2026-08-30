@@ -15,6 +15,8 @@ Builds and uploads Android AAB to Google Play Internal Testing track.
 
 - `versions` file at project root with `android_version_name` and `android_build_number`
 - `service_account_json_path` file in this directory with absolute path to Google Play service account JSON
+- Release status: `draft` for an unpublished draft app, or `completed` to roll
+  the release out to internal testers
 
 ## Android Signing Setup (One-time)
 
@@ -78,15 +80,16 @@ Keep the JSON file outside the project and never commit it.
 Run from project root:
 
 ```bash
-# For development server
-./scripts/upload_to_play_store/upload_to_playstore.sh development
+# Create a draft release against the development server
+./scripts/upload_to_play_store/upload_to_playstore.sh development draft
 
-# For production server
-./scripts/upload_to_play_store/upload_to_playstore.sh production
+# Roll out to internal testers against the production server
+./scripts/upload_to_play_store/upload_to_playstore.sh production completed
 ```
 
 ## Output
 
 1. Builds AAB using version from `versions` file
 2. Uploads to Google Play **Internal Testing** track
-3. App available for internal testers after Google's processing
+3. A `completed` release becomes available after processing; a `draft` release
+   remains in Google Play Console until completed

@@ -7,7 +7,5 @@ class CommandFlag extends CommandArg<bool> {
     required super.prompt,
     super.abbr,
     super.help,
-    super.choices,
-    super.aliases,
   });
 }

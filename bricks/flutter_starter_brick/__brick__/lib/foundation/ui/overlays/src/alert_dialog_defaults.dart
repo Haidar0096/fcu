@@ -6,9 +6,9 @@ abstract final class AlertDialogDefaults {
   ///
   /// It is deliberately NOT `DialogConstants.horizontalPadding`, which the
   /// two sibling dialogs use: the two numbers differ, the difference is
-  /// older than this file, and nobody has ruled which one the three dialogs
-  /// should share. Naming it here stops it being a raw number at the call
-  /// site; it does not settle the question.
+  /// older than this file, and no project decision has settled which value
+  /// the three dialogs should share. Naming the value here stops a raw number
+  /// at the call site; the name does not settle the question.
   static final double horizontalPadding = SpacingSize.spacing24.value;
 
   /// Opens the content under the dialog's top edge.

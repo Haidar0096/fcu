@@ -18,6 +18,53 @@ const List<String> _macOsEntitlementsFiles = [
   'macos/Runner/Release.entitlements',
 ];
 
+const String _iosAppDelegatePath = 'ios/Runner/AppDelegate.swift';
+const String _iosBackupExclusionChannelName =
+    'foundation.logging/backup_exclusion';
+
+const String _iosBackupExclusionChannelSetup = r'''
+    let channel = FlutterMethodChannel(
+      name: "foundation.logging/backup_exclusion",
+      binaryMessenger: engineBridge.applicationRegistrar.messenger()
+    )
+    channel.setMethodCallHandler { call, result in
+      guard call.method == "excludeFileFromBackup" else {
+        result(FlutterMethodNotImplemented)
+        return
+      }
+      guard
+        let arguments = call.arguments as? [String: Any],
+        let path = arguments["path"] as? String
+      else {
+        result(
+          FlutterError(
+            code: "invalid_backup_exclusion_path",
+            message: "A file path is required.",
+            details: nil
+          )
+        )
+        return
+      }
+
+      do {
+        var fileUrl = URL(fileURLWithPath: path)
+        var resourceValues = URLResourceValues()
+        resourceValues.isExcludedFromBackup = true
+        try fileUrl.setResourceValues(resourceValues)
+        result(nil)
+      } catch {
+        result(
+          FlutterError(
+            code: "backup_exclusion_failed",
+            message: error.localizedDescription,
+            details: nil
+          )
+        )
+      }
+    }
+    backupExclusionChannel = channel
+''';
+
 /// Adds [_macOsNetworkClientEntitlement] to one entitlements plist unless it
 /// is already there, so a re-run cannot write the key twice.
 ///
@@ -38,6 +85,39 @@ bool _addMacOsNetworkClientEntitlement(File file) {
   file.writeAsStringSync(
     '${document.toXmlString(pretty: true, indent: '\t')}\n',
   );
+  return true;
+}
+
+/// Wires the iOS resource flag that keeps the parked-report file out of
+/// iCloud and device backups.
+///
+/// Returns whether the file was rewritten.
+bool _addIosBackupExclusionChannel(File file) {
+  final source = file.readAsStringSync();
+  if (source.contains(_iosBackupExclusionChannelName)) return false;
+
+  const classDeclaration = '@objc class AppDelegate: FlutterAppDelegate, '
+      'FlutterImplicitEngineDelegate {';
+  const pluginRegistration = '    GeneratedPluginRegistrant.register(with: '
+      'engineBridge.pluginRegistry)';
+  if (!source.contains(classDeclaration) ||
+      !source.contains(pluginRegistration)) {
+    throw StateError(
+      'The pinned Flutter AppDelegate shape changed; backup exclusion '
+      'was not installed.',
+    );
+  }
+
+  final withChannelProperty = source.replaceFirst(
+    '$classDeclaration\n',
+    '$classDeclaration\n'
+        '  private var backupExclusionChannel: FlutterMethodChannel?\n\n',
+  );
+  final updated = withChannelProperty.replaceFirst(
+    '$pluginRegistration\n',
+    '$pluginRegistration\n\n$_iosBackupExclusionChannelSetup',
+  );
+  file.writeAsStringSync(updated);
   return true;
 }
 
@@ -74,6 +154,27 @@ Future<void> run(HookContext context) async {
     }
   }
 
+  Future<void> _requireFvm() async {
+    try {
+      final result = await Process.run('fvm', ['--version']);
+      if (result.exitCode == 0) return;
+    } on ProcessException {
+      // The clear instruction below is the whole failure path.
+    }
+    const message =
+        'FVM is required to generate this project. Install FVM, make the '
+        '`fvm` command available, then run generation again.';
+    context.logger.err(message);
+    throw Exception(message);
+  }
+
+  await _requireFvm();
+
+  await _executeCommand(
+    'Installing the Flutter SDK pinned in .fvmrc',
+    () => Process.run('fvm', ['install']),
+  );
+
   await _executeCommand(
     'Making shell scripts executable',
     () => Process.run('chmod', [
@@ -101,8 +202,9 @@ Future<void> run(HookContext context) async {
   await _executeCommand(
     'Adding dev dependencies',
     () => Process.run(
-      'dart',
+      'fvm',
       [
+        'dart',
         'pub',
         'add',
         '--dev',
@@ -118,8 +220,9 @@ Future<void> run(HookContext context) async {
   await _executeCommand(
     'Adding dependencies',
     () => Process.run(
-      'dart',
+      'fvm',
       [
+        'dart',
         'pub',
         'add',
         'get_it:^9.2.0',
@@ -137,6 +240,15 @@ Future<void> run(HookContext context) async {
         // 5.10.0 is the floor: `DioExceptionType.transformTimeout`, which the
         // networking client switches on, does not exist before it.
         'dio:^5.10.0',
+        // The one secure store: the auth token plumbing is the only class
+        // that imports it, and the Android backup rules already exclude its
+        // files from device backup.
+        //
+        // The settled 11.x-first check does not resolve beside this app's
+        // `package_info_plus ^9`: the secure-storage Windows implementation
+        // needs `win32 ^6`, while package_info_plus needs `win32 ^5`. Keep the
+        // ruled compatible fallback until that conflict clears.
+        'flutter_secure_storage:^9.2.4',
         'json_annotation:^4.12.0',
         'shared_preferences:^2.5.4',
         'uuid:^4.5.2'
@@ -146,7 +258,8 @@ Future<void> run(HookContext context) async {
 
   await _executeCommand(
     'Adding flutter_localizations sdk dependency',
-    () => Process.run('flutter', [
+    () => Process.run('fvm', [
+      'flutter',
       'pub',
       'add',
       'flutter_localizations',
@@ -156,7 +269,8 @@ Future<void> run(HookContext context) async {
 
   await _executeCommand(
     'Adding flutter_web_plugins sdk dependency',
-    () => Process.run('flutter', [
+    () => Process.run('fvm', [
+      'flutter',
       'pub',
       'add',
       'flutter_web_plugins',
@@ -175,9 +289,8 @@ Future<void> run(HookContext context) async {
         if (!file.existsSync()) return ProcessResult(0, 0, 'Success', '');
         final document = XmlDocument.parse(await file.readAsString());
         final manifestElement = document.findElements('manifest').first;
-        final applicationElement = manifestElement
-            .findElements('application')
-            .first;
+        final applicationElement =
+            manifestElement.findElements('application').first;
         _addAttributeIfMissing(
           element: applicationElement,
           name: 'android:dataExtractionRules',
@@ -188,16 +301,26 @@ Future<void> run(HookContext context) async {
           name: 'android:fullBackupContent',
           value: '@xml/backup_rules',
         );
-        final internetPermission = XmlElement(
-          XmlName('uses-permission'),
-          [
-            XmlAttribute(
-              XmlName('android:name'),
-              'android.permission.INTERNET',
-            ),
-          ],
-        );
-        manifestElement.children.insert(0, internetPermission);
+        final hasInternetPermission =
+            manifestElement.findElements('uses-permission').any(
+                  (element) => element.attributes.any(
+                    (attribute) =>
+                        attribute.name.toString() == 'android:name' &&
+                        attribute.value == 'android.permission.INTERNET',
+                  ),
+                );
+        if (!hasInternetPermission) {
+          final internetPermission = XmlElement(
+            XmlName('uses-permission'),
+            [
+              XmlAttribute(
+                XmlName('android:name'),
+                'android.permission.INTERNET',
+              ),
+            ],
+          );
+          manifestElement.children.insert(0, internetPermission);
+        }
         await file.writeAsString(document.toXmlString(pretty: true));
         return ProcessResult(0, 0, 'Success', '');
       } catch (e) {
@@ -225,49 +348,77 @@ Future<void> run(HookContext context) async {
   );
 
   await _executeCommand(
+    'Excluding parked reports from iOS backup',
+    () async {
+      try {
+        final file = File(_iosAppDelegatePath);
+        // A project generated without an iOS target owns no AppDelegate, so
+        // this step does nothing rather than adding a partial platform.
+        if (!file.existsSync()) return ProcessResult(0, 0, 'Success', '');
+        _addIosBackupExclusionChannel(file);
+        return ProcessResult(0, 0, 'Success', '');
+      } catch (e) {
+        return ProcessResult(0, 1, '', e.toString());
+      }
+    },
+  );
+
+  await _executeCommand(
     'Running flutter clean',
-    () => Process.run('flutter', ['clean']),
+    () => Process.run('fvm', ['flutter', 'clean']),
   );
 
   await _executeCommand(
     'Running flutter pub get',
-    () => Process.run('flutter', ['pub', 'get']),
+    () => Process.run('fvm', ['flutter', 'pub', 'get']),
   );
 
   await _executeCommand(
     'Running flutter gen-l10n',
-    () => Process.run('flutter', ['gen-l10n']),
+    () => Process.run('fvm', ['flutter', 'gen-l10n']),
   );
 
   await _executeCommand(
     'Running build_runner',
     () => Process.run(
-      'dart',
-      ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
+      'fvm',
+      [
+        'dart',
+        'run',
+        'build_runner',
+        'build',
+        '--delete-conflicting-outputs',
+      ],
     ),
   );
 
   await _executeCommand(
     'Running dart fix --apply',
-    () => Process.run('dart', ['fix', '--apply']),
+    () => Process.run('fvm', ['dart', 'fix', '--apply']),
   );
 
   await _executeCommand(
     'Running dart format .',
-    () => Process.run('dart', ['format', '.']),
+    () => Process.run('fvm', ['dart', 'format', '.']),
   );
 
   await _executeCommand(
     'Synchronizing build_runner after formatting',
     () => Process.run(
-      'dart',
-      ['run', 'build_runner', 'build', '--delete-conflicting-outputs'],
+      'fvm',
+      [
+        'dart',
+        'run',
+        'build_runner',
+        'build',
+        '--delete-conflicting-outputs',
+      ],
     ),
   );
 
   context.logger.success('🎉 Brick generated successfully!');
   context.logger.info(
-    'Run the app with: flutter run '
+    'Run the app with: fvm flutter run '
     '--dart-define-from-file=env/development.json',
   );
 }

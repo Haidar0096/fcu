@@ -4,7 +4,6 @@ const Color black = Color(0xFF000000);
 const Color white = Color(0xFFFFFFFF);
 
 const Color errorRed = Color(0xFFE74C3C);
-const Color inactiveGray = Color(0xFFCACACA);
 
 const Color primaryBlue = Color(0xFF3F5AAB);
 const Color primaryBlueContainer = Color(0xFFC6D1F5);
@@ -44,8 +43,6 @@ const Color darkSurfaceContainerHigh = Color(0xFF2A2E35);
 const Color darkSurfaceContainerHighest = Color(0xFF343941);
 
 const Color dropdownTextColor = lightGray;
-
-const Color textFieldBorderColor = lightGray;
 
 const Color primaryFixedDim = Color(0xFF8E9DE1);
 const Color onPrimaryFixedVariant = Color(0xFF24315D);

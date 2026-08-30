@@ -5,8 +5,6 @@ import 'dart:io';
 
 import 'package:yaml/yaml.dart';
 
-final Map<String, Map<String, List<String>>> _configurationCache = {};
-
 Map<String, List<String>> loadVendorImportConfiguration(
   String filePath,
   Map<String, List<String>> defaults,
@@ -15,20 +13,18 @@ Map<String, List<String>> loadVendorImportConfiguration(
   final marker = normalizedPath.lastIndexOf('/lib/');
   if (marker < 0) return defaults;
   final root = normalizedPath.substring(0, marker);
-  return _configurationCache.putIfAbsent(root, () {
-    final optionsFile = File('$root/analysis_options.yaml');
-    try {
-      if (optionsFile.existsSync()) {
-        return parseVendorImportWrapperSettings(
-          optionsFile.readAsStringSync(),
-          defaults: defaults,
-        );
-      }
-    } on Object {
-      return defaults;
+  final optionsFile = File('$root/analysis_options.yaml');
+  try {
+    if (optionsFile.existsSync()) {
+      return parseVendorImportWrapperSettings(
+        optionsFile.readAsStringSync(),
+        defaults: defaults,
+      );
     }
+  } on Object {
     return defaults;
-  });
+  }
+  return defaults;
 }
 
 Map<String, List<String>> parseVendorImportWrapperSettings(

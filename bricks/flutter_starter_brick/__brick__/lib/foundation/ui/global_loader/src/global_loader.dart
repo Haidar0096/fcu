@@ -46,13 +46,26 @@ class GlobalLoader {
   final AppLogger _appLogger;
   final ErrorLogger _errorLogger;
   final GlobalKey<NavigatorState> _rootNavigatorKey;
+  final Set<Object> _owners = <Object>{};
   OverlayEntry? _loadingOverlay;
   Timer? _hideTimer;
 
-  /// Shows the global loading overlay.
-  void show({String? loadingText, TextStyle? loadingTextStyle}) {
+  /// Acquires the global loading overlay for [owner].
+  ///
+  /// Returns false when no usable overlay exists, so a caller never records
+  /// ownership that was not actually acquired.
+  bool acquire({
+    required Object owner,
+    String? loadingText,
+    TextStyle? loadingTextStyle,
+  }) {
     _hideTimer?.cancel();
     _hideTimer = null;
+
+    if (_owners.contains(owner) && _loadingOverlay?.mounted == true) {
+      return true;
+    }
+    _owners.remove(owner);
 
     final context = _rootNavigatorKey.currentContext;
 
@@ -61,27 +74,29 @@ class GlobalLoader {
         message: 'Tried to show loader using a null context',
         tag: _tag,
       );
-      return;
+      return false;
     }
 
-    if (Overlay.maybeOf(context) == null) {
+    final overlay = Overlay.maybeOf(context);
+    if (overlay == null) {
       _appLogger.log(
         message: 'Tried to show loader on a context that is not attached to an'
         ' overlay',
         tag: _tag,
       );
-      return;
+      return false;
     }
 
     if (_loadingOverlay != null) {
       if (_loadingOverlay!.mounted) {
-        return;
+        _owners.add(owner);
+        return true;
       } else {
         _loadingOverlay = null;
       }
     }
 
-    _loadingOverlay = OverlayEntry(
+    final entry = OverlayEntry(
       builder: (context) {
         final effectiveLoadingTextStyle =
             loadingTextStyle ??
@@ -114,15 +129,34 @@ class GlobalLoader {
       },
     );
 
-    Overlay.of(context).insert(_loadingOverlay!);
+    try {
+      overlay.insert(entry);
+      _loadingOverlay = entry;
+      _owners.add(owner);
+      return true;
+    } catch (error, stackTrace) {
+      final message = 'Failed to insert the global loader overlay: $error';
+      _appLogger.log(
+        message: message,
+        tag: _tag,
+        stackTrace: stackTrace,
+      );
+      unawaited(
+        _errorLogger.recordError(error: message, stackTrace: stackTrace),
+      );
+      return false;
+    }
   }
 
-  /// Hides the global loading overlay.
-  void hide() {
+  /// Releases [owner] and hides the overlay after the final owner leaves.
+  void release({required Object owner}) {
+    if (!_owners.remove(owner) || _owners.isNotEmpty) return;
+
     _hideTimer?.cancel();
 
     // The delay absorbs rapid show/hide cycles so the overlay does not flicker.
     _hideTimer = Timer(AnimationDefaults.animationDurationVeryShort, () {
+      if (_owners.isNotEmpty) return;
       if (_loadingOverlay != null) {
         if (_loadingOverlay!.mounted) {
           try {
@@ -150,13 +184,15 @@ class GlobalLoader {
   }
 }
 
-void showGlobalLoader({String? loadingText, TextStyle? loadingTextStyle}) {
-  GlobalLoader.instance.show(
-    loadingText: loadingText,
-    loadingTextStyle: loadingTextStyle,
-  );
-}
+bool showGlobalLoader({
+  required Object owner,
+  String? loadingText,
+  TextStyle? loadingTextStyle,
+}) => GlobalLoader.instance.acquire(
+      owner: owner,
+      loadingText: loadingText,
+      loadingTextStyle: loadingTextStyle,
+    );
 
-void hideGlobalLoader() {
-  GlobalLoader.instance.hide();
-}
+void hideGlobalLoader({required Object owner}) =>
+    GlobalLoader.instance.release(owner: owner);

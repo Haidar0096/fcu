@@ -49,6 +49,9 @@ const Map<String, List<String>> _defaultWrappers = {
   'dio': ['foundation/networking'],
   'f_logs': ['foundation/logging'],
   'flutter_riverpod': [],
+  'flutter_secure_storage': [
+    'foundation/authentication/src/auth_token_store.dart',
+  ],
   'flutter_svg': ['resources/src/images.dart'],
   'hooks_riverpod': [],
   'http': ['foundation/networking'],
@@ -71,25 +74,34 @@ class _VendorImportsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitImportDirective(ImportDirective node) {
-    final uri = node.uri.stringValue;
     final filePath = currentFilePath(context);
-    if (uri == null || filePath == null) return;
-
-    final packageName = _packageName(uri);
-    if (packageName == null) return;
+    if (filePath == null) return;
 
     final wrappers =
         overrideWrappers ??
         loadVendorImportConfiguration(filePath, _defaultWrappers);
-    final allowedLocations = wrappers[packageName];
-    if (allowedLocations == null) return;
-
     final relativePath = _relativeLibPath(filePath);
     if (relativePath == null) return;
 
-    if (!allowedLocations.any(
-      (location) => _matchesLocation(relativePath, location),
-    )) {
+    final uris = <String?>[
+      node.uri.stringValue,
+      ...node.configurations.map(
+        (configuration) => configuration.uri.stringValue,
+      ),
+    ];
+    final hasViolation = uris.whereType<String>().any((uri) {
+      final packageName = _packageName(uri);
+      if (packageName == null) return false;
+
+      final allowedLocations = wrappers[packageName];
+      if (allowedLocations == null) return false;
+
+      return !allowedLocations.any(
+        (String location) => _matchesLocation(relativePath, location),
+      );
+    });
+
+    if (hasViolation) {
       rule.reportAtNode(node);
     }
   }

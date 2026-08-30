@@ -35,7 +35,7 @@ var x = App();
           0,
           35,
           messageContainsAll: [
-            'router/ can only import from features/, foundation/, resources/, and dependency_injection/.',
+            'router/ can only import from router/, features/, foundation/, resources/, and dependency_injection/.',
           ],
         ),
       ],

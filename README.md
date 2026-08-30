@@ -1,5 +1,7 @@
 # flutter_cli_utils
 
+Audience: Flutter CLI Utils contributors and adopters; public project setup and usage only.
+
 ## Getting Started 🚀
 
 If the CLI application is available on [pub.dev](https://pub.dev), activate globally via:

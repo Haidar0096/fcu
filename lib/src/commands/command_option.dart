@@ -8,6 +8,5 @@ class CommandOption extends CommandArg<String> {
     super.abbr,
     super.help,
     super.choices,
-    super.aliases,
   });
 }

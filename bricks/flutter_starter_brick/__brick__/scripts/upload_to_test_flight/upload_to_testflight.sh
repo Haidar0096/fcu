@@ -63,14 +63,8 @@ fi
 api_key=$(cat "$API_KEY_FILE")
 issuer_id=$(cat "$ISSUER_ID_FILE")
 
-# Prepare project
-echo "📦 Preparing project..."
-# Clean first: a dev-only plugin left in a stale generated registrant by an
-# earlier debug run fails the release build.
-fvm flutter clean || { echo "❌ flutter clean failed"; exit 1; }
-fvm flutter pub get || { echo "❌ flutter pub get failed"; exit 1; }
-fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; exit 1; }
-fvm dart run build_runner build || { echo "❌ build_runner failed"; exit 1; }
+# Prepare project through the shared local preparation owner.
+"$PROJECT_ROOT/scripts/build_web/build_web.sh" --prepare-only || exit 1
 (cd "$PROJECT_ROOT/ios" && pod install) || { echo "❌ pod install failed"; exit 1; }
 
 # Build IPA

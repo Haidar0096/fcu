@@ -9,6 +9,32 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:architecture_lint_rules/src/rules/rule_utils.dart';
 
+bool _isUiFilePath(String filePath) {
+  final normalized = filePath.replaceAll('\\', '/');
+  final markerIndex = normalized.lastIndexOf('/lib/');
+  String? relativePath;
+  if (markerIndex >= 0) {
+    relativePath = normalized.substring(markerIndex + '/lib/'.length);
+  } else if (normalized.startsWith('lib/')) {
+    relativePath = normalized.substring(4);
+  }
+  if (relativePath == null) return false;
+  final segments = relativePath.split('/');
+  if (segments.length >= 2 &&
+      segments[0] == 'foundation' &&
+      segments[1] == 'ui') {
+    return true;
+  }
+  if (segments.isEmpty || segments.first != 'features') return false;
+  for (var index = 1; index + 1 < segments.length; index++) {
+    if ((segments[index] == 'src' || segments[index] == 'shared') &&
+        segments[index + 1] == 'ui') {
+      return true;
+    }
+  }
+  return false;
+}
+
 class NoTransportImportsInUiRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'no_transport_imports_in_ui',
@@ -44,8 +70,8 @@ class _TransportImportVisitor extends SimpleAstVisitor<void> {
   @override
   void visitImportDirective(ImportDirective node) {
     final path = currentFilePath(context);
-    if (path == null || !path.contains('/src/ui/')) return;
-    final uri = node.uri.stringValue?.toLowerCase();
+    if (path == null || !_isUiFilePath(path)) return;
+    final uri = node.uri.stringValue?.replaceAll('\\', '/').toLowerCase();
     if (uri == null) return;
     if (uri.contains('/apis/') ||
         uri.contains('/networking/') ||

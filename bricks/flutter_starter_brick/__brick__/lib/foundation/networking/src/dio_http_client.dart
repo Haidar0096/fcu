@@ -34,7 +34,6 @@ class DioHttpClient extends HttpClient {
   final AppLogger _appLogger;
   final ErrorLogger? _errorLogger;
   final bool _reportsFailures;
-  String? _lastSuccessfulCorrelationId;
 
   static const String _tag = 'DioHttpClient';
 
@@ -47,9 +46,6 @@ class DioHttpClient extends HttpClient {
   /// A function that parses error response and returns message and code.
   final ({String? message, String? code})? Function(dynamic response)?
   serverErrorMessageParser;
-
-  @override
-  String? get lastSuccessfulCorrelationId => _lastSuccessfulCorrelationId;
 
   @override
   Future<Result<NetworkFailure, S>> get<S>({
@@ -178,29 +174,39 @@ class DioHttpClient extends HttpClient {
     OnProgressCallback? onSendProgress,
     CancelToken? cancelToken,
   }) async {
-    final fileName = filePath.baseName;
+    try {
+      final fileName = filePath.baseName;
+      final formData = dio.FormData.fromMap({
+        fieldName ?? 'file': await dio.MultipartFile.fromFile(
+          filePath,
+          filename: fileName,
+        ),
+        ...?additionalFields,
+      });
 
-    final formData = dio.FormData.fromMap({
-      fieldName ?? 'file': await dio.MultipartFile.fromFile(
-        filePath,
-        filename: fileName,
-      ),
-      ...?additionalFields,
-    });
-
-    return _request(
-      path: path,
-      method: 'POST',
-      isMultipart: false,
-      body: formData,
-      successResponseMapper: successResponseMapper,
-      queryParameters: queryParameters,
-      additionalHeaders: additionalHeaders,
-      replacementHeaders: replacementHeaders,
-      responseStatusCodeValidator: responseStatusCodeValidator,
-      onSendProgress: onSendProgress,
-      cancelToken: cancelToken,
-    );
+      return _request(
+        path: path,
+        method: 'POST',
+        isMultipart: false,
+        body: formData,
+        successResponseMapper: successResponseMapper,
+        queryParameters: queryParameters,
+        additionalHeaders: additionalHeaders,
+        replacementHeaders: replacementHeaders,
+        responseStatusCodeValidator: responseStatusCodeValidator,
+        onSendProgress: onSendProgress,
+        cancelToken: cancelToken,
+      );
+    } catch (error, stackTrace) {
+      return _unexpectedFailure(
+        operation: 'File upload preparation',
+        method: 'POST',
+        path: path,
+        error: error,
+        stackTrace: stackTrace,
+        parseServerError: false,
+      );
+    }
   }
 
   @override
@@ -258,8 +264,15 @@ class DioHttpClient extends HttpClient {
     CancelToken? cancelToken,
   }) async {
     if (additionalHeaders != null && replacementHeaders != null) {
-      throw ArgumentError(
-        'Cannot provide both additionalHeaders and replacementHeaders',
+      return _unexpectedFailure(
+        operation: 'Request header validation',
+        method: method,
+        path: path,
+        error: ArgumentError(
+          'Cannot provide both additionalHeaders and replacementHeaders',
+        ),
+        stackTrace: StackTrace.current,
+        parseServerError: false,
       );
     }
 
@@ -295,14 +308,10 @@ class DioHttpClient extends HttpClient {
         cancelToken: dioCancelToken,
       );
 
-      _lastSuccessfulCorrelationId = _readCorrelationId(response);
       return Result.success(
         data: successResponseMapper(response.toHttpResponse),
       );
     } on dio.DioException catch (dioException) {
-      final errorData = serverErrorMessageParser?.call(
-        dioException.response?.data,
-      );
       final statusCode = dioException.response?.statusCode;
       final correlationId = _readCorrelationId(dioException.response);
 
@@ -313,23 +322,45 @@ class DioHttpClient extends HttpClient {
         return Result.failure(
           data: CancelError(
             statusCode: statusCode,
-            message: errorData?.message,
-            code: errorData?.code,
+            message: null,
+            code: null,
             backendCorrelationId: correlationId,
           ),
         );
       }
 
+      final errorData = await _parseServerErrorSafely(
+        response: dioException.response?.data,
+        method: method,
+        path: path,
+        backendCorrelationId: correlationId,
+      );
+
       final errorDetails = buildDetailedErrorMessage(
         dioException: dioException,
         path: path,
       );
-      _appLogger.log(message: errorDetails, tag: _tag);
+      _appLogger.log(
+        message: errorDetails,
+        tag: _tag,
+        stackTrace: dioException.stackTrace,
+      );
       if (_reportsFailures) {
         await _errorLogger!.recordError(
           error: errorDetails,
           stackTrace: dioException.stackTrace,
           backendCorrelationId: correlationId,
+        );
+      }
+
+      if (errorData.contractViolation) {
+        return Result.failure(
+          data: ContractViolationError(
+            statusCode: statusCode,
+            message: null,
+            code: null,
+            backendCorrelationId: correlationId,
+          ),
         );
       }
 
@@ -341,8 +372,8 @@ class DioHttpClient extends HttpClient {
           return Result.failure(
             data: TimeoutError(
               statusCode: statusCode,
-              message: errorData?.message,
-              code: errorData?.code,
+              message: errorData.message,
+              code: errorData.code,
               backendCorrelationId: correlationId,
             ),
           );
@@ -352,8 +383,8 @@ class DioHttpClient extends HttpClient {
           return Result.failure(
             data: NetworkError(
               statusCode: statusCode,
-              message: errorData?.message,
-              code: errorData?.code,
+              message: errorData.message,
+              code: errorData.code,
               backendCorrelationId: correlationId,
             ),
           );
@@ -361,8 +392,8 @@ class DioHttpClient extends HttpClient {
           return Result.failure(
             data: CancelError(
               statusCode: statusCode,
-              message: errorData?.message,
-              code: errorData?.code,
+              message: errorData.message,
+              code: errorData.code,
               backendCorrelationId: correlationId,
             ),
           );
@@ -371,8 +402,8 @@ class DioHttpClient extends HttpClient {
           return Result.failure(
             data: ServerError(
               statusCode: statusCode,
-              message: errorData?.message,
-              code: errorData?.code,
+              message: errorData.message,
+              code: errorData.code,
               backendCorrelationId: correlationId,
             ),
           );
@@ -380,32 +411,116 @@ class DioHttpClient extends HttpClient {
           return Result.failure(
             data: UnknownError(
               statusCode: statusCode,
-              message: errorData?.message,
-              code: errorData?.code,
+              message: errorData.message,
+              code: errorData.code,
               backendCorrelationId: correlationId,
             ),
           );
       }
     } catch (error, stackTrace) {
-      final errorMessage = 'Non-DioException error for $method $path: $error';
-      _appLogger.log(message: errorMessage, tag: _tag);
+      return _unexpectedFailure(
+        operation: 'Non-DioException during request',
+        method: method,
+        path: path,
+        error: error,
+        stackTrace: stackTrace,
+        parseServerError: true,
+      );
+    }
+  }
+
+  Future<({String? message, String? code, bool contractViolation})>
+  _parseServerErrorSafely({
+    required dynamic response,
+    required String method,
+    required String path,
+    required String? backendCorrelationId,
+  }) async {
+    final parser = serverErrorMessageParser;
+    if (parser == null) {
+      return (message: null, code: null, contractViolation: false);
+    }
+
+    try {
+      final parsed = parser(response);
+      return (
+        message: parsed?.message,
+        code: parsed?.code,
+        contractViolation: false,
+      );
+    } catch (error, stackTrace) {
+      final errorMessage = _sanitizedFailureMessage(
+        operation: 'Server error response parsing during $method',
+        path: path,
+        error: error,
+      );
+      _appLogger.log(message: errorMessage, tag: _tag, stackTrace: stackTrace);
       if (_reportsFailures) {
         await _errorLogger!.recordError(
           error: errorMessage,
           stackTrace: stackTrace,
+          backendCorrelationId: backendCorrelationId,
         );
       }
+      return (message: null, code: null, contractViolation: true);
+    }
+  }
 
-      final errorData = serverErrorMessageParser?.call(error);
-      return Result.failure(
-        data: UnknownError(
-          statusCode: null,
-          message: errorData?.message,
-          code: errorData?.code,
-          backendCorrelationId: null,
-        ),
+  Future<Result<NetworkFailure, S>> _unexpectedFailure<S>({
+    required String operation,
+    required String method,
+    required String path,
+    required Object error,
+    required StackTrace stackTrace,
+    required bool parseServerError,
+  }) async {
+    final errorMessage = _sanitizedFailureMessage(
+      operation: '$operation during $method',
+      path: path,
+      error: error,
+    );
+    _appLogger.log(message: errorMessage, tag: _tag, stackTrace: stackTrace);
+    if (_reportsFailures) {
+      await _errorLogger!.recordError(
+        error: errorMessage,
+        stackTrace: stackTrace,
       );
     }
+
+    final errorData = parseServerError
+        ? await _parseServerErrorSafely(
+            response: error,
+            method: method,
+            path: path,
+            backendCorrelationId: null,
+          )
+        : (message: null, code: null, contractViolation: false);
+    return Result.failure(
+      data: errorData.contractViolation
+          ? const ContractViolationError(
+              statusCode: null,
+              message: null,
+              code: null,
+              backendCorrelationId: null,
+            )
+          : UnknownError(
+              statusCode: null,
+              message: errorData.message,
+              code: errorData.code,
+              backendCorrelationId: null,
+            ),
+    );
+  }
+
+  static String _sanitizedFailureMessage({
+    required String operation,
+    required String path,
+    required Object error,
+  }) {
+    final sanitizedOperation = SensitiveDataSanitizer.sanitizeText(operation);
+    final sanitizedTarget = sanitizeRequestTarget(path);
+    final sanitizedError = SensitiveDataSanitizer.sanitizeText('$error');
+    return '$sanitizedOperation for $sanitizedTarget: $sanitizedError';
   }
 
   static String? _readCorrelationId(dio.Response<dynamic>? response) =>

@@ -26,6 +26,9 @@ class _SlidingBannerWidgetState extends State<_SlidingBannerWidget>
   late final AnimationController _controller;
   late final Animation<Offset> _offsetAnimation;
   late final Animation<double> _fadeAnimation;
+  Object? _dismissOperation;
+  bool _didDismiss = false;
+  double _dragDisplacement = 0;
 
   @override
   void initState() {
@@ -60,15 +63,26 @@ class _SlidingBannerWidgetState extends State<_SlidingBannerWidget>
 
   @override
   void dispose() {
+    _dismissOperation = null;
     _controller.dispose();
     super.dispose();
   }
 
   Future<void> _dismiss() async {
+    if (_dismissOperation != null || _didDismiss) return;
+    final operation = Object();
+    _dismissOperation = operation;
+
     SlidingBanner._dismissTimer?.cancel();
     SlidingBanner._dismissTimer = null;
 
     await _controller.reverse();
+    if (!mounted ||
+        !identical(_dismissOperation, operation) ||
+        _didDismiss) {
+      return;
+    }
+    _didDismiss = true;
     widget.onDismiss();
   }
 
@@ -83,11 +97,15 @@ class _SlidingBannerWidgetState extends State<_SlidingBannerWidget>
       child: Material(
         color: Colors.transparent,
         child: GestureDetector(
+          onVerticalDragStart: (_) => _dragDisplacement = 0,
           onVerticalDragUpdate: (details) {
-            if (details.delta.dy < SlidingBannerDefaults.swipeThreshold) {
+            _dragDisplacement += details.delta.dy;
+            if (_dragDisplacement <= SlidingBannerDefaults.swipeThreshold) {
               unawaited(_dismiss());
             }
           },
+          onVerticalDragEnd: (_) => _dragDisplacement = 0,
+          onVerticalDragCancel: () => _dragDisplacement = 0,
           child: SlideTransition(
             position: _offsetAnimation,
             child: FadeTransition(

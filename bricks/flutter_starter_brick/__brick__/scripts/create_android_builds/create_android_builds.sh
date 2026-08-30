@@ -24,7 +24,13 @@ error_exit() {
 # Parse the output directory argument
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --output-dir) output_path="$2"; shift ;;
+        --output-dir)
+            if [[ "$#" -lt 2 || -z "$2" || "$2" == -* ]]; then
+                error_exit "Missing value for --output-dir. Usage: create_android_builds.sh [--output-dir PATH]"
+            fi
+            output_path="$2"
+            shift
+            ;;
         *) error_exit "Unknown parameter passed: $1" ;;
     esac
     shift
@@ -93,14 +99,9 @@ build_and_copy() {
     echo "✅ Output saved to: $output_file"
 }
 
-# Prepare project
-echo "📦 Preparing project..."
-# Clean first: a dev-only plugin left in a stale generated registrant by an
-# earlier debug run fails the release build.
-fvm flutter clean || error_exit "flutter clean failed"
-fvm flutter pub get || error_exit "flutter pub get failed"
-fvm flutter gen-l10n || error_exit "flutter gen-l10n failed"
-fvm dart run build_runner build || error_exit "build_runner failed"
+# Prepare project through the shared local preparation owner.
+"$PROJECT_ROOT/scripts/build_web/build_web.sh" --prepare-only || \
+    error_exit "Project preparation failed"
 
 # Build APKs for all combinations of servers and platforms
 echo "📦 Building APKs for all environments and architectures..."

@@ -49,20 +49,46 @@ class _RootScreenVisitor extends SimpleAstVisitor<void> {
     final name = className(declaration);
     if (!name.endsWith('Screen') && !name.endsWith('ScreenState')) return;
 
-    final expression = _singleBuildExpression(node.body);
-    if (expression == null) return;
-    if (expression is InstanceCreationExpression &&
-        constructorTypeName(expression) == 'RootScreenWidget') {
-      return;
+    if (!_allBuildReturnsUseRootScreenWidget(node.body)) {
+      rule.reportAtToken(node.name);
     }
-    rule.reportAtToken(node.name);
   }
 }
 
-Expression? _singleBuildExpression(FunctionBody body) {
-  if (body is ExpressionFunctionBody) return body.expression;
-  if (body is! BlockFunctionBody) return null;
-  final returns = body.block.statements.whereType<ReturnStatement>().toList();
-  if (returns.length != 1) return null;
-  return returns.single.expression;
+bool _allBuildReturnsUseRootScreenWidget(FunctionBody body) {
+  if (body is ExpressionFunctionBody) {
+    return _isRootScreenWidget(body.expression);
+  }
+  if (body is! BlockFunctionBody) return false;
+
+  final collector = _BuildReturnCollector();
+  body.block.accept(collector);
+  return collector.expressions.isNotEmpty &&
+      collector.expressions.every(
+        (expression) => expression != null && _isRootScreenWidget(expression),
+      );
+}
+
+bool _isRootScreenWidget(Expression expression) {
+  var current = expression;
+  while (current is ParenthesizedExpression) {
+    current = current.expression;
+  }
+  return current is InstanceCreationExpression &&
+      constructorTypeName(current) == 'RootScreenWidget';
+}
+
+class _BuildReturnCollector extends RecursiveAstVisitor<void> {
+  final List<Expression?> expressions = [];
+
+  @override
+  void visitReturnStatement(ReturnStatement node) {
+    expressions.add(node.expression);
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // A nested closure or local function has return paths of its own, not
+    // return paths from the screen's build method.
+  }
 }

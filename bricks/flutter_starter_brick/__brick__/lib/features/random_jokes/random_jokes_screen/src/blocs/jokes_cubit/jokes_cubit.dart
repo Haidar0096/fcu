@@ -11,7 +11,7 @@ part 'jokes_state.dart';
 /// Conflict matrix: none — fetching a joke is the only action and the entry
 /// guard below drops a second one. A matrix becomes needed the moment a second
 /// action (a save, a share) can sit in an async gap beside the fetch.
-class JokesCubit extends Cubit<JokesState> with CubitUtils<JokesState> {
+class JokesCubit extends Cubit<JokesState> with CubitUtilsMixin<JokesState> {
   JokesCubit({required JokesApi jokesApi})
     : _jokesApi = jokesApi,
       super(const JokesInitialState());
@@ -21,7 +21,8 @@ class JokesCubit extends Cubit<JokesState> with CubitUtils<JokesState> {
   Future<void> fetchJoke() async {
     if (state.isLoading) return;
 
-    emit(JokesLoadingState(lastGoodJoke: state.lastGoodJoke));
+    final lastGoodJoke = state.lastGoodJoke;
+    emit(JokesLoadingState(lastGoodJoke: lastGoodJoke));
 
     final result = await _jokesApi.fetchRandomJoke();
     if (isClosed) return;
@@ -31,10 +32,23 @@ class JokesCubit extends Cubit<JokesState> with CubitUtils<JokesState> {
         emitIfNotClosed(JokesLoadedState(joke: jokeDto.toUiModel()));
       },
       failure: (failure) {
+        if (failure.isContractViolation) {
+          emitIfNotClosed(const JokesCriticalErrorState());
+          return;
+        }
+        if (failure.isCancelError) {
+          emitIfNotClosed(
+            switch (lastGoodJoke) {
+              null => const JokesInitialState(),
+              final joke => JokesLoadedState(joke: joke),
+            },
+          );
+          return;
+        }
         emitIfNotClosed(
           JokesFailedState(
-            uiFailure: UiNetworkFailure(failure: failure),
-            lastGoodJoke: state.lastGoodJoke,
+            uiFailure: UiNetworkFailure.fromNetworkFailure(failure)!,
+            lastGoodJoke: lastGoodJoke,
           ),
         );
       },

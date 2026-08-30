@@ -5,7 +5,7 @@ repository: https://github.com/Haidar0096/fcu/tree/production/bricks/flutter_sta
 # The following defines the version and build number for your brick.
 # A version number is three numbers separated by dots, like 1.2.34
 # followed by an optional build number (separated by a +).
-version: 4.6.0
+version: 4.7.2
 
 # The following defines the environment for the current brick.
 # It includes the version of mason that the brick requires.
@@ -46,3 +46,8 @@ vars:
     description: Project description
     default: A new Flutter project
     prompt: What is your project description?
+
+  fresh_output_token:
+    type: string
+    description: One-time safety token supplied by the fcu create command
+    default: ''

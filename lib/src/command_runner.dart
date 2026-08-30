@@ -4,24 +4,21 @@ import 'package:cli_completion/cli_completion.dart';
 import 'package:flutter_cli_utils/src/commands/commands.dart';
 import 'package:flutter_cli_utils/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:pub_updater/pub_updater.dart';
 
-const executableName = 'flutter_cli_utils';
-const packageName = 'flutter_cli_utils';
+const executableName = 'fcu';
 const description = 'Helpful commands for Flutter developers.';
 
 /// {@template flutter_cli_utils_command_runner}
 /// A [CommandRunner] for the CLI.
 ///
 /// ```bash
-/// $ flutter_cli_utils --version
+/// $ fcu --version
 /// ```
 /// {@endtemplate}
 class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
   /// {@macro flutter_cli_utils_command_runner}
-  FlutterCliUtilsCommandRunner({Logger? logger, PubUpdater? pubUpdater})
+  FlutterCliUtilsCommandRunner({Logger? logger})
     : _logger = logger ?? Logger(),
-      _pubUpdater = pubUpdater ?? PubUpdater(),
       super(executableName, description) {
     argParser
       ..addFlag(
@@ -36,14 +33,13 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
       );
 
     addCommand(NewProjectCommand(logger: _logger));
-    addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
+    addCommand(UpdateCommand(logger: _logger));
   }
 
   @override
   void printUsage() => _logger.info(usage);
 
   final Logger _logger;
-  final PubUpdater _pubUpdater;
 
   @override
   Future<int> run(Iterable<String> args) async {
@@ -110,32 +106,6 @@ class FlutterCliUtilsCommandRunner extends CompletionCommandRunner<int> {
       exitCode = await super.runCommand(topLevelResults);
     }
 
-    if (topLevelResults.command?.name != UpdateCommand.commandName) {
-      await _checkForUpdates();
-    }
-
     return exitCode;
-  }
-
-  /// Checks if the current version (set by the build runner on the
-  /// version.dart file) is the most recent one. If not, show a prompt to the
-  /// user.
-  Future<void> _checkForUpdates() async {
-    try {
-      final latestVersion = await _pubUpdater.getLatestVersion(packageName);
-      final isUpToDate = packageVersion == latestVersion;
-      if (!isUpToDate) {
-        final updateBanner =
-            '${lightYellow.wrap('Update available!')} '
-            '${lightCyan.wrap(packageVersion)} \u2192 '
-            '${lightCyan.wrap(latestVersion)}\n'
-            'Run ${lightCyan.wrap('$executableName update')} to update';
-        _logger
-          ..info('')
-          ..info(updateBanner);
-      }
-    } catch (e) {
-      _logger.warn('Failed to check for updates: error was $e');
-    }
   }
 }

@@ -4,15 +4,7 @@
 <dict>
 	<key>method</key>
 	<string>app-store-connect</string>
-	<key>signingStyle</key>
-	<string>manual</string>
-	<key>teamID</key>
-	<string>TODO({{dev_name.paramCase()}}): Replace with Apple Team ID</string>
-	<key>provisioningProfiles</key>
-	<dict>
-		<key>{{org_name}}.{{proj_name}}</key>
-		<string>TODO({{dev_name.paramCase()}}): Replace with provisioning profile name</string>
-	</dict>
+	<!-- Manual-signing entries stay absent until project setup supplies real values. -->
 	<key>uploadSymbols</key>
 	<true/>
 	<key>stripSwiftSymbols</key>

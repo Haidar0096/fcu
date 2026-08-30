@@ -18,7 +18,7 @@ class CriticalErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => RootScreenWidget(
-    applySafeArea: false,
+    applySafeArea: true,
     canPop: false,
     resizeToAvoidBottomInset: true,
     applyTopSafeArea: true,

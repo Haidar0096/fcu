@@ -56,7 +56,8 @@ class _MainImportRestrictionsVisitor extends SimpleAstVisitor<void> {
 
     final currentUnit = context.currentUnit;
     if (currentUnit == null) return;
-    if (!currentUnit.file.path.endsWith('/lib/main.dart')) return;
+    final currentPath = currentUnit.file.path.replaceAll('\\', '/');
+    if (!currentPath.endsWith('/lib/main.dart')) return;
     if (!uri.startsWith('package:')) return;
 
     final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);

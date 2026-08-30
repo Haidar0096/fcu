@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/defaults.dart';
 import 'package:{{proj_name}}/resources/resources.dart';
 
-/// Enum representing fonts used in the application.
+/// Adds a [TextStyle] view to every [Fonts] value.
 ///
-/// This enum provides a centralized way to manage and access font data.
-/// Each enum value corresponds to a specific font.
+/// The style carries the selected font's family, style, and weight.
 extension FontExtension on Fonts {
   TextStyle get textStyle => TextStyle(
     fontFamily: fontFamilyName,

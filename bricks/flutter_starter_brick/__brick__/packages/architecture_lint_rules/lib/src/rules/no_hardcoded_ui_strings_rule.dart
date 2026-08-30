@@ -31,7 +31,7 @@ class NoHardcodedUiStringsRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    registry.addSimpleStringLiteral(
+    registry.addInstanceCreationExpression(
       this,
       _HardcodedUiStringVisitor(this, context),
     );
@@ -59,29 +59,40 @@ class _HardcodedUiStringVisitor extends SimpleAstVisitor<void> {
   final RuleContext context;
 
   @override
-  void visitSimpleStringLiteral(SimpleStringLiteral node) {
-    if (node.value.isEmpty || !_isWidgetLocation(node, context)) return;
-    if (_isTextArgument(node) || _isLabelArgument(node)) {
-      rule.reportAtNode(node);
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    if (!_isWidgetLocation(node, context)) return;
+
+    final arguments = node.argumentList.arguments;
+    if (constructorTypeName(node) == 'Text' && arguments.isNotEmpty) {
+      _reportIfHardcoded(arguments.first.argumentExpression);
+    }
+
+    for (final named in arguments.whereType<NamedArgument>()) {
+      if (_labelArgumentNames.contains(named.name.lexeme)) {
+        _reportIfHardcoded(named.argumentExpression);
+      }
     }
   }
-}
 
-bool _isTextArgument(SimpleStringLiteral node) {
-  final creation = ancestorOfType<InstanceCreationExpression>(node);
-  return creation != null &&
-      constructorTypeName(creation) == 'Text' &&
-      creation.argumentList.arguments.isNotEmpty &&
-      creation.argumentList.arguments.first == node;
-}
-
-bool _isLabelArgument(SimpleStringLiteral node) {
-  final named = node.parent;
-  if (named is! NamedArgument ||
-      !_labelArgumentNames.contains(named.name.lexeme)) {
-    return false;
+  void _reportIfHardcoded(Expression expression) {
+    final detector = _HardcodedStringDetector();
+    expression.accept(detector);
+    if (detector.found) rule.reportAtNode(expression);
   }
-  return named.parent?.parent is InstanceCreationExpression;
+}
+
+class _HardcodedStringDetector extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitSimpleStringLiteral(SimpleStringLiteral node) {
+    if (node.value.isNotEmpty) found = true;
+  }
+
+  @override
+  void visitInterpolationString(InterpolationString node) {
+    if (node.value.isNotEmpty) found = true;
+  }
 }
 
 bool _isWidgetLocation(AstNode node, RuleContext context) {

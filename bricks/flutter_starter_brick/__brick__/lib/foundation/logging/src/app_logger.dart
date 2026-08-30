@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:{{proj_name}}/foundation/logging/src/sensitive_data_sanitizer.dart';
 
 class AppLogger {
   const AppLogger();
@@ -13,10 +14,14 @@ class AppLogger {
   }) {
     if (kDebugMode) {
       final timestamp = DateTime.now().toIso8601String();
-      debugPrint('[$timestamp] [$tag] $message');
+      final sanitizedMessage = SensitiveDataSanitizer.sanitizeText(message);
+      debugPrint('[$timestamp] [$tag] $sanitizedMessage');
 
       if (stackTrace != null) {
-        debugPrint('[$timestamp] [$tag] Stack trace:\n$stackTrace');
+        final sanitizedStack = SensitiveDataSanitizer.sanitizeText(
+          stackTrace.toString(),
+        );
+        debugPrint('[$timestamp] [$tag] Stack trace:\n$sanitizedStack');
       }
     }
   }

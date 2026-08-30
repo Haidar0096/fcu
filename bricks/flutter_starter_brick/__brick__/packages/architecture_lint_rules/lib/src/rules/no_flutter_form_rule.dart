@@ -46,8 +46,9 @@ class _FlutterFormVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final libraryUri = node.constructorName.element?.library.uri;
     if (constructorTypeName(node) == 'Form' &&
-        importsPackage(context, 'flutter')) {
+        libraryUri?.toString() == 'package:flutter/src/widgets/form.dart') {
       rule.reportAtNode(node);
     }
   }

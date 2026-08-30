@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide Typography;
-import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/colors.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/defaults.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/src/theme_data/typography.dart';
 import 'package:{{proj_name}}/resources/resources.dart';
@@ -19,7 +18,7 @@ DropdownMenuThemeData dropdownMenuThemeData(ColorScheme colorScheme) =>
       ),
       textStyle: Typography.defaultDropdownFont.textStyle.copyWith(
         fontSize: 14,
-        color: dropdownTextColor,
+        color: colorScheme.onSurface,
       ),
       menuStyle: MenuStyle(
         backgroundColor: WidgetStatePropertyAll(colorScheme.surface),

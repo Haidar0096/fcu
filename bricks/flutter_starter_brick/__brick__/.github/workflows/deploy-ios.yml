@@ -11,6 +11,14 @@ on:
         options:
           - development
           - production
+      runner:
+        description: "iOS build runner"
+        required: true
+        type: choice
+        default: macos-26
+        options:
+          - macos-26
+          - self-hosted
 
 jobs:
   setup:
@@ -19,7 +27,7 @@ jobs:
   deploy:
     name: Build & Upload to TestFlight
     needs: setup
-    runs-on: macos-26
+    runs-on: ${{ inputs.runner }}
 
     steps:
       - name: Checkout code

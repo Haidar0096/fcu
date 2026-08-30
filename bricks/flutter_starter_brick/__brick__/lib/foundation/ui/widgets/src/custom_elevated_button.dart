@@ -59,24 +59,30 @@ class CustomElevatedButton extends StatelessWidget {
   final ButtonStyle? style;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    width: width,
-    height: height,
-    child: ElevatedButton(
-      style: style,
-      onPressed: onPressed,
-      child:
-          child ??
-          Text(
-            text!,
-            style: textStyle,
-            textAlign: textAlign ?? CustomElevatedButtonDefaults.textAlign,
-            maxLines: maxLines,
-            overflow:
-                textOverflow ?? CustomElevatedButtonDefaults.textOverflow,
-          ),
-    ),
-  );
+  Widget build(BuildContext context) {
+    if ((text == null) == (child == null)) {
+      throw ArgumentError('Provide exactly one of text or child');
+    }
+
+    return SizedBox(
+      width: width,
+      height: height,
+      child: ElevatedButton(
+        style: style,
+        onPressed: onPressed,
+        child:
+            child ??
+            Text(
+              text!,
+              style: textStyle,
+              textAlign: textAlign ?? CustomElevatedButtonDefaults.textAlign,
+              maxLines: maxLines,
+              overflow:
+                  textOverflow ?? CustomElevatedButtonDefaults.textOverflow,
+            ),
+      ),
+    );
+  }
 }
 
 abstract final class CustomElevatedButtonDefaults {

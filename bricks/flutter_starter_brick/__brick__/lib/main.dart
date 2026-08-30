@@ -24,7 +24,10 @@ Future<void> main() async {
       // Crash reporting first: the three global error channels hook before
       // dependency injection and storage exist, so a failure in either of
       // those is still recorded.
-      ErrorLogger.registerErrorHandlers(_resolveErrorLogger);
+      ErrorLogger.registerErrorHandlers(
+        resolveErrorLogger: _resolveErrorLogger,
+        resolveAppLogger: _resolveAppLogger,
+      );
 
       WidgetsFlutterBinding.ensureInitialized();
       configureUrlStrategy();
@@ -71,6 +74,9 @@ Future<void> main() async {
       runApp(const RootAppWidget());
     },
     (error, stackTrace) {
+      FlutterError.dumpErrorToConsole(
+        FlutterErrorDetails(exception: error, stack: stackTrace),
+      );
       unawaited(
         _resolveErrorLogger()?.recordError(
           error: error,
@@ -89,6 +95,15 @@ Future<void> main() async {
 ErrorLogger? _resolveErrorLogger() {
   try {
     return serviceLocator.tryGet<ErrorLogger>();
+  } catch (_) {
+    return null;
+  }
+}
+
+/// Resolves the debug logger without making the global error road throw.
+AppLogger? _resolveAppLogger() {
+  try {
+    return serviceLocator.tryGet<AppLogger>();
   } catch (_) {
     return null;
   }

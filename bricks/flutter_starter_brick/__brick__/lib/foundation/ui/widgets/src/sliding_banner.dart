@@ -17,12 +17,41 @@ abstract final class SlidingBannerDefaults {
   static const double swipeThreshold = -5;
 }
 
+final class _SlidingBannerRequest {
+  const _SlidingBannerRequest({
+    required this.type,
+    required this.message,
+    required this.autoDismiss,
+    required this.duration,
+    required this.onAction,
+    required this.actionText,
+    required this.onDismiss,
+  });
+
+  final StatusBannerType type;
+  final String message;
+  final bool autoDismiss;
+  final Duration duration;
+  final VoidCallback? onAction;
+  final String? actionText;
+  final VoidCallback? onDismiss;
+
+  bool hasSameBehavior(_SlidingBannerRequest other) =>
+      type == other.type &&
+      message == other.message &&
+      autoDismiss == other.autoDismiss &&
+      duration == other.duration &&
+      onAction == other.onAction &&
+      actionText == other.actionText &&
+      onDismiss == other.onDismiss;
+}
+
 /// A unified banner that slides from the top of the screen.
 /// Replaces both snackbars and static banners with a consistent experience.
 class SlidingBanner {
   static OverlayEntry? _currentEntry;
   static Timer? _dismissTimer;
-  static String? _currentMessage;
+  static _SlidingBannerRequest? _currentRequest;
 
   /// Shows a sliding banner with the specified configuration.
   static Future<void> show({
@@ -35,7 +64,20 @@ class SlidingBanner {
     String? actionText,
     VoidCallback? onDismiss,
   }) async {
-    if (_currentMessage == message && _currentEntry != null) {
+    if (!context.mounted) return;
+    final overlay = Overlay.of(context);
+    final request = _SlidingBannerRequest(
+      type: type,
+      message: message,
+      autoDismiss: autoDismiss,
+      duration: duration ?? SlidingBannerDefaults.defaultDuration,
+      onAction: onAction,
+      actionText: actionText,
+      onDismiss: onDismiss,
+    );
+
+    if (_currentEntry != null &&
+        _currentRequest?.hasSameBehavior(request) == true) {
       return;
     }
 
@@ -43,10 +85,7 @@ class SlidingBanner {
       hide();
     }
 
-    _currentMessage = message;
-
-    if (!context.mounted) return;
-    final overlay = Overlay.of(context);
+    _currentRequest = request;
 
     final widgetKey = GlobalKey<_SlidingBannerWidgetState>();
 
@@ -68,14 +107,14 @@ class SlidingBanner {
 
     if (autoDismiss) {
       _dismissTimer = Timer(
-        duration ?? SlidingBannerDefaults.defaultDuration,
+        request.duration,
         () {
-        final state = widgetKey.currentState;
-        if (state != null && state.mounted) {
-          unawaited(state._dismiss());
-        } else {
-          hide();
-        }
+          final state = widgetKey.currentState;
+          if (state != null && state.mounted) {
+            unawaited(state._dismiss());
+          } else {
+            hide();
+          }
         },
       );
     }
@@ -143,7 +182,7 @@ class SlidingBanner {
     _dismissTimer = null;
     _currentEntry?.remove();
     _currentEntry = null;
-    _currentMessage = null;
+    _currentRequest = null;
   }
 }
 

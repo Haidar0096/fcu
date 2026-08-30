@@ -8,7 +8,7 @@
   "continueButton": "Continue",
   "retry": "Retry",
   "appName": "{{proj_name.titleCase()}}",
-  "appTagline": "Your app tagline",
+  "appTagline": "{{proj_desc}}",
   "@appTagline": {
     "description": "The app's tagline shown on splash screen"
   },

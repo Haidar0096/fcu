@@ -7,8 +7,10 @@ class _JokesBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BlocBuilder<JokesCubit, JokesState>(
+    // Every state variant and payload changes the rendered body.
     builder: (context, state) => switch (state) {
       JokesInitialState() => const SizedBox.shrink(),
+      JokesCriticalErrorState() => const SizedBox.shrink(),
       JokesLoadingState(:final lastGoodJoke) => Stack(
         alignment: Alignment.center,
         children: [
@@ -30,7 +32,7 @@ class _JokesBody extends StatelessWidget {
             ),
           StatusBannerWidget(
             type: StatusBannerType.error,
-            message: uiFailure.getDisplayText(context),
+            message: uiFailure.getDisplayText(context.appLocalizations),
             actionText: context.appLocalizations.retry,
             onAction: onFetchJoke,
           ),

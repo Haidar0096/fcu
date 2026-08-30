@@ -1,5 +1,7 @@
 # Upload to TestFlight
 
+Audience: release operators authorized for iOS uploads; permitted content: the TestFlight upload procedure and credential locations, never credential values.
+
 Builds and uploads iOS IPA to TestFlight for beta testing.
 
 ## Prerequisites
