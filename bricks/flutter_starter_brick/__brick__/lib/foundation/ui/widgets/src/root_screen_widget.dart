@@ -124,8 +124,6 @@ class RootScreenWidget extends StatelessWidget {
 
     // PopScope feeds the screen's decision into every framework back path,
     // including the route's edge-bound, direction-aware iOS back gesture.
-    result = PopScope(canPop: canPop, child: result);
-
-    return result;
+    return PopScope(canPop: canPop, child: result);
   }
 }

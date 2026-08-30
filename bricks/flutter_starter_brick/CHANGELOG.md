@@ -1,3 +1,11 @@
+# 4.7.2
+Release date: 2026-08-30. A patch: the four analyzer notes left in a
+4.7.1 generated app are gone; nothing is added or removed.
+- The parked-report file checks existence and deletes with the
+  synchronous file calls the `avoid_slow_async_io` lint asks for.
+- The root screen widget returns its final wrapper directly instead of
+  assigning it first.
+
 # 4.7.1
 Release date: 2026-08-30. A patch: two fixes found by the 4.7.0 release
 proof app; nothing is added or removed.

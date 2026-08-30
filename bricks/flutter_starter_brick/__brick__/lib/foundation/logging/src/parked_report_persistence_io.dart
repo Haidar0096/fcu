@@ -21,7 +21,7 @@ final class ParkedReportPersistence {
     final persistence = ParkedReportPersistence._(
       File(path.join(directory.path, _fileName)),
     );
-    if (await persistence._file.exists()) {
+    if (persistence._file.existsSync()) {
       await persistence._excludeFromIosBackup();
     }
     return persistence;
@@ -29,7 +29,7 @@ final class ParkedReportPersistence {
 
   /// Reads one encoded JSON object per line, oldest first.
   Future<List<String>> readValues() async {
-    if (!await _file.exists()) return const <String>[];
+    if (!_file.existsSync()) return const <String>[];
     return (await _file.readAsLines())
         .where((line) => line.isNotEmpty)
         .toList(growable: false);
@@ -44,7 +44,7 @@ final class ParkedReportPersistence {
 
   /// Removes the queue after the final report is acknowledged.
   Future<void> clearValues() async {
-    if (await _file.exists()) await _file.delete();
+    if (_file.existsSync()) _file.deleteSync();
   }
 
   Future<void> _excludeFromIosBackup() async {
