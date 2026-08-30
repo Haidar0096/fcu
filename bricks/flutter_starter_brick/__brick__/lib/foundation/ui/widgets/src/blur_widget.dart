@@ -13,7 +13,7 @@ class BlurWidget extends StatelessWidget {
 
   final Widget child;
 
-  /// Indicates whether to apply the blur effect. Defaults to true.
+  /// Indicates whether to apply the blur effect.
   final bool applyBlur;
 
   /// The intensity of the blur effect. Higher values result in a stronger

@@ -17,9 +17,6 @@ typedef OnProgressCallback = void Function(int count, int total);
 
 /// An interface specifying the contract for making HTTP requests.
 abstract class HttpClient {
-  /// Correlation id from the most recent successful response, when present.
-  String? get lastSuccessfulCorrelationId;
-
   /// Makes a GET request to the specified [path].
   ///
   /// - [path]: The URL path for the request.

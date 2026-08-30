@@ -2,8 +2,10 @@
 
 [![Powered by Mason](https://img.shields.io/endpoint?url=https%3A%2F%2Ftinyurl.com%2Fmason-badge)](https://github.com/felangel/mason)
 
-A production-ready Flutter project starter template with clean architecture, comprehensive
-foundation modules, and best practices built-in.
+A production-oriented Flutter project starter template with clean architecture and
+comprehensive foundation modules. Project setup and project-specific release,
+authentication, token renewal, native crash reporting, theming, localization, and signing
+decisions must be completed before production use.
 
 ## Features
 
@@ -17,8 +19,8 @@ foundation modules, and best practices built-in.
 - [✓] **Type Safety**: Sealed classes, Result types, exhaustive pattern matching
 - [✓] **State Management**: BLoC pattern with Cubit, Hydrated BLoC, race condition prevention
 - [✓] **Dependency Injection**: Abstract service provider pattern with GetIt
-- [✓] **Error Handling**: Result type pattern, no exceptions, user-friendly messages
-- [✓] **Logging System**: Structured logging with separation between debug, error, and analytics
+- [✓] **Error Handling**: Expected operational failures use Result; programming and configuration errors may throw
+- [✓] **Logging System**: Structured debug event logging and error reporting; analytics remains unconfigured
 
 ### Networking & Data
 - [✓] **HTTP Client**: Type-safe, Result-based, with proper error handling
@@ -29,15 +31,15 @@ foundation modules, and best practices built-in.
 - [✓] **Rich UI Components**: 15+ customizable widgets following Material 3
 - [✓] **Theming System**: Light/dark themes with persistent preferences
 - [✓] **Internationalization**: Multi-language support with ARB files
-- [✓] **Responsive Design**: Adaptive layouts for different screen sizes
+- [✓] **Safe Areas & Theming**: Shared safe-area handling and persistent theme preferences
 - [✓] **Animations**: Pre-built animation utilities and extensions
 
 ### Developer Tools
-- [✓] **IAI System Setup**: Pre-configured `.iai/` skeleton with project-specific rules; universal Flutter rules ship via the global `mobile` skill
+- [✓] **IAI System Setup**: Pre-configured `.iai/` runtime workspace; universal Flutter rules ship via the global `mobile` skill
 - [✓] **Build Scripts**: APK generation for all architectures and environments
 - [✓] **TestFlight Upload**: Automated iOS distribution script
 - [✓] **GitHub Actions**: PR checks (format, analyze, test, build) plus Play Store and TestFlight deploy workflows
-- [✓] **Architecture Plugin**: 25 warning rules ship inside every app and load through `path: packages/architecture_lint_rules`
+- [✓] **Architecture Plugin**: 26 warning rules ship inside every app and load through `path: packages/architecture_lint_rules`
 - [✓] **Structure Gate**: `dart run tool/check_structure_io.dart` checks the real folder and file-name layout
 
 ## Project Structure
@@ -53,6 +55,7 @@ lib/
 │   ├── random_jokes/           # Example feature
 │   └── critical_error_screen/  # Unrecoverable-error screen
 ├── foundation/              # Core reusable modules
+│   ├── authentication/     # Token store, renewal coordinator, renewal outcomes
 │   ├── blocs/              # Base cubits and utilities
 │   ├── environments/       # Environment configuration
 │   ├── l10n/              # Localization
@@ -70,7 +73,7 @@ env/
 
 ## Key Patterns
 
-- **Result Type**: All async operations return `Result<Failure, Success>` - no exceptions
+- **Result Type**: Network and data-layer boundaries return `Result<Failure, Success>` without throwing across the boundary
 - **DTO Pattern**: Clean separation between API DTOs and UI models
 - **Module Pattern**: Every module uses src/ for private implementation, barrel file for public API
 - **Sealed Classes**: Exhaustive pattern matching for states and errors
@@ -86,13 +89,8 @@ env/
 
 ## Documentation
 
-Every generated project includes a pre-configured `.iai/` skeleton with `.iai/docs/project_rules.md` — a memory doc the IAI boot dump shows in every chat — documenting the app-specific bits:
-- App-specific configuration (orientation, persistence, error handling)
-- Starter feature list (splash, random jokes, critical error)
-- Code generation dependency choices
-- Localization setup
-- Animation extensions
-- Common task workflows (modifying error handling, etc.)
+Project setup creates the committed `business_rules.md` in the selected documentation home
+for project-specific business rules.
 
 Universal Flutter/Dart architecture and patterns are provided by the global `mobile` skill in the IAI agent system, with the Flutter mechanics under `mobile/flutter/`.
 

@@ -3,7 +3,7 @@ description: {{proj_desc}}
 publish_to: 'none'
 # Dummy. The shipped version lives in the `versions` file at the project root,
 # which the release scripts and the CI workflows read.
-version: 0.1.0
+version: 0.0.1
 
 environment:
   sdk: ^3.11.0
@@ -21,7 +21,7 @@ flutter:
   generate: true
   assets:
     - assets/images/common/
-  fonts: # TODO({{dev_name.paramCase()}}): use your own fonts if needed
+  fonts: # Montserrat is the starter font.
     - family: montserrat
       fonts:
         - asset: assets/fonts/montserrat_bold.ttf

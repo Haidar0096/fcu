@@ -19,6 +19,7 @@ import 'package:{{proj_name}}/foundation/ui/global_loader/global_loader.dart';
 /// }
 /// ```
 mixin LoaderStateMixin<T extends StatefulWidget> on State<T> {
+  final Object _loaderOwner = Object();
   bool _isLoaderShown = false;
 
   /// Changes the visibility of the global loader.
@@ -28,10 +29,9 @@ mixin LoaderStateMixin<T extends StatefulWidget> on State<T> {
   /// currently shown.
   void changeLoaderVisibility({required bool show}) {
     if (show && !_isLoaderShown) {
-      showGlobalLoader();
-      _isLoaderShown = true;
+      _isLoaderShown = showGlobalLoader(owner: _loaderOwner);
     } else if (!show && _isLoaderShown) {
-      hideGlobalLoader();
+      hideGlobalLoader(owner: _loaderOwner);
       _isLoaderShown = false;
     }
   }
@@ -40,7 +40,7 @@ mixin LoaderStateMixin<T extends StatefulWidget> on State<T> {
   void dispose() {
     // Ensure loader is hidden if widget is disposed while loading
     if (_isLoaderShown) {
-      hideGlobalLoader();
+      hideGlobalLoader(owner: _loaderOwner);
     }
     super.dispose();
   }

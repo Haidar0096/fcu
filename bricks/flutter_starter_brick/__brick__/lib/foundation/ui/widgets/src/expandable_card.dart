@@ -57,7 +57,7 @@ class ExpandableCard extends StatefulWidget {
 class ExpandableCardState extends State<ExpandableCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _expandAnimation;
+  late CurvedAnimation _expandAnimation;
   late bool _isExpanded;
 
   /// Whether the card is currently expanded
@@ -86,10 +86,18 @@ class ExpandableCardState extends State<ExpandableCard>
       _controller.duration =
           widget.duration ?? ExpandableCardDefaults.duration;
     }
+    if (widget.curve != oldWidget.curve) {
+      _expandAnimation.dispose();
+      _expandAnimation = CurvedAnimation(
+        parent: _controller,
+        curve: widget.curve ?? ExpandableCardDefaults.curve,
+      );
+    }
   }
 
   @override
   void dispose() {
+    _expandAnimation.dispose();
     _controller.dispose();
     super.dispose();
   }

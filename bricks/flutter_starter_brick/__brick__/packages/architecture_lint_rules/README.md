@@ -1,5 +1,7 @@
 # Architecture Lint Rules
 
+Audience: developers configuring or maintaining the generated analyzer plugin; permitted content: plugin behavior, configuration, and maintenance instructions.
+
 `architecture_lint_rules` is the warning-level analyzer plugin shipped inside every Flutter CLI Utils starter app. It enforces the starter's module boundaries, state-management rules, UI conventions, and security guardrails.
 
 The package requires Dart 3.11 or later. Its `pubspec.lock` is intentionally committed so generated apps carry the tested plugin dependency graph.
@@ -18,7 +20,7 @@ Restart the Dart analysis server after changing plugin configuration.
 
 ## Project switches
 
-All 25 rules are warning rules and are enabled by default. The official analyzer-plugin `diagnostics` map can disable any rule for one project. For example:
+All 26 rules are warning rules and are enabled by default. The official analyzer-plugin `diagnostics` map can disable any rule for one project. For example:
 
 ```yaml
 plugins:
@@ -49,11 +51,30 @@ The built-in defaults are:
 
 - `dio` and `http`: `foundation/networking`
 - `f_logs`, `logger`, `logging`, `loggy`, `talker`, and `talker_flutter`: `foundation/logging`
+- `flutter_secure_storage`: `foundation/authentication/src/auth_token_store.dart`
 - `flutter_svg`: `resources/src/images.dart`
 - `dart:io`: files whose names end in `_io.dart`
 - `provider`, `riverpod`, `flutter_riverpod`, `hooks_riverpod`, and `riverpod_annotation`: nowhere
 
+## Api-client setting
+
+`apis_take_their_declared_client` checks HTTP API construction in the composition root. Which client an API takes is the project's own answer, so every API must declare the mapping:
+
+```yaml
+architecture_lint_rules:
+  api_http_clients:
+    ProfileApi: loggedInBackendHttpClient
+```
+
+The built-in default is the one wiring the starter itself ships:
+
+- `JokesApi`: `publicBackendHttpClient`
+
+An entry here replaces the built-in one of the same name. A missing declaration is diagnosed without choosing a client for the project.
+
 ## Rules
+
+This list is derived from `lib/src/rules/*_rule.dart`; each matching source file owns its rule and wins if this overview differs.
 
 Every diagnostic below has `WARNING` severity.
 
@@ -82,6 +103,7 @@ Every diagnostic below has `WARNING` severity.
 - `no_hardcoded_ui_strings`: direct `Text` strings and named label strings come from localization.
 - `require_scoped_ignores`: `ignore_for_file` is forbidden and a line ignore includes ` -- ` followed by a reason.
 - `no_secret_literals`: Dart source cannot contain literals shaped like real keys, tokens, private keys, or high-entropy values assigned to secret-named fields.
+- `apis_take_their_declared_client`: inside `lib/dependency_injection/`, every HTTP API declares and takes exactly one named HTTP client.
 
 Rules intentionally match only the named syntax and location. Ambiguous code stays quiet.
 
@@ -107,7 +129,7 @@ dart analyze
 dart test
 ```
 
-The test suite covers all 10 module-boundary rules and all 15 starter guardrails. The guardrail suite includes a firing and quiet case per rule, a vendor-setting case, and a diagnostics off-switch case.
+The test suite covers all 10 module-boundary rules and all 16 starter guardrails. The guardrail suite includes a firing and quiet case per rule, a vendor-setting case, an api-client-setting case, and a diagnostics off-switch case.
 
 References:
 

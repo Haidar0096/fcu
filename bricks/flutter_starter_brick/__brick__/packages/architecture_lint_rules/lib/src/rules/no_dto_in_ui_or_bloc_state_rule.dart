@@ -52,7 +52,7 @@ class _DtoTypeVisitor extends SimpleAstVisitor<void> {
 }
 
 bool _isWidgetLocation(AstNode node, RuleContext context) {
-  final path = currentFilePath(context);
+  final path = currentFilePath(context)?.replaceAll('\\', '/');
   if (path?.contains('/src/ui/') ?? false) return true;
   final declaration = enclosingClass(node);
   if (declaration == null) return false;
@@ -66,7 +66,7 @@ bool _isWidgetLocation(AstNode node, RuleContext context) {
 }
 
 bool _isBlocStateLocation(AstNode node, RuleContext context) {
-  final path = currentFilePath(context);
+  final path = currentFilePath(context)?.replaceAll('\\', '/');
   if (path == null || !path.contains('/blocs/')) return false;
   final declaration = enclosingClass(node);
   return path.endsWith('_state.dart') ||

@@ -5,10 +5,11 @@
 .packages
 build/
 pubspec.lock
-# The architecture lint plugin is consumed by a `git:` source in every
-# generated app's analysis_options.yaml, so its resolved versions must be
-# reproducible: this ONE lock file is tracked. No other lock file is.
-!/packages/architecture_lint_rules/pubspec.lock
+# The architecture lint plugin is loaded by every generated app's
+# analysis_options.yaml as `path: packages/architecture_lint_rules`, so its
+# resolved versions must be reproducible: this ONE lock file is tracked. No
+# other lock file is.
+!/bricks/flutter_starter_brick/__brick__/packages/architecture_lint_rules/pubspec.lock
 
 # Files generated during tests
 .test_coverage.dart
@@ -25,4 +26,4 @@ coverage/
 .DS_Store
 
 # IAI related
-.iai/scratchpad/
+.iai/

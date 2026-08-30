@@ -1,5 +1,7 @@
 # Release Guide
 
+Audience: fcu and starter-brick release maintainers; limited to release operations and public repository facts.
+
 This document outlines the release process for both the Flutter Starter Brick and the Flutter CLI Utils (fcu) tool.
 
 ## Releasing the Flutter Starter Brick
@@ -84,10 +86,33 @@ the flow this repo uses.
 
 7. **Tag the release on `production`**
 
+   Two tag namespaces, because the two versions move independently: the bare
+   `vX.Y.Z` names a BRICK release, `cli-vX.Y.Z` names a CLI release. Tagging a
+   CLI release `vX.Y.Z` would collide with the brick tag of that number.
+
+   **The brick section above carries no git flow of its own, so a brick release
+   uses steps 1 and 5 to 8 of this section — and takes the brick tag.**
+
    ```bash
    git switch production && git pull
-   git tag v1.0.0
-   git push origin v1.0.0
+   git tag cli-v1.0.0        # a CLI release
+   # git tag v1.0.0          # a brick release — the brick's version, not the CLI's
+   git push origin cli-v1.0.0
+   # git push origin v1.0.0   # a brick release — pushes the tag made above
+   ```
+
+8. **Create the GitHub Release from the pushed tag**
+
+   For a CLI release:
+
+   ```bash
+   gh release create cli-v1.0.0 --title "CLI v1.0.0" --generate-notes
+   ```
+
+   For a brick release:
+
+   ```bash
+   gh release create v1.0.0 --title "Brick v1.0.0" --generate-notes
    ```
 
    > **Note**: The CLI tool is currently distributed as source code on GitHub (not published to pub.dev)

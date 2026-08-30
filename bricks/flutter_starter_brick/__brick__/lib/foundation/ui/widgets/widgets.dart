@@ -1,5 +1,4 @@
 export 'src/blur_widget.dart';
-export 'src/on_app_lifecycle_changed_callback.dart';
 export 'src/custom_elevated_button.dart';
 export 'src/custom_radio_button.dart';
 export 'src/custom_text_form_field.dart';
@@ -9,6 +8,7 @@ export 'src/expandable_card.dart';
 export 'src/invisible_validation_widget.dart';
 export 'src/loader_widget.dart';
 export 'src/main_button.dart';
+export 'src/on_app_lifecycle_changed_callback.dart';
 export 'src/png_image.dart';
 export 'src/root_screen_widget.dart';
 export 'src/secondary_button.dart';

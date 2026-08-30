@@ -13,7 +13,7 @@
 /// import 'package:myapp/router/router.dart';
 ///
 /// // ✅ GOOD: Feature importing foundation
-/// import 'package:myapp/foundation/ui/widgets/button.dart';
+/// import 'package:myapp/foundation/ui/widgets/widgets.dart';
 /// ```
 library;
 
@@ -72,7 +72,7 @@ class _FeaturesImportRestrictionsVisitor extends SimpleAstVisitor<void> {
     // Get the source file path
     final currentUnit = context.currentUnit;
     if (currentUnit == null) return;
-    final filePath = currentUnit.file.path;
+    final filePath = currentUnit.file.path.replaceAll('\\', '/');
 
     // Only check files in features/ folder
     if (!filePath.contains('lib/features/')) return;

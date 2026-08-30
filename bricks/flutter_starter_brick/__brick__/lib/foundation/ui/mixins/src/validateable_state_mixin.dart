@@ -92,7 +92,15 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
   bool validate() {
     hasValidatedOnce = true;
     final validatorFunction = validator;
-    if (validatorFunction == null) return true;
+    if (validatorFunction == null) {
+      if (errorMessage != null) {
+        setState(() {
+          errorMessage = null;
+        });
+      }
+      unawaited(animationController.reverse());
+      return true;
+    }
 
     final validationMessage = validatorFunction(currentValue);
 

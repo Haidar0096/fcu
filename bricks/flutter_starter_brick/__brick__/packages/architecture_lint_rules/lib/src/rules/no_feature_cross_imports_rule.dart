@@ -72,7 +72,7 @@ class _NoFeatureCrossImportsVisitor extends SimpleAstVisitor<void> {
     // Get the source file path
     final currentUnit = context.currentUnit;
     if (currentUnit == null) return;
-    final filePath = currentUnit.file.path;
+    final filePath = currentUnit.file.path.replaceAll('\\', '/');
 
     // Check if current file is in a feature folder
     // Extract the FULL feature path (everything between features/ and /src/ or end)
@@ -93,15 +93,14 @@ class _NoFeatureCrossImportsVisitor extends SimpleAstVisitor<void> {
 
     final importedFeature = importMatch.group(1)!;
 
-    // Allow imports from shared/ folder within the same parent feature
+    // Allow only the parent feature's exact shared/ module.
     final currentParent = currentFeature.split('/').first;
-    final importedParent = importedFeature.split('/').first;
-    final isImportingFromShared = importedFeature.split('/').contains('shared');
+    final parentSharedFeature = '$currentParent/shared';
 
-    // Report if importing from a different feature (unless it's shared/ within same parent)
+    // Report imports from a different feature except the exact shared module.
     if (currentFeature != importedFeature) {
-      // Allow if importing from shared/ within same parent feature
-      if (isImportingFromShared && currentParent == importedParent) {
+      // Allow the shared module owned by the current feature's parent.
+      if (importedFeature == parentSharedFeature) {
         return; // Allowed
       }
       rule.reportAtNode(node);

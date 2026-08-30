@@ -7,13 +7,17 @@ sealed class JokesState {
   /// Whether a joke is currently being fetched.
   bool get isLoading => switch (this) {
     JokesLoadingState() => true,
-    JokesInitialState() || JokesLoadedState() || JokesFailedState() => false,
+    JokesInitialState() ||
+    JokesLoadedState() ||
+    JokesFailedState() ||
+    JokesCriticalErrorState() => false,
   };
 
   /// The last joke that loaded successfully, retained during refresh and
   /// failure so the screen never blanks after it has useful data.
   UiJoke? get lastGoodJoke => switch (this) {
     JokesInitialState() => null,
+    JokesCriticalErrorState() => null,
     JokesLoadingState(:final lastGoodJoke) ||
     JokesFailedState(:final lastGoodJoke) =>
       lastGoodJoke,
@@ -49,4 +53,9 @@ final class JokesFailedState extends JokesState {
 
   @override
   final UiJoke? lastGoodJoke;
+}
+
+/// Fatal state used when the backend breaks the response contract.
+final class JokesCriticalErrorState extends JokesState {
+  const JokesCriticalErrorState();
 }

@@ -1,7 +1,7 @@
-import 'package:flutter/widgets.dart';
+import 'package:{{proj_name}}/resources/resources.dart';
 
 mixin DisplayableUiModelMixin {
   /// Returns the text that represents this model and which is suitable
   /// to be displayed on the UI.
-  String getDisplayText(BuildContext context);
+  String getDisplayText(AppLocalizations texts);
 }

@@ -63,46 +63,23 @@ class _ResourcesCannotImportVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitImportDirective(ImportDirective node) {
-    final uri = node.uri.stringValue;
-    if (uri == null) return;
+    final currentPath = context.currentUnit?.file.path
+        .replaceAll('\\', '/');
+    if (currentPath == null) return;
 
-    // Get the source file path
-    final currentUnit = context.currentUnit;
-    if (currentUnit == null) return;
-    final filePath = currentUnit.file.path;
+    const resourcesMarker = '/lib/resources/';
+    final resourcesIndex = currentPath.indexOf(resourcesMarker);
+    if (resourcesIndex < 0) return;
 
-    // Only check files in resources/ folder
-    if (!filePath.contains('lib/resources/')) return;
+    final importedPath = node.libraryImport?.importedLibrary?.firstFragment
+        .source.fullName
+        .replaceAll('\\', '/');
+    if (importedPath == null) return;
 
-    // Only check package: imports (skip dart: and relative imports)
-    if (!uri.startsWith('package:')) return;
+    final projectRoot = currentPath.substring(0, resourcesIndex);
+    if (!importedPath.startsWith('$projectRoot/')) return;
 
-    // Extract package name from import
-    final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);
-    if (packageMatch == null) return;
-
-    final importPackage = packageMatch.group(1)!;
-    final importPath = packageMatch.group(2)!;
-
-    // Get current package name from the library identifier
-    final libraryElement = context.libraryElement;
-    if (libraryElement == null) return;
-
-    // Extract package name from library identifier (e.g., "package:myapp/...")
-    final identifier = libraryElement.identifier;
-    final currentPackageMatch = RegExp(
-      r'package:([^/]+)/',
-    ).firstMatch(identifier);
-    if (currentPackageMatch == null) return;
-
-    final currentPackage = currentPackageMatch.group(1)!;
-
-    // Only check imports from the same package (skip external packages)
-    if (importPackage != currentPackage) return;
-
-    // Every home may import itself; resources/ is a leaf, so any OTHER folder
-    // of the project's own code is a violation.
-    if (!importPath.startsWith('resources/')) {
+    if (!importedPath.startsWith('$projectRoot/lib/resources/')) {
       rule.reportAtNode(node);
     }
   }

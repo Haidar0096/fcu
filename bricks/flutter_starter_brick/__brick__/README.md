@@ -10,10 +10,11 @@ For release process and building, see [RELEASE.md](RELEASE.md).
 2. Run the following commands in order:
 
    ```bash
-   flutter pub get
-   flutter gen-l10n
-   dart run build_runner build
-   flutter run --dart-define-from-file=env/development.json
+   fvm install
+   fvm flutter pub get
+   fvm flutter gen-l10n
+   fvm dart run build_runner build --delete-conflicting-outputs
+   fvm flutter run --dart-define-from-file=env/development.json
    ```
 
 Use `env/production.json` for the production environment. The committed files

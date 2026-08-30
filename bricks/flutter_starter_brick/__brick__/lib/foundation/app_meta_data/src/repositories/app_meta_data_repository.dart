@@ -2,12 +2,19 @@ import 'package:android_id/android_id.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:{{proj_name}}/foundation/app_meta_data/src/platform/platform_info.dart';
 import 'package:{{proj_name}}/foundation/app_meta_data/src/repositories/app_meta_data_repository_keys.dart';
 import 'package:{{proj_name}}/foundation/basic_types/basic_types.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
+
+/// Reads one string from the app's preferences store.
+typedef OnReadPreferenceStringCallback =
+    String? Function({required String key});
+
+/// Writes one string to the app's preferences store.
+typedef OnWritePreferenceStringCallback =
+    Future<bool> Function({required String key, required String value});
 
 /// Repository for device and application metadata retrieval.
 ///
@@ -25,20 +32,23 @@ class AppMetaDataRepository {
     required AppLogger appLogger,
     required DeviceInfoPlugin deviceInfoPlugin,
     required ErrorLogger errorLogger,
-    required SharedPreferences sharedPreferences,
+    required OnReadPreferenceStringCallback readPreferenceString,
+    required OnWritePreferenceStringCallback writePreferenceString,
     required Uuid uuid,
   }) : _androidId = androidId,
        _appLogger = appLogger,
        _deviceInfoPlugin = deviceInfoPlugin,
        _errorLogger = errorLogger,
-       _sharedPreferences = sharedPreferences,
+       _readPreferenceString = readPreferenceString,
+       _writePreferenceString = writePreferenceString,
        _uuid = uuid;
 
   final AndroidId _androidId;
   final AppLogger _appLogger;
   final DeviceInfoPlugin _deviceInfoPlugin;
   final ErrorLogger _errorLogger;
-  final SharedPreferences _sharedPreferences;
+  final OnReadPreferenceStringCallback _readPreferenceString;
+  final OnWritePreferenceStringCallback _writePreferenceString;
   final Uuid _uuid;
 
   static const String _tag = 'AppMetaDataRepository';
@@ -99,18 +109,21 @@ class AppMetaDataRepository {
   /// Web: returns cached UUID from SharedPreferences, or generates and caches
   /// a new one if none exists.
   Future<String> _getWebDeviceId() async {
-    final cached = _sharedPreferences.getString(
-      AppMetaDataRepositoryKeys.deviceId,
+    final cached = _readPreferenceString(
+      key: AppMetaDataRepositoryKeys.deviceId,
     );
     if (cached != null) {
       return cached;
     }
 
     final deviceId = _uuid.v4();
-    await _sharedPreferences.setString(
-      AppMetaDataRepositoryKeys.deviceId,
-      deviceId,
+    final stored = await _writePreferenceString(
+      key: AppMetaDataRepositoryKeys.deviceId,
+      value: deviceId,
     );
+    if (!stored) {
+      throw StateError('Failed to persist the web device identifier.');
+    }
     return deviceId;
   }
 

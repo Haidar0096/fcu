@@ -1,5 +1,7 @@
 # Release Process
 
+Audience: generated-app release maintainers; limited to release operations and project release facts.
+
 ## Pre-release checklist
 
 Before releasing, ensure the following:
@@ -43,16 +45,17 @@ Development and production branches are synchronized (development has been merge
 1. Open a PR from development to production
 2. Team approves and merges the PR (regular merge, not squash)
 3. Promote the release to production on Google Play Console and App Store Connect
-4. Create a git tag on production carrying the version name only: `vX.Y.Z` — each platform's build number moves on its own in the `versions` file, so no single tag can name them all; the changelog rows are the build numbers' home
+4. Create one git tag on production for each released platform, using that
+   platform's version-name field: `android-vX.Y.Z` from
+   `android_version_name`, `ios-vX.Y.Z` from `ios_version_name`, and
+   `web-vX.Y.Z` from `web_version_name`. Build numbers remain independent and
+   stay in the changelog; the platform namespace keeps divergent version names
+   unambiguous.
 5. Verify after release (below)
 
 ## Verify after release
 
 Verifying a mobile release means installing the BUILT artifact on a real device and running the release smoke pass on it — not re-checking the CI output. The checklist itself lives in the software-release skill's verify-after section; run it there and record the result with the release.
-
-## Store timing facts
-
-TODO({{dev_name.paramCase()}}): record this project's real store timings here once they are known — App Store review delay, Google Play review delay, and whether production rollout is staged (and over how many days). These decide when a release can actually be promoted, so they belong beside the flow rather than in someone's memory.
 
 ## Rollback
 
@@ -62,7 +65,6 @@ A store build that has shipped cannot be un-shipped. Going back to the last good
 2. In the `versions` file, put the last good version name back and raise the build number above the bad build's — the stores reject a build number that is not higher
 3. Merge the prep branch and run the same GitHub Actions workflows
 4. Promote the new build in the Google Play Console and App Store Connect, and halt or reduce the bad build's rollout there
-5. TODO({{dev_name.paramCase()}}): record any rollback step specific to this project here (data migrations, feature flags, server-side switches)
 
 ## Merge strategy
 

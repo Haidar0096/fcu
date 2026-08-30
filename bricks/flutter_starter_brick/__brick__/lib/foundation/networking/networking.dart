@@ -1,7 +1,8 @@
-export 'src/backend_http_client.dart';
-// Only the owned interface leaves the module: the dio-backed implementation
-// carries dio types on its own constructor and on an extension it declares,
-// which no caller may see, so it is reachable only from inside this folder.
+// What each file inside this module holds: `src/README.md`.
+export 'src/backend_meta_headers.dart';
+// Only package-owned types leave the module. The composition root may reach
+// the implementation and chain builders through `src/`; ordinary callers may
+// not expose their transport types.
 export 'src/cancel_token.dart' show CancelToken;
 export 'src/http_client.dart';
 export 'src/http_response.dart';

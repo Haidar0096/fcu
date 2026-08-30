@@ -20,5 +20,5 @@ final class JokeDto with UiConvertibleDtoMixin<UiJoke> {
   final String value;
 
   @override
-  UiJoke toUiModel() => UiJoke(id: id, content: value);
+  UiJoke toUiModel() => UiJoke(content: value);
 }

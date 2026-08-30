@@ -7,12 +7,15 @@ import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/random_j
 import 'package:{{proj_name}}/features/random_jokes/random_jokes_screen/src/apis/jokes_api.dart';
 import 'package:{{proj_name}}/features/splash_screen/splash_screen.dart';
 import 'package:{{proj_name}}/foundation/app_meta_data/app_meta_data.dart';
+import 'package:{{proj_name}}/foundation/authentication/authentication.dart';
 import 'package:{{proj_name}}/foundation/environment_variables/environment_variables.dart';
 import 'package:{{proj_name}}/foundation/environments/environments.dart';
 import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
 import 'package:{{proj_name}}/foundation/locator/locator.dart';
 import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:{{proj_name}}/foundation/networking/networking.dart';
+import 'package:{{proj_name}}/foundation/networking/src/backend_http_client.dart';
+import 'package:{{proj_name}}/foundation/networking/src/backend_interceptors_builder.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 
 void registerInstances({
@@ -41,14 +44,26 @@ void registerInstances({
       dispose: (bloc) => bloc.close(),
     )
     ..registerSingletonAsync<SharedPreferences>(SharedPreferences.getInstance)
+    ..registerSingletonAsync<ParkedReportStore>(
+      () => ParkedReportStore.create(
+        // Unset until project setup records the project's own bound.
+        capacity: null,
+      ),
+    )
     ..registerSingletonAsync<AppMetaDataRepository>(() async {
       await getIt.isReady<SharedPreferences>();
+      // AppMetaDataRepository takes ErrorLogger, whose report sender takes the
+      // async parked-report store. Resolve neither until both stores are ready.
+      await getIt.isReady<ParkedReportStore>();
       return AppMetaDataRepository(
         androidId: const AndroidId(),
         appLogger: getIt.get(),
         deviceInfoPlugin: DeviceInfoPlugin(),
         errorLogger: getIt.get(),
-        sharedPreferences: getIt.get(),
+        readPreferenceString: ({required key}) =>
+            getIt.get<SharedPreferences>().getString(key),
+        writePreferenceString: ({required key, required value}) =>
+            getIt.get<SharedPreferences>().setString(key, value),
         uuid: const Uuid(),
       );
     })
@@ -56,14 +71,54 @@ void registerInstances({
       () => AppMetaDataCubit(repository: getIt.get()),
       dispose: (bloc) => bloc.close(),
     )
+    // ---------------------------------------------------------------------
+    // THE TOKEN PLUMBING — shipped before any login exists, deliberately.
+    //
+    // Adding login must be ONE change: the screens and the auth API. If the
+    // plumbing arrived with them, every project would build it again, and a
+    // token would be attached at a call site until someone noticed.
+    //
+    // The store ships EMPTY: nothing writes a token because nothing logs in.
+    // The renewal ships UNWIRED and says so loudly if it is ever reached —
+    // the renewal address and the shape the server answers in are the
+    // project's, and the starter guesses neither.
+    // ---------------------------------------------------------------------
+    ..registerLazySingleton<AuthTokenStore>(
+      () => AuthTokenStore.standard(
+        appLogger: getIt.get(),
+        errorLogger: getIt.get(),
+      ),
+    )
+    // ONE coordinator for the whole app, which is what makes renewal
+    // single-flight true: a copy per client or per request would each hold
+    // their own in-flight completer, and ten refusals would spend the refresh
+    // credential ten times.
+    ..registerLazySingleton<AuthTokenRenewalCoordinator>(
+      () => AuthTokenRenewalCoordinator(renewTokens: unwiredAuthTokenRenewal),
+      dispose: (coordinator) => coordinator.close(),
+    )
     ..registerFactory<HttpClient>(
       () => BackendHttpClient.standard(
         baseUrl: getIt.get<EnvironmentVariables>().backendBaseUrl,
         errorLogger: getIt.get(),
         appLogger: getIt.get(),
         reportsFailures: true,
+        buildInterceptors: publicInterceptorsBuilder(),
       ),
       instanceName: InstanceNames.publicBackendHttpClient.name,
+    )
+    ..registerFactory<HttpClient>(
+      () => BackendHttpClient.standard(
+        baseUrl: getIt.get<EnvironmentVariables>().backendBaseUrl,
+        errorLogger: getIt.get(),
+        appLogger: getIt.get(),
+        reportsFailures: true,
+        buildInterceptors: loggedInInterceptorsBuilder(
+          tokenStore: getIt.get(),
+          renewalCoordinator: getIt.get(),
+        ),
+      ),
+      instanceName: InstanceNames.loggedInBackendHttpClient.name,
     )
     ..registerFactory<HttpClient>(
       () => BackendHttpClient.standard(
@@ -71,40 +126,31 @@ void registerInstances({
         errorLogger: null,
         appLogger: getIt.get(),
         reportsFailures: false,
+        buildInterceptors: publicInterceptorsBuilder(),
       ),
       instanceName: InstanceNames.reportUploadHttpClient.name,
-    )
-    ..registerLazySingleton<ParkedReportStore>(
-      () => ParkedReportStore(sharedPreferences: getIt.get()),
     )
     // ---------------------------------------------------------------------
     // THE REPORT SENDER — and the one seam this starter deliberately leaves
     // open.
     //
     // THE RECEIVER TAKES A REPORT WITH NO LOGIN TOKEN. That is settled, and
-    // it is why nothing here attaches one: a crash that happens before the
-    // user logs in still has to be reported. The receiver is rate limited
-    // per calling address and strips secrets again on arrival — the sender
-    // is never trusted — so the open door costs nothing here.
+    // it is why the sender rides the public no-report client: a crash that
+    // happens before the user logs in still has to be reported. The receiver
+    // is rate limited per calling address and strips secrets again on arrival.
+    // Those controls mitigate abuse; the unauthenticated endpoint still has
+    // bandwidth, storage, and abuse exposure that the backend must bound.
     //
-    // Two things are NOT settled, and neither may be guessed at:
+    // THE RECEIVER'S PATH is not settled and may not be guessed. It sits in
+    // EnvironmentVariables beside the base URL, ships EMPTY, and is filled in
+    // from the answer given at project setup; while it is empty every report
+    // parks on the device instead of being posted at an address nobody chose.
     //
-    //   1. WHICH AUTH CLIENT future authenticated APIs ride. The report
-    //      sender already has its public no-report client, so an upload
-    //      failure cannot report itself recursively.
-    //   2. THE RECEIVER'S PATH, which sits in EnvironmentVariables beside
-    //      the base URL. It ships EMPTY and is filled in from the answer
-    //      given at project setup; while it is empty every report parks on
-    //      the device instead of being posted at an address nobody chose.
-    //
-    // Nothing here works around either: no second client is registered, no
-    // address is invented, and a failed upload is parked like any other.
-    //
-    // The client arrives as a resolver rather than as a value because the
-    // one client reports its own failures through ErrorLogger, which is fed
-    // by this very sender: resolving it here would close a circle the
-    // container cannot build. The resolver names the dedicated report client
-    // above — it defers WHEN, never WHICH.
+    // BackendReportSender's constructor currently takes a resolver, so this
+    // registration supplies the named dedicated client through that shape.
+    // The client has no ErrorLogger and does not report failures; the lazy
+    // resolution is an API detail, not a dependency-cycle break. The resolver
+    // defers WHEN, never WHICH.
     // ---------------------------------------------------------------------
     ..registerLazySingleton<ReportSender>(
       () => switch (getIt.get<EnvironmentVariables>().reportSenderKind) {
@@ -112,11 +158,15 @@ void registerInstances({
           resolveHttpClient: () => getIt.get<HttpClient>(
             instanceName: InstanceNames.reportUploadHttpClient.name,
           ),
+          appLogger: getIt.get(),
           parkedReports: getIt.get(),
           receiverPath: getIt.get<EnvironmentVariables>().reportReceiverPath,
         ),
       },
     )
+    // The jokes endpoint needs no login, so its API takes the PUBLIC client.
+    // Every API names exactly one client, and it is named here — never inside
+    // the API class.
     ..registerLazySingleton<JokesApi>(
       () => JokesApi(
         getIt.get<HttpClient>(

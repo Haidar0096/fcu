@@ -1,12 +1,5 @@
 # Build Web Application
 
-> **This lane does not build yet.** The starter's shared code still
-> imports `dart:io`, and the web compiler rejects that import, so
-> `flutter build web --dart-define-from-file=env/<name>.json` fails before this
-> script reaches its output step.
-> That import has to go first. Until it does, read this script as the
-> shape of the lane rather than a lane the project can run.
-
 Builds the Flutter Web application in release mode.
 
 ## Prerequisites

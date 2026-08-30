@@ -25,11 +25,11 @@ extension FilePathExtension on String {
 
   /// Gets the part of path after the last separator.
   ///
-  ///     p.basename('path/to/foo.dart'); // -> 'foo.dart'
-  ///     p.basename('path/to');          // -> 'to'
+  ///     path.basename('path/to/foo.dart'); // -> 'foo.dart'
+  ///     path.basename('path/to');          // -> 'to'
   ///
   /// Trailing separators are ignored.
   ///
-  ///     p.basename('path/to/'); // -> 'to'
+  ///     path.basename('path/to/'); // -> 'to'
   String get baseName => path.basename(this);
 }

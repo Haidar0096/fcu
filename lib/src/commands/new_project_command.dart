@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:args/command_runner.dart';
 import 'package:flutter_cli_utils/src/commands/command_arg.dart';
@@ -18,6 +19,9 @@ typedef _FlutterProjectCreationData = ({
   bool useStarterBrick,
   bool initGitRepo,
 });
+
+const String _freshOutputSentinelName = 'fcu_fresh_flutter_output.sentinel';
+const String _freshOutputSentinelVersion = 'fcu-fresh-flutter-output-v1';
 
 /// {@template new_project_command}
 /// A [Command] to create a new Flutter project.
@@ -328,7 +332,7 @@ class NewProjectCommand extends Command<int> {
     final gitCommitResult = await Process.run('git', [
       'commit',
       '-m',
-      "'Initial commit'",
+      'initial commit',
     ], workingDirectory: creationData.outputDirectory);
     if (gitCommitResult.exitCode != 0) {
       throw Exception(
@@ -377,26 +381,38 @@ class NewProjectCommand extends Command<int> {
     }
     _progress?.complete();
 
+    final freshOutputToken = _createFreshOutputToken();
+    final freshOutputSentinel = _writeFreshOutputSentinel(
+      outputDirectory: creationData.outputDirectory,
+      token: freshOutputToken,
+    );
     _progress = _logger.progress('Running `mason make`...');
     // `mason make` inherits this process' stdio, so its own output is already
     // on the terminal and its `stderr` stream is not connected to read back.
-    final masonMakeProcess = await Process.start(
-      'mason',
-      buildStarterBrickMakeArguments(
-        projectName: creationData.projectName,
-        projectDescription: creationData.projectDescription,
-        organization: creationData.organization,
-        developerName: creationData.devName,
-      ),
-      workingDirectory: creationData.outputDirectory,
-      mode: ProcessStartMode.inheritStdio,
-    );
-    final masonMakeExitCode = await masonMakeProcess.exitCode;
-    if (masonMakeExitCode != 0) {
-      throw Exception(
-        'Failed to run `mason make flutter_starter_brick` in project '
-        '(exit code $masonMakeExitCode); see the output above.',
+    try {
+      final masonMakeProcess = await Process.start(
+        'mason',
+        buildStarterBrickMakeArguments(
+          projectName: creationData.projectName,
+          projectDescription: creationData.projectDescription,
+          organization: creationData.organization,
+          developerName: creationData.devName,
+          freshOutputToken: freshOutputToken,
+        ),
+        workingDirectory: creationData.outputDirectory,
+        mode: ProcessStartMode.inheritStdio,
       );
+      final masonMakeExitCode = await masonMakeProcess.exitCode;
+      if (masonMakeExitCode != 0) {
+        throw Exception(
+          'Failed to run `mason make flutter_starter_brick` in project '
+          '(exit code $masonMakeExitCode); see the output above.',
+        );
+      }
+    } finally {
+      if (freshOutputSentinel.existsSync()) {
+        freshOutputSentinel.deleteSync();
+      }
     }
     _progress?.complete();
   }
@@ -630,6 +646,7 @@ List<String> buildStarterBrickMakeArguments({
   required String projectDescription,
   required String organization,
   required String developerName,
+  required String freshOutputToken,
 }) => [
   'make',
   'flutter_starter_brick',
@@ -643,7 +660,32 @@ List<String> buildStarterBrickMakeArguments({
   organization,
   '--dev_name',
   developerName,
+  '--fresh_output_token',
+  freshOutputToken,
 ];
+
+String _createFreshOutputToken() {
+  final random = Random.secure();
+  return List<String>.generate(
+    32,
+    (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+    growable: false,
+  ).join();
+}
+
+File _writeFreshOutputSentinel({
+  required String outputDirectory,
+  required String token,
+}) {
+  final outputRoot = Directory(outputDirectory).resolveSymbolicLinksSync();
+  final sentinel =
+      File('$outputRoot${Platform.pathSeparator}$_freshOutputSentinelName')
+        ..writeAsStringSync(
+          '$_freshOutputSentinelVersion\n$token\n$outputRoot\n',
+          flush: true,
+        );
+  return sentinel;
+}
 
 /// Builds the next steps printed after a starter app is generated.
 String buildStarterNextSteps(String outputDirectory) =>

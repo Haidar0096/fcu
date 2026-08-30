@@ -4,7 +4,6 @@ abstract final class ThemeDefaults {
   static const double buttonWidth = 100;
   static const double buttonMaxWidth = 400;
 
-  static const double borderRadiusXSmall = 2;
   static const double borderRadiusSmall = 8;
   static const double borderRadiusMedium = 12;
   static const double borderRadiusExtraLarge = 20;
@@ -16,8 +15,6 @@ abstract final class ThemeDefaults {
   static const double iconSize = 24;
   static const double smallIconSize = 20;
   static const double largeIconSize = 64;
-  static const double iconButtonSize = 48;
-  static const double smallIconButtonSize = 40;
 
   static const double screenContentPadding = 24;
 
@@ -34,7 +31,6 @@ abstract final class ThemeDefaults {
   static const double bodyTextSize = 14;
   static const double smallTextSize = 12;
   static const double buttonTextSize = 16;
-  static const double dropdownTextSize = 18;
   static const double bodyTextHeight = 1.5;
 
   static const double scrollbarThickness = 10;

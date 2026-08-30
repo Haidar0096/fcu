@@ -8,6 +8,29 @@
 #   ./build_web.sh development  # builds with env/development.json
 #   ./build_web.sh production   # builds with env/production.json
 
+# Resolve paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+prepare_release_project() {
+    echo "📦 Preparing project..."
+    # Clean first: a dev-only plugin left in a stale generated registrant by an
+    # earlier debug run fails the release build.
+    fvm flutter clean || { echo "❌ flutter clean failed"; return 1; }
+    fvm flutter pub get || { echo "❌ flutter pub get failed"; return 1; }
+    fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; return 1; }
+    fvm dart run build_runner build || {
+        echo "❌ build_runner failed"
+        return 1
+    }
+}
+
+# Internal mode shared by the four local release scripts.
+if [[ "${1:-}" == "--prepare-only" ]]; then
+    prepare_release_project
+    exit $?
+fi
+
 # Check for environment argument
 if [[ -z "$1" ]]; then
     echo "❌ Usage: $0 <development|production>"
@@ -27,9 +50,6 @@ case "$ENVIRONMENT" in
         ;;
 esac
 
-# Resolve paths
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 VERSIONS_FILE="$PROJECT_ROOT/versions"
 ENVIRONMENT_FILE="$PROJECT_ROOT/env/$ENVIRONMENT.json"
 
@@ -47,14 +67,8 @@ if [[ -z "$web_version_name" || -z "$web_build_number" ]]; then
     exit 1
 fi
 
-# Prepare project
-echo "📦 Preparing project..."
-# Clean first: a dev-only plugin left in a stale generated registrant by an
-# earlier debug run fails the release build.
-fvm flutter clean || { echo "❌ flutter clean failed"; exit 1; }
-fvm flutter pub get || { echo "❌ flutter pub get failed"; exit 1; }
-fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; exit 1; }
-fvm dart run build_runner build || { echo "❌ build_runner failed"; exit 1; }
+# Prepare project through the shared local preparation owner.
+"$SCRIPT_DIR/build_web.sh" --prepare-only || exit 1
 
 # Build Web
 echo "🚀 Building Web for version $web_version_name ($web_build_number) [$ENVIRONMENT]..."

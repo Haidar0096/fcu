@@ -102,9 +102,7 @@ class SplashScreen extends StatelessWidget {
         break; // Do nothing
       case AppMetaDataLoadingFailedState():
         // Metadata is unrecoverable: the app cannot continue without it.
-        context.read<SplashCubit>().onMetadataLoadingFailed(
-          errorMessage: context.appLocalizations.criticalErrorMessage,
-        );
+        context.read<SplashCubit>().onMetadataLoadingFailed();
       case AppMetaDataLoadedState():
         context.read<SplashCubit>().onMetadataLoaded();
     }
@@ -116,10 +114,9 @@ class SplashScreen extends StatelessWidget {
         break; // Do nothing
       case SplashCompleteState():
         onStartupComplete();
-      case SplashCriticalErrorState(:final errorMessage):
+      case SplashCriticalErrorState():
         onNavigateToCriticalError(
-          message:
-              errorMessage ?? context.appLocalizations.criticalErrorMessage,
+          message: context.appLocalizations.criticalErrorMessage,
         );
     }
   }

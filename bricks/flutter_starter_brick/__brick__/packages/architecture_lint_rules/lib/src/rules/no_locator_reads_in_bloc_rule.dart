@@ -6,6 +6,7 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:architecture_lint_rules/src/rules/rule_utils.dart';
 
@@ -31,7 +32,7 @@ class NoLocatorReadsInBlocRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = _LocatorVisitor(this, context);
+    final visitor = _LocatorVisitor(this);
     registry
       ..addMethodInvocation(this, visitor)
       ..addFunctionExpressionInvocation(this, visitor);
@@ -39,63 +40,33 @@ class NoLocatorReadsInBlocRule extends AnalysisRule {
 }
 
 class _LocatorVisitor extends SimpleAstVisitor<void> {
-  _LocatorVisitor(this.rule, this.context);
+  _LocatorVisitor(this.rule);
 
   final AnalysisRule rule;
-  final RuleContext context;
 
-  bool get _importsGetIt => importsPackage(context, 'get_it');
-
-  bool get _importsLocator => context.definingUnit.unit.directives
-      .whereType<ImportDirective>()
-      .any((directive) {
-        final uri = directive.uri.stringValue;
-        return uri != null && uri.contains('/locator/');
-      });
-
-  /// `GetIt.I<T>()` and `getIt<T>()` resolve to a call on a getter's value,
-  /// which the analyzer represents as a function-expression invocation.
   @override
   void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
     if (!isInsideBloc(node)) return;
-
-    final function = node.function.toSource();
-    final getItRead =
-        _importsGetIt && (function == 'GetIt' || function.startsWith('GetIt.'));
-    final namedLocatorRead = const {
-      'getIt',
-      'locator',
-      'serviceLocator',
-    }.contains(function);
-
-    if (getItRead || namedLocatorRead) {
-      rule.reportAtNode(node);
-    }
+    if (_isLocatorElement(node.element)) rule.reportAtNode(node);
   }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (!isInsideBloc(node)) return;
+    if (_isLocatorElement(node.methodName.element)) rule.reportAtNode(node);
+  }
 
-    final name = node.methodName.name;
-    final target = node.realTarget?.toSource();
-    final importsGetIt = _importsGetIt;
-    final importsLocator = _importsLocator;
-
-    final directLocatorRead =
-        (importsGetIt || importsLocator) &&
-        target == null &&
-        const {'get', 'getIt', 'locator', 'tryGet'}.contains(name);
-    final getItRead =
-        importsGetIt &&
-        target != null &&
-        (target == 'GetIt' || target.startsWith('GetIt.'));
-    final namedLocatorRead =
-        target != null &&
-        const {'getIt', 'locator', 'serviceLocator'}.contains(target);
-
-    if (directLocatorRead || getItRead || namedLocatorRead) {
-      rule.reportAtNode(node);
+  bool _isLocatorElement(Element? element) {
+    final baseElement = element?.baseElement;
+    if (baseElement == null) return false;
+    final libraryUri = baseElement.library?.uri.toString();
+    if (libraryUri == null ||
+        (!libraryUri.startsWith('package:get_it/') &&
+            !libraryUri.replaceAll('\\', '/').contains('/locator/'))) {
+      return false;
     }
+    return const {'call', 'get', 'getAsync', 'tryGet'}.contains(
+      baseElement.displayName,
+    );
   }
 }

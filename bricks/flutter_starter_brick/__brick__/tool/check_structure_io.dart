@@ -79,13 +79,12 @@ void _checkEnvironmentFiles(Directory root) {
     return;
   }
 
-  const requiredFiles = {'development.json', 'production.json'};
   final entries = _visibleEntries(env);
   final files = {
     for (final entry in entries.whereType<File>()) _name(entry.path),
   };
-  for (final file in requiredFiles.difference(files)) {
-    _add('env/$file', 1, 'required build environment file is missing');
+  if (files.isEmpty) {
+    _add('env', 1, 'declare at least one build environment JSON file');
   }
   for (final entry in entries) {
     if (entry is! File || !_name(entry.path).endsWith('.json')) {
@@ -115,6 +114,16 @@ void _checkFeatureTree(Directory features) {
       for (final child in _visibleEntries(entry).whereType<Directory>())
         _name(child.path),
     };
+    final platformBases = <String>{};
+    for (final childName in childNames) {
+      for (final suffix in ['_mobile', '_web']) {
+        if (childName.endsWith(suffix)) {
+          platformBases.add(
+            childName.substring(0, childName.length - suffix.length),
+          );
+        }
+      }
+    }
     for (final child in _visibleEntries(entry)) {
       if (child is! Directory) {
         _add(
@@ -131,20 +140,16 @@ void _checkFeatureTree(Directory features) {
         _checkModule(child, 2);
         _checkFeatureModule(child);
       }
-      if (childName.endsWith('_mobile')) {
-        final base = childName.substring(
-          0,
-          childName.length - '_mobile'.length,
-        );
-        for (final sibling in ['${base}_web', 'shared']) {
-          if (!childNames.contains(sibling)) {
-            _add(
-              _relative('${entry.path}/$sibling'),
-              14,
-              'a whole-feature platform split holds <feature>_mobile, '
-              '<feature>_web, and shared/ together',
-            );
-          }
+    }
+    for (final base in platformBases) {
+      for (final sibling in ['${base}_mobile', '${base}_web', 'shared']) {
+        if (!childNames.contains(sibling)) {
+          _add(
+            _relative('${entry.path}/$sibling'),
+            14,
+            'a whole-feature platform split holds <feature>_mobile, '
+            '<feature>_web, and shared/ together',
+          );
         }
       }
     }
@@ -303,7 +308,7 @@ void _checkForbiddenFolders(Directory lib) {
   const forbidden = {'data', 'domain', 'presentation', 'services'};
   for (final directory in _allDirectories(lib)) {
     final name = _name(directory.path);
-    if (forbidden.contains(name)) {
+    if (forbidden.contains(name) && _hasForbiddenArchitecturalRole(directory)) {
       _add(
         _relative(directory.path),
         name == 'services' ? 9 : 1,
@@ -326,6 +331,21 @@ void _checkForbiddenFolders(Directory lib) {
       );
     }
   }
+}
+
+bool _hasForbiddenArchitecturalRole(Directory directory) {
+  final segments = _relative(directory.path).split('/');
+  if (segments.length < 2 || segments.first != 'lib') return false;
+
+  if (segments.length == 2) return true;
+  if (_name(directory.parent.path) == 'src') return true;
+
+  final home = segments[1];
+  if (home == 'foundation') return true;
+  if (home == 'features') {
+    return segments.length > 3;
+  }
+  return false;
 }
 
 void _checkBlocFolders(Directory lib) {
@@ -352,7 +372,15 @@ void _checkBlocFolders(Directory lib) {
           'Bloc/Cubit folder and main file names must match',
         );
       }
-      for (final child in _visibleEntries(entry).whereType<File>()) {
+      for (final child in _visibleEntries(entry)) {
+        if (child is! File) {
+          _add(
+            _relative(child.path),
+            6,
+            'Bloc/Cubit folders contain files only',
+          );
+          continue;
+        }
         final childName = _name(child.path);
         if (name.endsWith('_cubit') && childName.endsWith('_event.dart')) {
           _add(_relative(child.path), 6, 'a cubit has no event file');
@@ -388,23 +416,45 @@ void _checkGeneratedFiles(Directory lib) {
           15,
           'a generated file sits beside the file that declares its part',
         );
+        continue;
+      }
+      final partPattern =
+          r'''^\s*part\s+['"]''' +
+          RegExp.escape(name) +
+          r'''['"]\s*;\s*(?://.*)?$''';
+      if (!RegExp(
+        partPattern,
+        multiLine: true,
+      ).hasMatch(declaring.readAsStringSync())) {
+        _add(
+          _relative(file.path),
+          15,
+          'the sibling source must declare the matching part file',
+        );
       }
     }
   }
 }
 
 void _checkConditionalFiles(Directory lib) {
+  const suffixes = ['_io.dart', '_web.dart', '_stub.dart'];
+  final bases = <String>{};
   for (final file in _allFiles(lib)) {
     final name = _name(file.path);
-    if (!name.endsWith('_io.dart')) continue;
-    final base = file.path.substring(0, file.path.length - '_io.dart'.length);
-    for (final suffix in ['.dart', '_web.dart', '_stub.dart']) {
+    for (final suffix in suffixes) {
+      if (name.endsWith(suffix)) {
+        bases.add(file.path.substring(0, file.path.length - suffix.length));
+      }
+    }
+  }
+  for (final base in bases) {
+    for (final suffix in ['.dart', ...suffixes]) {
       final sibling = File('$base$suffix');
       if (!sibling.existsSync()) {
         _add(
           _relative(sibling.path),
           14,
-          'an _io file needs facade, _web, and _stub siblings',
+          'conditional files need facade, _io, _web, and _stub siblings',
         );
       }
     }

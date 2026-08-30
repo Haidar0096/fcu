@@ -63,26 +63,13 @@ class _FoundationImportRestrictionsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitImportDirective(ImportDirective node) {
-    final uri = node.uri.stringValue;
-    if (uri == null) return;
-
     // Get the source file path
     final currentUnit = context.currentUnit;
     if (currentUnit == null) return;
-    final filePath = currentUnit.file.path;
+    final filePath = currentUnit.file.path.replaceAll(r'\', '/');
 
     // Only check files in foundation/ folder
     if (!filePath.contains('lib/foundation/')) return;
-
-    // Only check package: imports (skip dart: and relative imports)
-    if (!uri.startsWith('package:')) return;
-
-    // Extract package name and path from import
-    final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);
-    if (packageMatch == null) return;
-
-    final importPackage = packageMatch.group(1)!;
-    final importPath = packageMatch.group(2)!;
 
     // Get current package name from the library identifier
     final libraryElement = context.libraryElement;
@@ -97,16 +84,30 @@ class _FoundationImportRestrictionsVisitor extends SimpleAstVisitor<void> {
 
     final currentPackage = currentPackageMatch.group(1)!;
 
-    // Only check imports from the same package (skip external packages)
-    if (importPackage != currentPackage) return;
+    final importUris = [
+      node.uri.stringValue,
+      ...node.configurations.map(
+        (configuration) => configuration.uri.stringValue,
+      ),
+    ];
 
-    // Foundation can ONLY import from foundation/ or resources/
-    final isImportingFromFoundation = importPath.startsWith('foundation/');
-    final isImportingFromResources = importPath.startsWith('resources/');
+    for (final uri in importUris) {
+      if (uri == null || !uri.startsWith('package:')) continue;
 
-    // If importing from same package but NOT from allowed folders, report error
-    if (!isImportingFromFoundation && !isImportingFromResources) {
-      rule.reportAtNode(node);
+      final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);
+      if (packageMatch == null) continue;
+
+      final importPackage = packageMatch.group(1)!;
+      if (importPackage != currentPackage) continue;
+
+      final importPath = packageMatch.group(2)!;
+      final isAllowed =
+          importPath.startsWith('foundation/') ||
+          importPath.startsWith('resources/');
+      if (!isAllowed) {
+        rule.reportAtNode(node);
+        return;
+      }
     }
   }
 }

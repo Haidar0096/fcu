@@ -11,41 +11,22 @@
 /// (Named `RequestDataSanitizer` while it only covered requests; the report
 /// strip is why it now carries the wider name and lives beside the loggers.)
 abstract final class SensitiveDataSanitizer {
-  // The shared starter list. Project-specific forbidden fields join this one
-  // home when they become known.
-  static const Set<String> _forbiddenFieldNames = {
-    'password',
-    'passcode',
-    'pin',
-    'token',
-    'authorization',
-    'cookie',
-    'secret',
-    'apikey',
-    'cardnumber',
-    'cvv',
-    'nationalid',
-    'email',
-    'phone',
-  };
+  // The project-specific list starts empty. Project setup and later review
+  // add only fields recorded for this project; no field is guessed.
+  static const Set<String> _forbiddenFieldNames = <String>{};
 
   static const _redactedValue = '[REDACTED]';
 
-  /// Every forbidden name, longest first so a name that contains a shorter
-  /// one is still matched whole.
-  static final List<String> _forbiddenNames =
-      _forbiddenFieldNames.toList()
-        ..sort((a, b) => b.length.compareTo(a.length));
-
-  /// A forbidden field NAME standing as a whole word, the separator after it,
-  /// and the value it introduces up to the next delimiter.
+  /// A possible field key, the separator after the key, and the value the key
+  /// introduces up to the next delimiter.
   ///
-  /// The word boundaries are what keep ordinary text out of it: `mapping`,
-  /// `spinner` and the app's own `CancelToken` carry no forbidden name as a
-  /// whole word, so none of them is touched. The already-redacted marker is
-  /// matched first so running this twice changes nothing.
+  /// The captured key is normalized through [_isForbiddenKey] before the value
+  /// is replaced. This catches camelCase, snake_case and kebab-case compound
+  /// keys without treating a forbidden fragment in ordinary prose as a key.
+  /// The already-redacted marker is matched first so running this twice changes
+  /// nothing.
   static final RegExp _forbiddenAssignment = RegExp(
-    '\\b(${_forbiddenNames.map(RegExp.escape).join('|')})\\b'
+    r'([A-Za-z][A-Za-z0-9_.-]*)'
     '("?\\s*[:=]\\s*"?)'
     '(${RegExp.escape(_redactedValue)}|[^,;&}\\)\\]"\\n]*)',
     caseSensitive: false,
@@ -85,13 +66,13 @@ abstract final class SensitiveDataSanitizer {
   /// failures have to stay distinguishable — a report reading only
   /// `[REDACTED]` is neither.
   static String sanitizeText(String text) {
-    // No forbidden names means nothing to redact. Without this the alternation
-    // is empty, `\b()\b` matches at every word boundary, and the pattern
-    // redacts the value of EVERY `name: value` pair in the text.
-    if (_forbiddenNames.isEmpty) return text;
+    // No recorded forbidden names means no assignment should be redacted.
+    if (_forbiddenFieldNames.isEmpty) return text;
     return text.replaceAllMapped(
       _forbiddenAssignment,
-      (match) => '${match[1]}${match[2]}$_redactedValue',
+      (match) => _isForbiddenKey(match[1]!)
+          ? '${match[1]}${match[2]}$_redactedValue'
+          : match[0]!,
     );
   }
 
@@ -114,15 +95,16 @@ abstract final class SensitiveDataSanitizer {
   }
 
   static bool _isForbiddenKey(String key) {
-    final normalizedKey = key.toLowerCase().replaceAll(
-      RegExp('[^a-z0-9]'),
-      '',
-    );
-    return _forbiddenFieldNames.any(
-      (forbiddenName) =>
-          normalizedKey == forbiddenName ||
-          normalizedKey.startsWith(forbiddenName) ||
-          normalizedKey.endsWith(forbiddenName),
-    );
+    final normalizedKey = _normalizeFieldName(key);
+    return _forbiddenFieldNames.any((forbiddenName) {
+      final normalizedForbiddenName = _normalizeFieldName(forbiddenName);
+      return normalizedForbiddenName.isNotEmpty &&
+          (normalizedKey == normalizedForbiddenName ||
+              normalizedKey.startsWith(normalizedForbiddenName) ||
+              normalizedKey.endsWith(normalizedForbiddenName));
+    });
   }
+
+  static String _normalizeFieldName(String name) =>
+      name.toLowerCase().replaceAll(RegExp('[^a-z0-9]'), '');
 }

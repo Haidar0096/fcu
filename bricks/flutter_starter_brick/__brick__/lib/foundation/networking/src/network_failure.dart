@@ -33,6 +33,7 @@ sealed class NetworkFailure {
     NetworkError() ||
     TimeoutError() ||
     CancelError() ||
+    ContractViolationError() ||
     UnknownError() => false,
   };
 
@@ -41,6 +42,17 @@ sealed class NetworkFailure {
     NetworkError() ||
     ServerError() ||
     TimeoutError() ||
+    ContractViolationError() ||
+    UnknownError() => false,
+  };
+
+  /// Whether the backend response violated the shape the app must receive.
+  bool get isContractViolation => switch (this) {
+    ContractViolationError() => true,
+    NetworkError() ||
+    ServerError() ||
+    TimeoutError() ||
+    CancelError() ||
     UnknownError() => false,
   };
 
@@ -121,6 +133,23 @@ final class CancelError extends NetworkFailure {
   @override
   String toString() =>
       'CancelError{'
+      'statusCode: $statusCode, '
+      'message: $message, '
+      'code: $code, '
+      'backendCorrelationId: $backendCorrelationId}';
+}
+
+final class ContractViolationError extends NetworkFailure {
+  const ContractViolationError({
+    required super.statusCode,
+    required super.message,
+    required super.code,
+    required super.backendCorrelationId,
+  });
+
+  @override
+  String toString() =>
+      'ContractViolationError{'
       'statusCode: $statusCode, '
       'message: $message, '
       'code: $code, '

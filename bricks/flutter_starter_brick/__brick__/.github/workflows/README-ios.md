@@ -55,7 +55,7 @@ base64 -i /path/to/profile.mobileprovision | gh secret set IOS_PROVISIONING_PROF
 
 The Key ID of your App Store Connect API key.
 
-**Where to get it:** See `scripts/upload_to_test_flight/README.md` — "Create App Store Connect API Key". The Key ID is the key file name shown on the API Keys page.
+**Where to get it:** See `scripts/upload_to_test_flight/README.md` — "Create App Store Connect API Key". The Key ID is the value in the **Key ID** field; the downloaded file is named `AuthKey_<KEY_ID>.p8`.
 
 Set it manually on GitHub.
 

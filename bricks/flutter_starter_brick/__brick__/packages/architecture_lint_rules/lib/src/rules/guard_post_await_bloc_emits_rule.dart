@@ -6,6 +6,7 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:architecture_lint_rules/src/rules/rule_utils.dart';
 
@@ -58,25 +59,32 @@ class _GuardPostAwaitVisitor extends SimpleAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name != 'emit' || !isInsideBloc(node)) return;
-    final body = ancestorOfType<FunctionBody>(node);
-    if (body == null) return;
-    final collector = _AwaitCollector(body, node.offset)..collect();
-    if (collector.hasEarlierAwait) rule.reportAtNode(node);
+    FunctionBody? body = ancestorOfType<FunctionBody>(node);
+    while (body != null) {
+      final collector = _AwaitCollector(body, node.offset)..collect();
+      if (collector.hasEarlierAwait) {
+        rule.reportAtNode(node);
+        return;
+      }
+      body = ancestorOfType<FunctionBody>(body);
+    }
   }
 }
 
+const Set<String> _approvedCloseGuardMixins = {
+  'BlocUtilsMixin',
+  'CubitUtilsMixin',
+  'HydratedCubitUtilsMixin',
+};
+
 bool _hasCloseGuardMixin(ClassDeclaration declaration) {
-  final names = declaration.withClause?.mixinTypes
-      .map((type) => type.name.lexeme)
-      .toSet();
-  if (names == null) return false;
-  return names.any(
-    (name) =>
-        name == 'BlocUtils' ||
-        name == 'CubitUtils' ||
-        name == 'HydratedCubitUtils' ||
-        name.contains('CloseGuard'),
-  );
+  final mixins = declaration.withClause?.mixinTypes;
+  if (mixins == null) return false;
+  return mixins.any((type) {
+    final element = type.element;
+    return element is MixinElement &&
+        _approvedCloseGuardMixins.contains(element.displayName);
+  });
 }
 
 class _AwaitCollector extends RecursiveAstVisitor<void> {

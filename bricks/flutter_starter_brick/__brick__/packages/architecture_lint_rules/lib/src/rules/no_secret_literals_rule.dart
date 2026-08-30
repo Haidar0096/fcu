@@ -12,7 +12,8 @@ class NoSecretLiteralsRule extends AnalysisRule {
   static const LintCode code = LintCode(
     'no_secret_literals',
     'Do not embed secret-looking literals in Dart source.',
-    correctionMessage: 'Remove the secret and rotate it if it was real.',
+    correctionMessage:
+        'Remove and report the leaked value, then follow the incident rule.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -30,7 +31,10 @@ class NoSecretLiteralsRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    registry.addSimpleStringLiteral(this, _SecretLiteralVisitor(this));
+    final visitor = _SecretLiteralVisitor(this);
+    registry
+      ..addSimpleStringLiteral(this, visitor)
+      ..addAdjacentStrings(this, visitor);
   }
 }
 
@@ -41,8 +45,19 @@ class _SecretLiteralVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitSimpleStringLiteral(SimpleStringLiteral node) {
-    if (_knownSecretShape(node.value) ||
-        (_hasSensitiveName(node) && _looksHighEntropy(node.value))) {
+    if (node.parent is AdjacentStrings) return;
+    _check(node, node.value);
+  }
+
+  @override
+  void visitAdjacentStrings(AdjacentStrings node) {
+    final value = node.stringValue;
+    if (value != null) _check(node, value);
+  }
+
+  void _check(StringLiteral node, String value) {
+    if (_knownSecretShape(value) ||
+        (_hasSensitiveName(node) && _looksHighEntropy(value))) {
       rule.reportAtNode(node);
     }
   }
@@ -58,7 +73,7 @@ bool _knownSecretShape(String value) =>
       r'^[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,}$',
     ).hasMatch(value);
 
-bool _hasSensitiveName(SimpleStringLiteral node) {
+bool _hasSensitiveName(StringLiteral node) {
   final parent = node.parent;
   String? name;
   if (parent is VariableDeclaration) {
