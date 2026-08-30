@@ -175,31 +175,57 @@ class NoLocatorReadsInBlocRuleTest extends AnalysisRuleTest {
   }
 
   Future<void> test_locatorReadInCubit_reports() async {
+    newFile(
+      '$testPackageLibPath/foundation/locator/locator.dart',
+      'class Locator { T get<T>() => null as T; } '
+          'final serviceLocator = Locator();',
+    );
     const source = r'''
-final getIt = Locator();
-class Locator { T get<T>() => null as T; }
+import 'package:test/foundation/locator/locator.dart' as di;
 class LoginCubit {
-  void load() => getIt.get<Object>();
+  void load() => di.serviceLocator.get<Object>();
 }
 ''';
     newFile('$testPackageLibPath/login_cubit.dart', source);
     await assertDiagnosticsInFile('$testPackageLibPath/login_cubit.dart', [
-      lint(source.lastIndexOf('getIt'), 'getIt.get<Object>()'.length),
+      lint(
+        source.lastIndexOf('di.serviceLocator'),
+        'di.serviceLocator.get<Object>()'.length,
+      ),
     ]);
   }
 
   Future<void> test_callableLocatorReadInCubit_reports() async {
+    newFile(
+      '$testPackageLibPath/foundation/locator/locator.dart',
+      'class Locator { T call<T>() => null as T; } '
+          'final serviceLocator = Locator();',
+    );
     const source = r'''
-final getIt = Locator();
-class Locator { T call<T>() => null as T; }
+import 'package:test/foundation/locator/locator.dart' as di;
 class LoginCubit {
-  void load() => getIt<Object>();
+  void load() => di.serviceLocator<Object>();
 }
 ''';
     newFile('$testPackageLibPath/login_cubit.dart', source);
     await assertDiagnosticsInFile('$testPackageLibPath/login_cubit.dart', [
-      lint(source.lastIndexOf('getIt'), 'getIt<Object>()'.length),
+      lint(
+        source.lastIndexOf('di.serviceLocator'),
+        'di.serviceLocator<Object>()'.length,
+      ),
     ]);
+  }
+
+  Future<void> test_unrelatedLocalLocatorName_isQuiet() async {
+    const source = r'''
+final locator = Locator();
+class Locator { T get<T>() => null as T; }
+class LoginCubit {
+  void load() => locator.get<Object>();
+}
+''';
+    newFile('$testPackageLibPath/login_cubit.dart', source);
+    await assertNoDiagnosticsInFile('$testPackageLibPath/login_cubit.dart');
   }
 
   Future<void> test_injectedDependencyInCubit_isQuiet() async {
@@ -229,9 +255,11 @@ class NoFlutterUiInBlocRuleTest extends AnalysisRuleTest {
 
   Future<void> test_buildContextInBloc_reports() async {
     const source =
-        'class BuildContext {} class LoginBloc { void open(BuildContext context) {} }';
+        "import 'package:flutter/widgets.dart' show BuildContext;\n"
+        'class LoginBloc { void open(BuildContext context) {} }';
     newFile('$testPackageLibPath/login_bloc.dart', source);
     await assertDiagnosticsInFile('$testPackageLibPath/login_bloc.dart', [
+      lint(0, source.indexOf('\n')),
       lint(source.lastIndexOf('BuildContext'), 'BuildContext'.length),
     ]);
   }
@@ -246,6 +274,30 @@ class NoFlutterUiInBlocRuleTest extends AnalysisRuleTest {
   }
 
   Future<void> test_navigationCallInBloc_reports() async {
+    const source = r'''import 'package:flutter/widgets.dart' show NavigatorState;
+class LoginBloc {
+  void close(NavigatorState navigator) => navigator.pop();
+}
+''';
+    newFile('$testPackageLibPath/login_bloc.dart', source);
+    await assertDiagnosticsInFile('$testPackageLibPath/login_bloc.dart', [
+      lint(0, source.indexOf('\n')),
+      lint(
+        source.indexOf('navigator.pop()'),
+        'navigator.pop()'.length,
+      ),
+    ]);
+  }
+
+  Future<void> test_localBuildContextInBloc_isQuiet() async {
+    const source =
+        'class BuildContext {} '
+        'class LoginBloc { void open(BuildContext context) {} }';
+    newFile('$testPackageLibPath/login_bloc.dart', source);
+    await assertNoDiagnosticsInFile('$testPackageLibPath/login_bloc.dart');
+  }
+
+  Future<void> test_localNavigationLookalikeInBloc_isQuiet() async {
     const source = r'''
 class Router { void go(String path) {} }
 final context = Router();
@@ -254,9 +306,7 @@ class LoginBloc {
 }
 ''';
     newFile('$testPackageLibPath/login_bloc.dart', source);
-    await assertDiagnosticsInFile('$testPackageLibPath/login_bloc.dart', [
-      lint(source.indexOf("context.go('/home')"), "context.go('/home')".length),
-    ]);
+    await assertNoDiagnosticsInFile('$testPackageLibPath/login_bloc.dart');
   }
 
   Future<void> test_buildContextOutsideBloc_isQuiet() async {
@@ -432,6 +482,9 @@ class NoTransportImportsInUiRuleTest extends AnalysisRuleTest {
 @reflectiveTest
 class NoFrameworkColorsInUiRuleTest extends AnalysisRuleTest {
   @override
+  bool get addFlutterPackageDep => true;
+
+  @override
   void setUp() {
     rule = NoFrameworkColorsInUiRule();
     super.setUp();
@@ -439,17 +492,32 @@ class NoFrameworkColorsInUiRuleTest extends AnalysisRuleTest {
 
   Future<void> test_frameworkColorInUi_reports() async {
     const source =
-        'class Colors { static final red = Object(); } var color = Colors.red;';
+        "import 'package:flutter/material.dart' as material;\n"
+        'var color = material.Colors.red;';
     final path = '$testPackageLibPath/features/auth/src/ui/login.dart';
     newFile(path, source);
     await assertDiagnosticsInFile(path, [
-      lint(source.lastIndexOf('Colors.red'), 'Colors.red'.length),
+      lint(source.lastIndexOf('red'), 'red'.length),
     ]);
   }
 
   Future<void> test_transparentInUi_isQuiet() async {
+    newFile(
+      '/packages/flutter/lib/src/material/colors.dart',
+      'abstract final class Colors { '
+          'static final transparent = Object(); }',
+    );
     const source =
-        'class Colors { static final transparent = Object(); } var color = Colors.transparent;';
+        "import 'package:flutter/src/material/colors.dart' as material;\n"
+        'var color = material.Colors.transparent;';
+    final path = '$testPackageLibPath/features/auth/src/ui/login.dart';
+    newFile(path, source);
+    await assertNoDiagnosticsInFile(path);
+  }
+
+  Future<void> test_localColorsName_isQuiet() async {
+    const source =
+        'class Colors { static final red = Object(); } var color = Colors.red;';
     final path = '$testPackageLibPath/features/auth/src/ui/login.dart';
     newFile(path, source);
     await assertNoDiagnosticsInFile(path);
@@ -459,23 +527,47 @@ class NoFrameworkColorsInUiRuleTest extends AnalysisRuleTest {
 @reflectiveTest
 class NoSnackbarOutsideBannerRuleTest extends AnalysisRuleTest {
   @override
+  bool get addFlutterPackageDep => true;
+
+  @override
   void setUp() {
     rule = NoSnackbarOutsideBannerRule();
     super.setUp();
   }
 
   Future<void> test_snackbarOutsideBanner_reports() async {
-    const source = 'class SnackBar {} var bar = SnackBar();';
+    newFile(
+      '/packages/flutter/lib/src/material/snack_bar.dart',
+      'class SnackBar { const SnackBar(); }',
+    );
+    const source =
+        "import 'package:flutter/src/material/snack_bar.dart' as material;\n"
+        'var bar = const material.SnackBar();';
+    const construction = 'const material.SnackBar()';
     newFile('$testPackageLibPath/features/auth/src/ui/login.dart', source);
     await assertDiagnosticsInFile(
       '$testPackageLibPath/features/auth/src/ui/login.dart',
-      [lint(source.lastIndexOf('SnackBar()'), 'SnackBar()'.length)],
+      [lint(source.indexOf(construction), construction.length)],
     );
   }
 
   Future<void> test_snackbarInsideBanner_isQuiet() async {
+    newFile(
+      '/packages/flutter/lib/src/material/snack_bar.dart',
+      'class SnackBar { const SnackBar(); }',
+    );
+    const source =
+        "import 'package:flutter/src/material/snack_bar.dart' as material;\n"
+        'var bar = const material.SnackBar();';
+    final path =
+        '$testPackageLibPath/foundation/ui/widgets/src/sliding_banner.dart';
+    newFile(path, source);
+    await assertNoDiagnosticsInFile(path);
+  }
+
+  Future<void> test_localSnackBarName_isQuiet() async {
     const source = 'class SnackBar {} var bar = SnackBar();';
-    final path = '$testPackageLibPath/foundation/ui/banners/app_banner.dart';
+    final path = '$testPackageLibPath/features/auth/src/ui/login.dart';
     newFile(path, source);
     await assertNoDiagnosticsInFile(path);
   }
@@ -493,12 +585,29 @@ class NoFlutterFormRuleTest extends AnalysisRuleTest {
   }
 
   Future<void> test_flutterForm_reports() async {
+    newFile(
+      '/packages/flutter/lib/src/widgets/form.dart',
+      'class Form { const Form({required Object child}); } '
+          'class SizedBox { const SizedBox(); }',
+    );
     const source =
-        "import 'package:flutter/material.dart' show Widget;\nWidget? marker;\nclass Form {}\nvar form = Form();";
+        "import 'package:flutter/src/widgets/form.dart' as widgets;\n"
+        'var form = widgets.Form(child: const widgets.SizedBox());';
+    const construction = 'widgets.Form(child: const widgets.SizedBox())';
     newFile('$testPackageLibPath/features/auth/src/ui/login.dart', source);
     await assertDiagnosticsInFile(
       '$testPackageLibPath/features/auth/src/ui/login.dart',
-      [lint(source.indexOf('Form()'), 'Form()'.length)],
+      [lint(source.indexOf(construction), construction.length)],
+    );
+  }
+
+  Future<void> test_localFormName_isQuiet() async {
+    const source =
+        "import 'package:flutter/widgets.dart' show Widget;\n"
+        'Widget? marker; class Form {} var form = Form();';
+    newFile('$testPackageLibPath/features/auth/src/ui/login.dart', source);
+    await assertNoDiagnosticsInFile(
+      '$testPackageLibPath/features/auth/src/ui/login.dart',
     );
   }
 

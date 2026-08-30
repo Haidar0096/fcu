@@ -12,7 +12,6 @@ sealed class CommandArg<T> {
     this.abbr,
     this.help,
     this.choices,
-    this.aliases,
   });
 
   final String name;
@@ -21,5 +20,4 @@ sealed class CommandArg<T> {
   final T defaultsTo;
   final String prompt;
   final List<String>? choices;
-  final List<String>? aliases;
 }

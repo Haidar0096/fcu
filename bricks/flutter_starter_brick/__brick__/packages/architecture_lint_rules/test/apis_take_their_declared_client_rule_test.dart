@@ -67,11 +67,14 @@ class ApisTakeTheirDeclaredClientRuleTest extends AnalysisRuleTest {
     await assertNoDiagnosticsInFile(_compositionRootPath);
   }
 
-  Future<void> test_undeclaredApi_isQuiet() async {
+  Future<void> test_undeclaredApi_reports() async {
     const source =
         '$_preamble\nfinal api = ProfileApi(getIt.get<HttpClient>());\n';
     newFile(_compositionRootPath, source);
-    await assertNoDiagnosticsInFile(_compositionRootPath);
+    const wiring = 'ProfileApi(getIt.get<HttpClient>())';
+    await assertDiagnosticsInFile(_compositionRootPath, [
+      lint(source.indexOf(wiring), wiring.length),
+    ]);
   }
 
   Future<void> test_outsideTheCompositionRoot_isQuiet() async {

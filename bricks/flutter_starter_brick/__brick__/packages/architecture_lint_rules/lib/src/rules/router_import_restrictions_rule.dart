@@ -1,4 +1,5 @@
-/// Lint rule: router/ can only import from features/, foundation/, resources/, and dependency_injection/.
+/// Lint rule: router/ can only import from router/, features/, foundation/,
+/// resources/, and dependency_injection/.
 ///
 /// The router orchestrates navigation and needs access to features, foundation,
 /// and dependency injection, but should not depend on the app layer.
@@ -27,7 +28,7 @@ class RouterImportRestrictionsRule extends AnalysisRule {
   /// Diagnostic code for this rule.
   static const LintCode code = LintCode(
     'router_import_restrictions',
-    'router/ can only import from features/, foundation/, resources/, and dependency_injection/.',
+    'router/ can only import from router/, features/, foundation/, resources/, and dependency_injection/.',
     // WARNING, not the LintCode default of INFO: every rule here is
     // registered with `registerWarningRule`, and an architecture breach is a
     // build-stopping fault, not a suggestion. At INFO `dart analyze` exits 0
@@ -67,55 +68,30 @@ class _RouterImportRestrictionsVisitor extends SimpleAstVisitor<void> {
     final uri = node.uri.stringValue;
     if (uri == null) return;
 
-    // Get the source file path
-    final currentUnit = context.currentUnit;
-    if (currentUnit == null) return;
-    final filePath = currentUnit.file.path;
+    final currentUri = context.libraryElement?.uri;
+    if (currentUri == null || currentUri.scheme != 'package') return;
+    final currentSegments = currentUri.pathSegments;
+    if (currentSegments.length < 3 || currentSegments[1] != 'router') return;
 
-    // Only check files in router/ folder
-    if (!filePath.contains('lib/router/')) return;
+    final parsedUri = Uri.tryParse(uri);
+    if (parsedUri == null || parsedUri.scheme == 'dart') return;
+    final importedUri = currentUri.resolveUri(parsedUri);
+    if (importedUri.scheme != 'package') return;
 
-    // Only check package: imports (skip dart: and relative imports)
-    if (!uri.startsWith('package:')) return;
+    final importedSegments = importedUri.pathSegments;
+    if (importedSegments.length < 2 ||
+        importedSegments.first != currentSegments.first) {
+      return;
+    }
 
-    // Extract package name and path from import
-    final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);
-    if (packageMatch == null) return;
-
-    final importPackage = packageMatch.group(1)!;
-    final importPath = packageMatch.group(2)!;
-
-    // Get current package name from the library identifier
-    final libraryElement = context.libraryElement;
-    if (libraryElement == null) return;
-
-    // Extract package name from library identifier (e.g., "package:myapp/...")
-    final identifier = libraryElement.identifier;
-    final currentPackageMatch = RegExp(
-      r'package:([^/]+)/',
-    ).firstMatch(identifier);
-    if (currentPackageMatch == null) return;
-
-    final currentPackage = currentPackageMatch.group(1)!;
-
-    // Only check imports from the same package (skip external packages)
-    if (importPackage != currentPackage) return;
-
-    // Router can import from features/, foundation/, resources/, dependency_injection/, and router/
-    final isImportingFromFeatures = importPath.startsWith('features/');
-    final isImportingFromFoundation = importPath.startsWith('foundation/');
-    final isImportingFromResources = importPath.startsWith('resources/');
-    final isImportingFromDependencyInjection = importPath.startsWith(
-      'dependency_injection/',
-    );
-    final isImportingFromRouter = importPath.startsWith('router/');
-
-    // If importing from same package but NOT from allowed folders, report error
-    if (!isImportingFromFeatures &&
-        !isImportingFromFoundation &&
-        !isImportingFromResources &&
-        !isImportingFromDependencyInjection &&
-        !isImportingFromRouter) {
+    const allowedFolders = {
+      'dependency_injection',
+      'features',
+      'foundation',
+      'resources',
+      'router',
+    };
+    if (!allowedFolders.contains(importedSegments[1])) {
       rule.reportAtNode(node);
     }
   }

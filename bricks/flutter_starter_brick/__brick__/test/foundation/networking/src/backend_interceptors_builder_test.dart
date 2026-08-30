@@ -1,18 +1,19 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart' as dio;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:{{proj_name}}/foundation/authentication/authentication.dart';
+import 'package:{{proj_name}}/foundation/logging/logging.dart';
 import 'package:{{proj_name}}/foundation/networking/networking.dart';
+import 'package:{{proj_name}}/foundation/networking/src/authorization_header.dart';
+import 'package:{{proj_name}}/foundation/networking/src/backend_interceptors_builder.dart';
 
 /// The logged-in chain, stood up exactly as a generated app stands it up: the
 /// real builder, over a real transport, with a scripted transport adapter.
 ///
-/// The transport package is named in this file because the chain's own builder
-/// takes that transport as its parameter — the retry step sends a refused
-/// request again on the client that carried it, so the chain cannot be built
-/// without one. Nothing under `lib/` gains that import.
+/// The transport package is named here because this test exercises the
+/// module's internal chain builder directly. Neither the builder nor its
+/// transport-bearing signature leaves the public networking barrel.
 void main() {
   group('the logged-in chain', () {
     test(
@@ -118,8 +119,21 @@ dio.Dio _chainOn({
 /// The real token store over an in-memory secure store, already holding
 /// [tokens].
 Future<AuthTokenStore> _storeHolding(AuthTokens tokens) async {
+  final values = <String, String>{};
   final store = AuthTokenStore(
-    secureStorage: _InMemorySecureStorage(<String, String>{}),
+    appLogger: const AppLogger(),
+    errorLogger: ErrorLogger(
+      reportSender: const _DiscardingReportSender(),
+      flowBuffer: FlowBuffer(),
+      appShortName: 'test',
+    ),
+    readValue: ({required key}) async => values[key],
+    writeValue: ({required key, required value}) async {
+      values[key] = value;
+    },
+    deleteValue: ({required key}) async {
+      values.remove(key);
+    },
   );
   await store.write(tokens: tokens);
   return store;
@@ -164,53 +178,12 @@ final class _ScriptedAdapter implements dio.HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
-/// An in-memory stand-in for the platform secure store.
-///
-/// The token store is a `final` class, so nothing stands in for the store
-/// itself; the test builds the real one over the seam the store already
-/// declares.
-final class _InMemorySecureStorage extends FlutterSecureStorage {
-  _InMemorySecureStorage(this._values);
-
-  final Map<String, String> _values;
+final class _DiscardingReportSender implements ReportSender {
+  const _DiscardingReportSender();
 
   @override
-  Future<String?> read({
-    required String key,
-    AppleOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    AppleOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async => _values[key];
+  Future<void> send(ErrorReportDto report) async {}
 
   @override
-  Future<void> write({
-    required String key,
-    required String? value,
-    AppleOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    AppleOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async {
-    if (value == null) {
-      _values.remove(key);
-      return;
-    }
-    _values[key] = value;
-  }
-
-  @override
-  Future<void> delete({
-    required String key,
-    AppleOptions? iOptions,
-    AndroidOptions? aOptions,
-    LinuxOptions? lOptions,
-    WebOptions? webOptions,
-    AppleOptions? mOptions,
-    WindowsOptions? wOptions,
-  }) async => _values.remove(key);
+  Future<void> sendParkedReports() async {}
 }

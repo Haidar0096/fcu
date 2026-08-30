@@ -6,6 +6,7 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:architecture_lint_rules/src/rules/rule_utils.dart';
 
@@ -31,7 +32,7 @@ class NoFrameworkColorsInUiRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    registry.addPrefixedIdentifier(this, _ColorsVisitor(this, context));
+    registry.addSimpleIdentifier(this, _ColorsVisitor(this, context));
   }
 }
 
@@ -42,10 +43,18 @@ class _ColorsVisitor extends SimpleAstVisitor<void> {
   final RuleContext context;
 
   @override
-  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+  void visitSimpleIdentifier(SimpleIdentifier node) {
     if (!isUiFile(context)) return;
-    if (node.prefix.name == 'Colors' && node.identifier.name != 'transparent') {
-      rule.reportAtNode(node);
+    if (node.name == 'transparent') return;
+    final enclosingElement = node.element?.enclosingElement;
+    if (enclosingElement is! ClassElement ||
+        enclosingElement.name != 'Colors') {
+      return;
     }
+    if (enclosingElement.library.uri.toString() !=
+        'package:flutter/src/material/colors.dart') {
+      return;
+    }
+    rule.reportAtNode(node);
   }
 }

@@ -5,6 +5,7 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
 
@@ -31,31 +32,32 @@ class RequireScopedIgnoresRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    registry.addCompilationUnit(this, _ScopedIgnoreVisitor(this, context));
+    registry.addCompilationUnit(this, _ScopedIgnoreVisitor(this));
   }
 }
 
 class _ScopedIgnoreVisitor extends SimpleAstVisitor<void> {
-  _ScopedIgnoreVisitor(this.rule, this.context);
+  _ScopedIgnoreVisitor(this.rule);
 
   final AnalysisRule rule;
-  final RuleContext context;
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
-    final content = context.currentUnit?.content;
-    if (content == null) return;
-    var offset = 0;
-    for (final line in content.split('\n')) {
-      final trimmed = line.trimLeft();
-      final leadingLength = line.length - trimmed.length;
-      if (RegExp(r'^//\s*ignore_for_file\s*:').hasMatch(trimmed)) {
-        rule.reportAtOffset(offset + leadingLength, trimmed.length);
-      } else if (RegExp(r'^//\s*ignore\s*:').hasMatch(trimmed) &&
-          !_hasReason(trimmed)) {
-        rule.reportAtOffset(offset + leadingLength, trimmed.length);
+    for (var token = node.beginToken; ; token = token.next!) {
+      for (
+        var comment = token.precedingComments;
+        comment != null;
+        comment = comment.next as CommentToken?
+      ) {
+        final text = comment.lexeme;
+        if (RegExp(r'^//\s*ignore_for_file\s*:').hasMatch(text)) {
+          rule.reportAtOffset(comment.offset, comment.length);
+        } else if (RegExp(r'^//\s*ignore\s*:').hasMatch(text) &&
+            !_hasReason(text)) {
+          rule.reportAtOffset(comment.offset, comment.length);
+        }
       }
-      offset += line.length + 1;
+      if (identical(token, node.endToken)) break;
     }
   }
 }
@@ -64,5 +66,9 @@ bool _hasReason(String comment) {
   final reasonIndex = comment.indexOf(' -- ');
   if (reasonIndex < 0) return false;
   final reason = comment.substring(reasonIndex + 4).trim();
-  return RegExp('[A-Za-z]{3}').hasMatch(reason);
+  final words = RegExp(
+    '[A-Za-z]+',
+  ).allMatches(reason).map((match) => match.group(0)!.toLowerCase()).toList();
+  const placeholders = {'abc', 'fixme', 'tbd', 'todo', 'xxx'};
+  return words.length >= 3 && !words.any(placeholders.contains);
 }

@@ -7,9 +7,9 @@ part 'error_report_dto.g.dart';
 ///
 /// There is no `debug` value on purpose — a report not worth sending is not
 /// composed at all — and no `warning`, which would be a third word for the
-/// same two cases. The two names match `EventLoggerLevel`'s own `info` and
-/// `error`, so one word means one thing across the app and across the
-/// project's report table.
+/// same two cases. These names are the report wire's `info` and `error`
+/// values, so one word means one thing across the app and the project's
+/// report table.
 enum ErrorReportLevel { info, error }
 
 /// One report on its way out of the app.

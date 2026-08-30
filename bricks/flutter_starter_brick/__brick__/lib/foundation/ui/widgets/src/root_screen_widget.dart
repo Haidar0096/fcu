@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
-import 'package:{{proj_name}}/foundation/ui/widgets/src/platform_navigation.dart';
 
 /// A widget that represents a screen with common properties and functionality.
 ///
@@ -123,37 +122,10 @@ class RootScreenWidget extends StatelessWidget {
       );
     }
 
-    if (!usesCupertinoBackGesture) {
-      result = PopScope(canPop: canPop, child: result);
-    } else {
-      // There is a bug in PopScope on iOS: it does not govern the back swipe.
-      result = GestureDetector(
-        onHorizontalDragUpdate: (details) async {
-          const sensitivity = RootScreenWidgetDefaults.swipeSensitivity;
-
-          if (details.delta.dx > sensitivity && canPop) {
-            if (!context.mounted) return;
-            // Chosen deviation from go_router's context.canPop(): the pop
-            // below is a Navigator pop, so the Navigator's stack is the one
-            // that must be asked.
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            }
-          }
-        },
-        child: PopScope(
-          // The gesture detector above owns the iOS swipe; PopScope still
-          // blocks every other system back path when the screen says no.
-          canPop: false,
-          child: result,
-        ),
-      );
-    }
+    // PopScope feeds the screen's decision into every framework back path,
+    // including the route's edge-bound, direction-aware iOS back gesture.
+    result = PopScope(canPop: canPop, child: result);
 
     return result;
   }
-}
-
-abstract final class RootScreenWidgetDefaults {
-  static const int swipeSensitivity = 20;
 }

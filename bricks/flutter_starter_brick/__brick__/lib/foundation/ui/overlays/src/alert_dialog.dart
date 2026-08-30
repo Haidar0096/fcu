@@ -22,60 +22,59 @@ Future<void> showAlertDialog({
   barrierDismissible: barrierDismissible,
   applyBlur: true,
   applyDim: true,
-  content: AlertDialog(
-    contentPadding: EdgeInsets.only(
-      left: AlertDialogDefaults.horizontalPadding,
-      right: AlertDialogDefaults.horizontalPadding,
-      top: AlertDialogDefaults.contentTopPadding,
-      bottom: AlertDialogDefaults.contentBottomPadding,
-    ),
-    actionsPadding: EdgeInsets.only(
-      left: AlertDialogDefaults.horizontalPadding,
-      right: AlertDialogDefaults.horizontalPadding,
-      bottom: AlertDialogDefaults.actionsBottomPadding,
-    ),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (icon != null) ...[
-          icon,
-          Spacing.vertical(SpacingSize.spacing24),
+  content: Builder(
+    builder: (overlayContext) => AlertDialog(
+      contentPadding: EdgeInsets.only(
+        left: AlertDialogDefaults.horizontalPadding,
+        right: AlertDialogDefaults.horizontalPadding,
+        top: AlertDialogDefaults.contentTopPadding,
+        bottom: AlertDialogDefaults.contentBottomPadding,
+      ),
+      actionsPadding: EdgeInsets.only(
+        left: AlertDialogDefaults.horizontalPadding,
+        right: AlertDialogDefaults.horizontalPadding,
+        bottom: AlertDialogDefaults.actionsBottomPadding,
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            icon,
+            Spacing.vertical(SpacingSize.spacing24),
+          ],
+          Text(
+            title,
+            style: overlayContext.typography?.primaryTitle.copyWith(
+              color: overlayContext.themeData.colorScheme.onSurface,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          Spacing.vertical(SpacingSize.spacing16),
+          Text(
+            message,
+            style: overlayContext.typography?.bodyText.copyWith(
+              color: overlayContext.themeData.colorScheme.onSurface,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ],
-        Text(
-          title,
-          style: context.typography?.primaryTitle.copyWith(
-            color: context.themeData.colorScheme.onSurface,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            if (autoDismissOnAction) {
+              final navigator = Navigator.of(overlayContext);
+              if (navigator.canPop()) navigator.pop();
+            }
+            onAction?.call();
+          },
+          child: Text(
+            (actionText ?? overlayContext.appLocalizations.continueButton)
+                .toUpperCase(),
           ),
-          textAlign: TextAlign.center,
-        ),
-        Spacing.vertical(SpacingSize.spacing16),
-        Text(
-          message,
-          style: context.typography?.bodyText.copyWith(
-            color: context.themeData.colorScheme.onSurface,
-          ),
-          textAlign: TextAlign.center,
         ),
       ],
+      actionsAlignment: MainAxisAlignment.center,
     ),
-    actions: [
-      TextButton(
-        onPressed: () {
-          // Chosen deviation from go_router's context.canPop(): this closes a
-          // dialog route on the Navigator stack, which is the stack that has
-          // to be asked.
-          // The guard and the pop go through the same navigator, named the
-          // same way, so a reader cannot mistake them for two stacks.
-          if (autoDismissOnAction && Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
-          }
-          onAction?.call();
-        },
-        child: Text(
-          (actionText ?? context.appLocalizations.continueButton).toUpperCase(),
-        ),
-      ),
-    ],
-    actionsAlignment: MainAxisAlignment.center,
   ),
 );

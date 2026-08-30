@@ -23,7 +23,11 @@ flat source folder; it does not widen that public API.
 | `backend_report_sender.dart` | The default sender through the app's own backend client. |
 | `report_sender_kind.dart` | The configured sender kind. |
 | `parked_report_store.dart` | The bounded device store for reports awaiting another send. |
-| `parked_report_store_keys.dart` | The storage keys owned by the parked-report store. |
+| `parked_report_persistence.dart` | The platform selector for parked-report persistence. |
+| `parked_report_persistence_io.dart` | Native JSONL persistence in application-support storage. |
+| `parked_report_persistence_web.dart` | Browser persistence through shared preferences. |
+| `parked_report_persistence_stub.dart` | The explicit stop for unsupported platforms. |
+| `parked_report_store_keys.dart` | The browser-storage keys owned by the parked-report store. |
 
 ## Context and privacy
 

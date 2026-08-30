@@ -1,5 +1,5 @@
-/// Lint rule: dependency_injection/ can only import fake_data/, features/,
-/// foundation/, resources/, and router/.
+/// Lint rule: dependency_injection/ can only import dependency_injection/,
+/// fake_data/, features/, foundation/, resources/, and router/.
 ///
 /// The composition root wires everything together, so it reaches nearly every
 /// home — but never the app layer that composes it.
@@ -75,7 +75,7 @@ class _DependencyInjectionImportRestrictionsVisitor
     // Get the source file path
     final currentUnit = context.currentUnit;
     if (currentUnit == null) return;
-    final filePath = currentUnit.file.path;
+    final filePath = currentUnit.file.path.replaceAll(r'\', '/');
 
     // Only check files in dependency_injection/ folder
     if (!filePath.contains('lib/dependency_injection/')) return;

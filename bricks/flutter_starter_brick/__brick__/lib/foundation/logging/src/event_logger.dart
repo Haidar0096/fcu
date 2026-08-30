@@ -26,4 +26,4 @@ class EventLogger {
   }
 }
 
-enum EventLoggerLevel { debug, info, error }
+enum EventLoggerLevel { info, error }

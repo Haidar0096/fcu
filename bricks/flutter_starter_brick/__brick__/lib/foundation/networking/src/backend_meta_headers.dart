@@ -4,7 +4,7 @@
 /// the project's server: which name it reads the app version, the platform or
 /// a build number under is the server's answer, not the starter's, and the
 /// starter names none it was not given. An invented name would be sent on
-/// every request and read by nobody.
+/// every request even though no server component reads it.
 ///
 /// Both backend clients read this one holder, so a project answers once.
 abstract final class BackendMetaHeaders {

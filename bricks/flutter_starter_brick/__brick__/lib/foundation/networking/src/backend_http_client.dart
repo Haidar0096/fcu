@@ -51,6 +51,14 @@ final class BackendHttpClient extends DioHttpClient {
     required bool reportsFailures,
     required OnBuildInterceptorsCallback buildInterceptors,
   }) {
+    if (reportsFailures && errorLogger == null) {
+      throw ArgumentError.value(
+        errorLogger,
+        'errorLogger',
+        'must be provided when reportsFailures is true',
+      );
+    }
+
     client.options
       ..baseUrl = baseUrl
       ..headers = {'Content-Type': 'application/json'}

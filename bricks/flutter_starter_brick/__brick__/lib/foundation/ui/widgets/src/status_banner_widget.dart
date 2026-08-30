@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:{{proj_name}}/foundation/l10n/l10n.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
 import 'package:{{proj_name}}/foundation/ui/widgets/widgets.dart';
 
@@ -18,7 +17,19 @@ class StatusBannerWidget extends StatelessWidget {
     this.actionText,
     this.onDismiss,
     super.key,
-  });
+  }) : assert(
+         onAction == null || actionText != null,
+         'actionText is required when onAction is set.',
+       );
+
+  static const double _maxWidth = 400;
+
+  static const Map<StatusBannerType, IconData> _icons = {
+    StatusBannerType.success: Icons.check_circle_outline,
+    StatusBannerType.error: Icons.error_outline,
+    StatusBannerType.warning: Icons.warning_outlined,
+    StatusBannerType.info: Icons.info_outline,
+  };
 
   final StatusBannerType type;
   final String message;
@@ -30,8 +41,11 @@ class StatusBannerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (onAction != null && actionText == null) {
+      throw ArgumentError('actionText is required when onAction is set.');
+    }
+
     final colors = _getBannerColors(context);
-    final icon = _getBannerIcon();
 
     final banner = Container(
       margin: EdgeInsets.symmetric(
@@ -73,7 +87,7 @@ class StatusBannerWidget extends StatelessWidget {
                       )
                     else
                       Icon(
-                        icon,
+                        _icons[type]!,
                         color: colors.iconColor,
                         size: StatusBannerWidgetDefaults.iconSize,
                       ),
@@ -97,8 +111,7 @@ class StatusBannerWidget extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: MainButton(
-                      text: (actionText ?? context.appLocalizations.retry)
-                          .toUpperCase(),
+                      text: actionText!,
                       onPressed: onAction,
                     ),
                   ),
@@ -142,7 +155,7 @@ class StatusBannerWidget extends StatelessWidget {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(
-          maxWidth: ThemeDefaults.buttonMaxWidth,
+          maxWidth: _maxWidth,
         ),
         child: banner,
       ),
@@ -199,22 +212,6 @@ class StatusBannerWidget extends StatelessWidget {
           iconColor: colorScheme.onSurface,
           textColor: colorScheme.onSurface,
         );
-    }
-  }
-
-  /// Gets the appropriate icon for the banner type.
-  IconData _getBannerIcon() {
-    switch (type) {
-      case StatusBannerType.loading:
-        return Icons.info_outline; // Won't be used, loading shows spinner
-      case StatusBannerType.success:
-        return Icons.check_circle_outline;
-      case StatusBannerType.error:
-        return Icons.error_outline;
-      case StatusBannerType.warning:
-        return Icons.warning_outlined;
-      case StatusBannerType.info:
-        return Icons.info_outline;
     }
   }
 }

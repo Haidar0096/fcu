@@ -5,8 +5,17 @@ import 'package:{{proj_name}}/resources/resources.dart';
 
 @immutable
 class UiNetworkFailure implements DisplayableUiModelMixin {
-  const UiNetworkFailure({required NetworkFailure failure})
-    : _failure = failure;
+  const UiNetworkFailure._(this._failure);
+
+  /// Converts only failures that belong on a user-visible error surface.
+  /// Cancellation is a normal ending and therefore returns null.
+  static UiNetworkFailure? fromNetworkFailure(NetworkFailure failure) =>
+      switch (failure) {
+        CancelError() => null,
+        ContractViolationError() => null,
+        NetworkError() || ServerError() || TimeoutError() || UnknownError() =>
+          UiNetworkFailure._(failure),
+      };
 
   final NetworkFailure _failure;
 
@@ -18,7 +27,12 @@ class UiNetworkFailure implements DisplayableUiModelMixin {
       NetworkError() => texts.networkErrorMessage,
       ServerError() => texts.serverErrorMessage,
       TimeoutError() => texts.timeoutErrorMessage,
-      CancelError() => texts.requestCancelledMessage,
+      CancelError() => throw StateError(
+        'Cancellation cannot create a UiNetworkFailure.',
+      ),
+      ContractViolationError() => throw StateError(
+        'A contract violation must use the critical-error road.',
+      ),
       UnknownError() => texts.unknownErrorMessage,
     };
   }

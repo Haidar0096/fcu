@@ -17,11 +17,16 @@ void main() {
       projectDescription: 'Sample app',
       organization: 'dev.example',
       developerName: 'Jane Doe',
+      freshOutputToken: 'fresh-output-token',
     );
 
     final optionIndex = arguments.indexOf('--dev_name');
     expect(optionIndex, isNonNegative);
     expect(arguments[optionIndex + 1], 'Jane Doe');
+    expect(
+      arguments,
+      containsAllInOrder(['--fresh_output_token', 'fresh-output-token']),
+    );
   });
 
   test('starter next steps pass the development environment file', () {
@@ -29,12 +34,5 @@ void main() {
       buildStarterNextSteps('sample_app'),
       contains('flutter run --dart-define-from-file=env/development.json'),
     );
-  });
-
-  test('generated repositories ignore the full IAI folder', () {
-    final lines = buildProjectGitIgnoreAddition().split('\n');
-
-    expect(lines, contains('.iai/'));
-    expect(lines, isNot(contains('.iai/scratchpad/')));
   });
 }

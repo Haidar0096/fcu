@@ -222,6 +222,14 @@ class CustomTextFormFieldState extends State<CustomTextFormField>
   }
 
   @override
+  void didUpdateWidget(covariant CustomTextFormField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != null && widget.controller == null) {
+      _internalTextController.value = oldWidget.controller!.value;
+    }
+  }
+
+  @override
   void dispose() {
     _internalTextController.dispose();
     super.dispose();

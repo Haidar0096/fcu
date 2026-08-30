@@ -17,7 +17,5 @@ final class SplashCompleteState extends SplashState {
 
 /// State when a critical unrecoverable error occurs
 final class SplashCriticalErrorState extends SplashState {
-  const SplashCriticalErrorState({required this.errorMessage});
-
-  final String? errorMessage;
+  const SplashCriticalErrorState();
 }

@@ -23,20 +23,11 @@ class ScreenTrailObserver extends NavigatorObserver {
   final FlowBuffer _flowBuffer;
 
   @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    _record(route);
-  }
-
-  @override
-  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    _record(newRoute);
-  }
-
-  @override
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    // The screen the user lands BACK on is the one worth recording; the one
-    // being left is already in the trail.
-    _record(previousRoute);
+  void didChangeTop(
+    Route<dynamic> topRoute,
+    Route<dynamic>? previousTopRoute,
+  ) {
+    _record(topRoute);
   }
 
   void _record(Route<dynamic>? route) {

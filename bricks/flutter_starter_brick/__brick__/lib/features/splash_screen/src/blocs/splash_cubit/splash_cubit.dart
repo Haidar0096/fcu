@@ -22,8 +22,7 @@ class SplashCubit extends Cubit<SplashState> with CubitUtilsMixin<SplashState> {
 
   void onMetadataLoaded() => _startSplashTimer();
 
-  void onMetadataLoadingFailed({required String? errorMessage}) =>
-      emit(SplashCriticalErrorState(errorMessage: errorMessage));
+  void onMetadataLoadingFailed() => emit(const SplashCriticalErrorState());
 
   void _startSplashTimer() {
     _cancelSplashTimer();

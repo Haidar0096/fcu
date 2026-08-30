@@ -16,7 +16,6 @@ enum PngImages {
   /// [path] is the relative path to the PNG image asset.
   const PngImages({required this.path});
 
-  /// The relative path to the PNG image asset, from the root of the assets
-  /// directory.
+  /// The project-root-relative Flutter asset key for the PNG image.
   final String path;
 }

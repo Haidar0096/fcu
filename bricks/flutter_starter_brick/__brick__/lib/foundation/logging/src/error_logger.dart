@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
+import 'package:{{proj_name}}/foundation/logging/src/app_logger.dart';
 import 'package:{{proj_name}}/foundation/logging/src/error_report_dto.dart';
 import 'package:{{proj_name}}/foundation/logging/src/flow_buffer.dart';
 import 'package:{{proj_name}}/foundation/logging/src/report_sender.dart';
@@ -14,6 +16,9 @@ import 'package:{{proj_name}}/foundation/logging/src/sensitive_data_sanitizer.da
 /// them: a lookup that throws inside an error handler turns a reportable
 /// failure into a crash.
 typedef OnResolveErrorLoggerCallback = ErrorLogger? Function();
+
+/// Hands back the live debug logger, or null before registration completes.
+typedef OnResolveAppLoggerCallback = AppLogger? Function();
 
 /// The ONE class every report leaves the app through.
 ///
@@ -36,6 +41,10 @@ class ErrorLogger {
   final ReportSender _reportSender;
   final FlowBuffer _flowBuffer;
 
+  static const String _tag = 'ErrorLogger';
+  static const int _maximumEncodedReportBytes = 262144;
+  static const String _truncatedStackMarker = '\n[TRUNCATED]';
+
   /// The short name this app puts on every report it sends, so the project's
   /// report table tells this app's reports from every other app's.
   final String _appShortName;
@@ -52,10 +61,10 @@ class ErrorLogger {
 
   /// Marks the zone the report road runs inside.
   ///
-  /// The client the sender rides logs AND reports its own failures, so an
-  /// upload that fails would raise a second report, which fails the same way:
-  /// an error road that reports its own errors loops. Any failure raised
-  /// inside the marked zone is therefore recorded nowhere.
+  /// The standard sender logs its own failures without reporting them. The
+  /// marked zone is a second guard for any sender implementation that calls
+  /// this logger while a report is already being delivered: an error road
+  /// that reports its own errors would otherwise loop.
   ///
   /// The marker rides the zone rather than a flag on this object on purpose:
   /// a flag would also drop an UNRELATED failure that happened to arrive
@@ -68,9 +77,10 @@ class ErrorLogger {
   /// [ErrorLogger]: each channel resolves the live logger through
   /// [resolveErrorLogger] at the moment a failure arrives, and a failure
   /// raised before there is one still reaches the console.
-  static void registerErrorHandlers(
-    OnResolveErrorLoggerCallback resolveErrorLogger,
-  ) {
+  static void registerErrorHandlers({
+    required OnResolveErrorLoggerCallback resolveErrorLogger,
+    required OnResolveAppLoggerCallback resolveAppLogger,
+  }) {
     FlutterError.onError = (errorDetails) => _handleFlutterError(
       errorDetails: errorDetails,
       resolveErrorLogger: resolveErrorLogger,
@@ -80,9 +90,13 @@ class ErrorLogger {
           error: error,
           stackTrace: stackTrace,
           resolveErrorLogger: resolveErrorLogger,
+          resolveAppLogger: resolveAppLogger,
         );
     if (!kIsWeb) {
-      _addIsolateErrorListener(resolveErrorLogger);
+      _addIsolateErrorListener(
+        resolveErrorLogger: resolveErrorLogger,
+        resolveAppLogger: resolveAppLogger,
+      );
     }
   }
 
@@ -90,7 +104,6 @@ class ErrorLogger {
     required FlutterErrorDetails errorDetails,
     required OnResolveErrorLoggerCallback resolveErrorLogger,
   }) {
-    FlutterError.dumpErrorToConsole(errorDetails);
     unawaited(
       resolveErrorLogger()?.recordError(
         error: errorDetails.exception,
@@ -104,24 +117,36 @@ class ErrorLogger {
     required Object error,
     required StackTrace stackTrace,
     required OnResolveErrorLoggerCallback resolveErrorLogger,
+    required OnResolveAppLoggerCallback resolveAppLogger,
   }) {
-    debugPrint('Platform error: $error\n$stackTrace');
+    _logGlobalError(
+      operation: 'Platform error',
+      error: error,
+      stackTrace: stackTrace,
+      resolveAppLogger: resolveAppLogger,
+    );
     unawaited(
       resolveErrorLogger()?.recordError(error: error, stackTrace: stackTrace),
     );
     return true;
   }
 
-  static void _addIsolateErrorListener(
-    OnResolveErrorLoggerCallback resolveErrorLogger,
-  ) {
+  static void _addIsolateErrorListener({
+    required OnResolveErrorLoggerCallback resolveErrorLogger,
+    required OnResolveAppLoggerCallback resolveAppLogger,
+  }) {
     Isolate.current.addErrorListener(
       RawReceivePort((List<dynamic> errorData) {
         final error = errorData.elementAtOrNull(0);
         final stackTrace = errorData.elementAtOrNull(1) is String
             ? StackTrace.fromString(errorData.elementAtOrNull(1) as String)
             : null;
-        debugPrint('Isolate error: $error\n$stackTrace');
+        _logGlobalError(
+          operation: 'Isolate error',
+          error: error,
+          stackTrace: stackTrace,
+          resolveAppLogger: resolveAppLogger,
+        );
         unawaited(
           resolveErrorLogger()?.recordError(
             error: error,
@@ -129,6 +154,26 @@ class ErrorLogger {
           ),
         );
       }).sendPort,
+    );
+  }
+
+  static void _logGlobalError({
+    required String operation,
+    required Object? error,
+    required StackTrace? stackTrace,
+    required OnResolveAppLoggerCallback resolveAppLogger,
+  }) {
+    AppLogger? logger;
+    try {
+      logger = resolveAppLogger();
+    } catch (_) {
+      // The error handler must remain usable before dependency injection.
+    }
+    (logger ?? const AppLogger()).log(
+      message: '$operation: '
+          '${SensitiveDataSanitizer.sanitizeText('$error')}',
+      tag: _tag,
+      stackTrace: stackTrace,
     );
   }
 
@@ -178,7 +223,7 @@ class ErrorLogger {
     // THE FIRST STRIP: everything is stripped here, before the sender is
     // called, so no unstripped shape can reach a sender. The backend strips
     // a second time on arrival; the sender is never trusted.
-    final report = ErrorReportDto(
+    final unboundedReport = ErrorReportDto(
       app: _appShortName,
       level: level,
       message: SensitiveDataSanitizer.sanitizeText('$value'),
@@ -197,8 +242,107 @@ class ErrorLogger {
       ),
     );
 
+    final report = _fitReportToMaximumSize(unboundedReport);
+    if (report == null) return;
+
     await _runInsideReportRoad(() => _reportSender.send(report));
   }
+
+  static ErrorReportDto? _fitReportToMaximumSize(
+    ErrorReportDto report,
+  ) {
+    if (_encodedReportBytes(report) <= _maximumEncodedReportBytes) {
+      return report;
+    }
+
+    var flow = List<Map<String, dynamic>>.unmodifiable(
+      report.flow.map((entry) {
+        final withoutOptionalData = Map<String, dynamic>.of(entry)
+          ..remove('data');
+        return Map<String, dynamic>.unmodifiable(withoutOptionalData);
+      }),
+    );
+    var candidate = _copyReport(report: report, stack: report.stack, flow: flow);
+
+    while (
+      flow.isNotEmpty &&
+      _encodedReportBytes(candidate) > _maximumEncodedReportBytes
+    ) {
+      flow = List<Map<String, dynamic>>.unmodifiable(flow.skip(1));
+      candidate = _copyReport(
+        report: candidate,
+        stack: candidate.stack,
+        flow: flow,
+      );
+    }
+
+    if (_encodedReportBytes(candidate) > _maximumEncodedReportBytes) {
+      candidate = _copyReport(
+        report: candidate,
+        stack: _largestStackThatFits(report: candidate),
+        flow: candidate.flow,
+      );
+    }
+
+    return _encodedReportBytes(candidate) <= _maximumEncodedReportBytes
+        ? candidate
+        : null;
+  }
+
+  static String _largestStackThatFits({required ErrorReportDto report}) {
+    final originalStack = report.stack;
+    var low = 0;
+    var high = originalStack.length;
+    var bestEnd = -1;
+
+    while (low <= high) {
+      final midpoint = (low + high) ~/ 2;
+      final safeEnd = _safePrefixEnd(originalStack, midpoint);
+      final stack = '${originalStack.substring(0, safeEnd)}'
+          '$_truncatedStackMarker';
+      final candidate = _copyReport(
+        report: report,
+        stack: stack,
+        flow: report.flow,
+      );
+
+      if (_encodedReportBytes(candidate) <= _maximumEncodedReportBytes) {
+        bestEnd = safeEnd;
+        low = midpoint + 1;
+      } else {
+        high = midpoint - 1;
+      }
+    }
+
+    return bestEnd < 0
+        ? _truncatedStackMarker
+        : '${originalStack.substring(0, bestEnd)}$_truncatedStackMarker';
+  }
+
+  static int _safePrefixEnd(String value, int end) {
+    if (end <= 0 || end >= value.length) return end;
+    final previousCodeUnit = value.codeUnitAt(end - 1);
+    final splitsSurrogatePair = previousCodeUnit >= 0xD800 &&
+        previousCodeUnit <= 0xDBFF;
+    return splitsSurrogatePair ? end - 1 : end;
+  }
+
+  static ErrorReportDto _copyReport({
+    required ErrorReportDto report,
+    required String stack,
+    required List<Map<String, dynamic>> flow,
+  }) => ErrorReportDto(
+    app: report.app,
+    level: report.level,
+    message: report.message,
+    stack: stack,
+    correlationId: report.correlationId,
+    occurredAt: report.occurredAt,
+    flow: List<Map<String, dynamic>>.unmodifiable(flow),
+  );
+
+  static int _encodedReportBytes(ErrorReportDto report) =>
+      utf8.encode(jsonEncode(report.toJson())).length;
 
   /// Sends every report an earlier launch had to park, then clears them.
   ///

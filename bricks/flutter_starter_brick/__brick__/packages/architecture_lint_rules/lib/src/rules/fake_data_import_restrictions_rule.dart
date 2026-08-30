@@ -1,5 +1,5 @@
-/// Lint rule: fake_data/ can only import features/, foundation/, and
-/// resources/.
+/// Lint rule: fake_data/ can only import fake_data/, features/, foundation/,
+/// and resources/.
 ///
 /// The fake-data registry composes fakes for the app's own types, so it
 /// reaches features and foundation — but never the app layer, the router, or
@@ -65,54 +65,73 @@ class _FakeDataImportRestrictionsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitImportDirective(ImportDirective node) {
-    final uri = node.uri.stringValue;
-    if (uri == null) return;
-
-    // Get the source file path
     final currentUnit = context.currentUnit;
     if (currentUnit == null) return;
-    final filePath = currentUnit.file.path;
+    final sourcePath = _pathUnderFinalLib(currentUnit.file.path);
+    if (sourcePath == null || !sourcePath.startsWith('fake_data/')) return;
 
-    // Only check files in fake_data/ folder
-    if (!filePath.contains('lib/fake_data/')) return;
-
-    // Only check package: imports (skip dart: and relative imports)
-    if (!uri.startsWith('package:')) return;
-
-    // Extract package name and path from import
-    final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);
-    if (packageMatch == null) return;
-
-    final importPackage = packageMatch.group(1)!;
-    final importPath = packageMatch.group(2)!;
-
-    // Get current package name from the library identifier
     final libraryElement = context.libraryElement;
     if (libraryElement == null) return;
-
-    // Extract package name from library identifier (e.g., "package:myapp/...")
-    final identifier = libraryElement.identifier;
     final currentPackageMatch = RegExp(
       r'package:([^/]+)/',
-    ).firstMatch(identifier);
+    ).firstMatch(libraryElement.identifier);
     if (currentPackageMatch == null) return;
-
     final currentPackage = currentPackageMatch.group(1)!;
 
-    // Only check imports from the same package (skip external packages)
-    if (importPackage != currentPackage) return;
-
-    // fake_data/ can ONLY import features/, foundation/, resources/, or itself
-    const allowedFolders = [
-      'fake_data/',
-      'features/',
-      'foundation/',
-      'resources/',
+    final uriNodes = <StringLiteral>[
+      node.uri,
+      ...node.configurations.map((configuration) => configuration.uri),
     ];
-
-    // If importing from same package but NOT from allowed folders, report error
-    if (!allowedFolders.any(importPath.startsWith)) {
-      rule.reportAtNode(node);
+    for (final uriNode in uriNodes) {
+      final uri = uriNode.stringValue;
+      if (uri == null) continue;
+      final importPath = _samePackageImportPath(
+        uri: uri,
+        currentPackage: currentPackage,
+        sourcePath: sourcePath,
+      );
+      if (importPath != null && !_isAllowedImportPath(importPath)) {
+        rule.reportAtNode(node);
+        return;
+      }
     }
+  }
+
+  static const _allowedFolders = [
+    'fake_data/',
+    'features/',
+    'foundation/',
+    'resources/',
+  ];
+
+  String? _samePackageImportPath({
+    required String uri,
+    required String currentPackage,
+    required String sourcePath,
+  }) {
+    if (uri.startsWith('package:')) {
+      final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);
+      if (packageMatch == null || packageMatch.group(1) != currentPackage) {
+        return null;
+      }
+      return packageMatch.group(2)!;
+    }
+
+    final parsedUri = Uri.tryParse(uri);
+    if (parsedUri == null || parsedUri.hasScheme) return null;
+    final resolvedPath = Uri(path: '/$sourcePath').resolveUri(parsedUri).path;
+    return resolvedPath.startsWith('/')
+        ? resolvedPath.substring(1)
+        : resolvedPath;
+  }
+
+  bool _isAllowedImportPath(String importPath) =>
+      _allowedFolders.any(importPath.startsWith);
+
+  String? _pathUnderFinalLib(String filePath) {
+    final normalizedPath = filePath.replaceAll('\\', '/');
+    final libIndex = normalizedPath.lastIndexOf('/lib/');
+    if (libIndex < 0) return null;
+    return normalizedPath.substring(libIndex + '/lib/'.length);
   }
 }

@@ -41,26 +41,40 @@ class NoSnackbarOutsideBannerRule extends AnalysisRule {
 class _SnackbarVisitor extends SimpleAstVisitor<void> {
   _SnackbarVisitor(this.rule, this.context);
 
+  static const String _bannerModulePath =
+      'lib/foundation/ui/widgets/src/sliding_banner.dart';
+
   final AnalysisRule rule;
   final RuleContext context;
 
   bool get _isBannerCode {
-    final path = currentFilePath(context)?.toLowerCase();
+    final path = currentFilePath(context)?.replaceAll('\\', '/').toLowerCase();
     return path != null &&
-        (path.contains('/banners/') || path.split('/').last.contains('banner'));
+        (path == _bannerModulePath || path.endsWith('/$_bannerModulePath'));
   }
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    if (!_isBannerCode && constructorTypeName(node) == 'SnackBar') {
+    final libraryUri = node.constructorName.element?.library.uri;
+    if (!_isBannerCode &&
+        constructorTypeName(node) == 'SnackBar' &&
+        _isFlutterMaterialLibrary(libraryUri)) {
       rule.reportAtNode(node);
     }
   }
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (!_isBannerCode && node.name == 'ScaffoldMessenger') {
+    final libraryUri = node.element?.library?.uri;
+    if (!_isBannerCode &&
+        node.name == 'ScaffoldMessenger' &&
+        _isFlutterMaterialLibrary(libraryUri)) {
       rule.reportAtNode(node);
     }
   }
+
+  bool _isFlutterMaterialLibrary(Uri? uri) =>
+      uri != null &&
+      uri.scheme == 'package' &&
+      uri.path.startsWith('flutter/src/material/');
 }

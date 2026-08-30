@@ -1,8 +1,10 @@
-/// Lint rule: Package imports should use barrel files, not src/ folders.
+/// Lint rule: Imports should use barrel files, not src/ folders.
 ///
-/// This rule enforces the use of barrel files for imports within the same package.
-/// Importing directly from src/ folders breaks encapsulation and violates the
-/// module pattern where src/ should be private implementation.
+/// This rule enforces the use of barrel files for imports within the same
+/// package.
+/// Importing directly from src/ folders through package, relative, default, or
+/// conditional URIs breaks encapsulation and violates the module pattern where
+/// src/ should be private implementation.
 ///
 /// Exception: the composition roots — dependency_injection/, router/, and the
 /// fake_data/ registry FILE — are allowed to import from any src/ folder, as
@@ -78,10 +80,18 @@ const _composingHomes = {'dependency_injection', 'router'};
 
 /// The one file inside `fake_data/` the import table lets reach into another
 /// module's src/: "its registry".
-///
-/// The path is anchored on `/lib/` so a file of the same name elsewhere (a
-/// test double, a nested package) is not mistaken for the registry.
-const _fakeDataRegistryPath = '/lib/fake_data/src/fake_data_registry.dart';
+const _fakeDataRegistryPath = 'fake_data/src/fake_data_registry.dart';
+
+const _rootSrcModule = '<root-src>';
+
+String? _packageRelativePath(String filePath) {
+  final normalized = filePath.replaceAll('\\', '/');
+  final markerIndex = normalized.lastIndexOf('/lib/');
+  if (markerIndex >= 0) {
+    return normalized.substring(markerIndex + '/lib/'.length);
+  }
+  return normalized.startsWith('lib/') ? normalized.substring(4) : null;
+}
 
 /// The module a file belongs to.
 ///
@@ -89,16 +99,50 @@ const _fakeDataRegistryPath = '/lib/fake_data/src/fake_data_registry.dart';
 /// other file under lib/ belongs to the folder it sits in (a barrel, a
 /// composition-root file), and the main.dart file directly under lib/ belongs
 /// to no module at all.
-String? _moduleOfFile(String filePath) {
-  final srcMatch = RegExp(r'lib/([^/]+(?:/[^/]+)*?)/src/').firstMatch(filePath);
-  if (srcMatch != null) return srcMatch.group(1);
-
-  final libMatch = RegExp(r'lib/(.*)$').firstMatch(filePath);
-  if (libMatch == null) return null;
-
-  final segments = libMatch.group(1)!.split('/');
-  if (segments.length == 1) return '';
+String? _moduleOfPath(String relativePath) {
+  final segments = relativePath.split('/');
+  final srcIndex = segments.indexOf('src');
+  if (srcIndex >= 0) {
+    return srcIndex == 0
+        ? _rootSrcModule
+        : segments.sublist(0, srcIndex).join('/');
+  }
+  if (segments.length == 1) return null;
   return segments.sublist(0, segments.length - 1).join('/');
+}
+
+String? _resolveRelativeImport(String currentPath, String uri) {
+  final normalized = uri.replaceAll('\\', '/');
+  final parsed = Uri.tryParse(normalized);
+  if (parsed == null || parsed.hasScheme || normalized.startsWith('/')) {
+    return null;
+  }
+  final segments = currentPath.split('/')..removeLast();
+  for (final segment in parsed.pathSegments) {
+    if (segment.isEmpty || segment == '.') continue;
+    if (segment == '..') {
+      if (segments.isEmpty) return null;
+      segments.removeLast();
+    } else {
+      segments.add(segment);
+    }
+  }
+  return segments.join('/');
+}
+
+String? _samePackageImportPath(
+  String uri,
+  String currentPackage,
+  String currentPath,
+) {
+  final normalized = uri.replaceAll('\\', '/');
+  final packageMatch = RegExp(r'^package:([^/]+)/(.+)$').firstMatch(normalized);
+  if (packageMatch != null) {
+    return packageMatch.group(1) == currentPackage
+        ? packageMatch.group(2)
+        : null;
+  }
+  return _resolveRelativeImport(currentPath, normalized);
 }
 
 /// Visitor implementation for [NoSrcImportsRule].
@@ -110,70 +154,49 @@ class _NoSrcImportsVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitImportDirective(ImportDirective node) {
-    final uri = node.uri.stringValue;
-    if (uri == null) return;
-
-    // Only check package: imports (skip dart: and relative imports)
-    if (!uri.startsWith('package:')) return;
-
-    // Extract package name and path from import
-    final packageMatch = RegExp(r'package:([^/]+)/(.+)').firstMatch(uri);
-    if (packageMatch == null) return;
-
-    final importPackage = packageMatch.group(1)!;
-    final importPath = packageMatch.group(2)!;
-
-    // Get current package name from the library identifier
-    final libraryElement = context.libraryElement;
-    if (libraryElement == null) return;
-
-    // Extract package name from library identifier (e.g., "package:myapp/...")
-    final identifier = libraryElement.identifier;
-    final currentPackageMatch = RegExp(
-      r'package:([^/]+)/',
-    ).firstMatch(identifier);
-    if (currentPackageMatch == null) return;
-
-    final currentPackage = currentPackageMatch.group(1)!;
-
-    // Only check imports from the same package (skip external packages)
-    if (importPackage != currentPackage) return;
-
-    // Check if the import path contains /src/
-    if (!importPath.contains('/src/')) return;
-
-    // Get current file path to determine the module
     final currentUnit = context.currentUnit;
     if (currentUnit == null) return;
-    final currentFilePath = currentUnit.file.path;
+    final currentPath = _packageRelativePath(currentUnit.file.path);
+    if (currentPath == null) return;
+    final currentModule = _moduleOfPath(currentPath);
 
-    // Module = everything before /src/ (e.g., "foundation/clipboard" or
-    // "features/auth"). Use non-greedy matching (*?) to stop at the FIRST
-    // /src/ encountered (handles nested src folders like
-    // features/x/src/blocs/y/src/).
-    final importModuleMatch = RegExp(
-      r'^([^/]+(?:/[^/]+)*?)/src/',
-    ).firstMatch(importPath);
-
-    // If we can't determine the modules, be conservative and don't report
-    final currentModule = _moduleOfFile(currentFilePath);
-    if (currentModule == null || importModuleMatch == null) return;
-
-    final importModule = importModuleMatch.group(1)!;
-
-    // Exception: the composition roots can import from any src/ folder.
-    // dependency_injection/ and router/ are exempt as WHOLE homes; inside
-    // fake_data/ only the registry file is.
-    if (_composingHomes.contains(currentModule.split('/').first)) {
-      return;
-    }
-    if (currentFilePath.endsWith(_fakeDataRegistryPath)) {
+    if (_composingHomes.contains(currentPath.split('/').first) ||
+        currentPath == _fakeDataRegistryPath) {
       return;
     }
 
-    // Only report if importing from a DIFFERENT module's src/
-    if (currentModule != importModule) {
-      rule.reportAtNode(node);
+    final libraryElement = context.libraryElement;
+    if (libraryElement == null) return;
+    final identifier = libraryElement.identifier;
+    final currentPackageMatch = RegExp(
+      r'^package:([^/]+)/',
+    ).firstMatch(identifier);
+    if (currentPackageMatch == null) return;
+    final currentPackage = currentPackageMatch.group(1)!;
+
+    final uriLiterals = <StringLiteral>[
+      node.uri,
+      for (final configuration in node.configurations) configuration.uri,
+    ];
+    for (final uriLiteral in uriLiterals) {
+      final uri = uriLiteral.stringValue;
+      if (uri == null) continue;
+      final importPath = _samePackageImportPath(
+        uri,
+        currentPackage,
+        currentPath,
+      );
+      if (importPath == null) continue;
+      final importSegments = importPath.split('/');
+      final srcIndex = importSegments.indexOf('src');
+      if (srcIndex < 0) continue;
+      final importModule = srcIndex == 0
+          ? _rootSrcModule
+          : importSegments.sublist(0, srcIndex).join('/');
+      if (currentModule != importModule) {
+        rule.reportAtNode(node);
+        return;
+      }
     }
   }
 }

@@ -6,6 +6,8 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:architecture_lint_rules/src/rules/rule_utils.dart';
 
@@ -58,7 +60,11 @@ class _NoFlutterUiVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitNamedType(NamedType node) {
-    if (node.name.lexeme == 'BuildContext' && isInsideBloc(node)) {
+    final type = node.type;
+    final element = type is InterfaceType ? type.element : node.element;
+    if (isInsideBloc(node) &&
+        element?.displayName == 'BuildContext' &&
+        _isFromPackage(element, 'flutter')) {
       rule.reportAtNode(node);
     }
   }
@@ -66,26 +72,22 @@ class _NoFlutterUiVisitor extends SimpleAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (!isInsideBloc(node)) return;
-    final name = node.methodName.name;
-    final target = node.realTarget?.toSource();
-    final isContextNavigation =
-        target == 'context' &&
-        const {
-          'canPop',
-          'go',
-          'goNamed',
-          'pop',
-          'push',
-          'pushNamed',
-        }.contains(name);
-    final isFrameworkNavigation =
-        target != null &&
-        (target == 'Navigator' ||
-            target.startsWith('Navigator.') ||
-            target == 'GoRouter' ||
-            target.startsWith('GoRouter.'));
-    if (isContextNavigation || isFrameworkNavigation) {
+    final element = node.methodName.element;
+    final ownerName = element?.enclosingElement?.displayName;
+    final isFlutterNavigation =
+        _isFromPackage(element, 'flutter') &&
+        const {'Navigator', 'NavigatorState'}.contains(ownerName);
+    final isGoRouterNavigation = _isFromPackage(element, 'go_router');
+    if (isFlutterNavigation || isGoRouterNavigation) {
       rule.reportAtNode(node);
     }
   }
+}
+
+bool _isFromPackage(Element? element, String packageName) {
+  final uri = element?.library?.uri;
+  return uri != null &&
+      uri.scheme == 'package' &&
+      uri.pathSegments.isNotEmpty &&
+      uri.pathSegments.first == packageName;
 }

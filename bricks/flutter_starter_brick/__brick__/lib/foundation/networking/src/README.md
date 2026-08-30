@@ -1,3 +1,5 @@
+Audience: developers working on the generated networking module; this page may contain only the module's file map and public/private boundaries.
+
 # What each file in `networking/src/` holds
 
 This folder is flat and large enough that a reader needs a map before a file

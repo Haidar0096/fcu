@@ -31,10 +31,11 @@ class NoRoutePathLiteralsRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    registry.addSimpleStringLiteral(
-      this,
-      _RoutePathLiteralVisitor(this, context),
-    );
+    final visitor = _RoutePathLiteralVisitor(this, context);
+    registry
+      ..addAdjacentStrings(this, visitor)
+      ..addSimpleStringLiteral(this, visitor)
+      ..addStringInterpolation(this, visitor);
   }
 }
 
@@ -46,7 +47,44 @@ class _RoutePathLiteralVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitSimpleStringLiteral(SimpleStringLiteral node) {
-    if (!node.value.startsWith('/') || node.value.startsWith('//')) return;
+    if (node.parent is AdjacentStrings) return;
+    _checkRouteString(node: node, leadingText: node.value);
+  }
+
+  @override
+  void visitStringInterpolation(StringInterpolation node) {
+    if (node.parent is AdjacentStrings) return;
+    if (node.elements.isEmpty) return;
+    final firstElement = node.elements.first;
+    if (firstElement is! InterpolationString) return;
+    _checkRouteString(node: node, leadingText: firstElement.value);
+  }
+
+  @override
+  void visitAdjacentStrings(AdjacentStrings node) {
+    if (node.strings.isEmpty) return;
+    final leadingText = _leadingText(node.strings.first);
+    if (leadingText == null) return;
+    _checkRouteString(node: node, leadingText: leadingText);
+  }
+
+  String? _leadingText(StringLiteral literal) {
+    if (literal is SimpleStringLiteral) return literal.value;
+    if (literal is StringInterpolation && literal.elements.isNotEmpty) {
+      final firstElement = literal.elements.first;
+      return firstElement is InterpolationString ? firstElement.value : null;
+    }
+    if (literal is AdjacentStrings && literal.strings.isNotEmpty) {
+      return _leadingText(literal.strings.first);
+    }
+    return null;
+  }
+
+  void _checkRouteString({
+    required StringLiteral node,
+    required String leadingText,
+  }) {
+    if (!leadingText.startsWith('/') || leadingText.startsWith('//')) return;
     final declaration = enclosingClass(node);
     if (declaration != null && className(declaration).endsWith('RoutePath')) {
       return;

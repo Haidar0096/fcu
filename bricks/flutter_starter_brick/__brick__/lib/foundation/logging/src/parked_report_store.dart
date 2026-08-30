@@ -1,55 +1,93 @@
+import 'dart:async';
 import 'dart:convert';
 
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:{{proj_name}}/foundation/logging/src/parked_report_store_keys.dart';
+import 'package:{{proj_name}}/foundation/logging/src/parked_report_persistence.dart';
 
 /// Holds the reports that could not go out, so the next launch sends them.
-///
-/// Hides `shared_preferences`, the only package this class imports.
-///
-/// Chosen deviation from "a tiny on-device FILE": writing a file means
-/// importing `dart:io`, which the dependency rules keep out of shared code
-/// and which would not build on web. The outcome the rule fixes — the report
-/// waits on the device and rides the next launch instead of being thrown
-/// away — is unchanged, and the storage method is the project's own to pick.
 class ParkedReportStore {
-  ParkedReportStore({required SharedPreferences sharedPreferences})
-    : _sharedPreferences = sharedPreferences;
-
-  /// How many reports wait at most, so the queue stays tiny. A project that
-  /// must never lose a report raises this.
-  static const int capacity = 20;
-
-  final SharedPreferences _sharedPreferences;
-
-  /// Parks [report], dropping the oldest once [capacity] is reached.
-  Future<void> park(Map<String, dynamic> report) async {
-    final parked = <String>[..._read(), jsonEncode(report)];
-    final trimmed = parked.length > capacity
-        ? parked.sublist(parked.length - capacity)
-        : parked;
-
-    await _sharedPreferences.setStringList(
-      ParkedReportStoreKeys.parkedReports,
-      trimmed,
-    );
+  ParkedReportStore._({
+    required int? capacity,
+    required ParkedReportPersistence persistence,
+  }) : _capacity = capacity,
+       _persistence = persistence {
+    if (capacity != null && capacity <= 0) {
+      throw ArgumentError.value(capacity, 'capacity', 'must be positive');
+    }
   }
 
-  /// Returns everything parked and clears the store in the same step, so a
-  /// drain can never send the same report twice.
-  Future<List<Map<String, dynamic>>> takeAll() async {
-    final parked = _read();
-    if (parked.isEmpty) return const <Map<String, dynamic>>[];
+  /// Builds the platform persistence before the report sender can use it.
+  static Future<ParkedReportStore> create({required int? capacity}) async =>
+      ParkedReportStore._(
+        capacity: capacity,
+        persistence: await ParkedReportPersistence.create(),
+      );
 
-    await _sharedPreferences.remove(ParkedReportStoreKeys.parkedReports);
+  /// Null until project setup records the project's own queue bound.
+  final int? _capacity;
+  final ParkedReportPersistence _persistence;
+  Future<void> _mutationQueue = Future<void>.value();
 
-    return parked
-        .map<Object?>(jsonDecode)
-        .whereType<Map<String, dynamic>>()
-        .toList();
+  /// Parks [report], dropping the oldest once the project-selected cap is
+  /// reached. An unset cap remains null rather than borrowing another queue's
+  /// number.
+  Future<void> park(Map<String, dynamic> report) =>
+      _serializeMutation(() async {
+        final parked = <String>[
+          ...await _persistence.readValues(),
+          jsonEncode(report),
+        ];
+        final capacity = _capacity;
+        final trimmed = capacity != null && parked.length > capacity
+            ? parked.sublist(parked.length - capacity)
+            : parked;
+
+        await _persistence.writeValues(trimmed);
+      });
+
+  /// Returns the oldest report without clearing it.
+  ///
+  /// [encoded] is the exact stored record the acknowledgement must present;
+  /// a racing or duplicate drain can therefore never remove a different
+  /// report.
+  Future<({String encoded, Map<String, dynamic> report})?> peek() =>
+      _serializeMutation(() async {
+        final parked = await _persistence.readValues();
+        if (parked.isEmpty) return null;
+
+        final encoded = parked.first;
+        final decoded = jsonDecode(encoded);
+        if (decoded is! Map<String, dynamic>) {
+          throw const FormatException('Parked report is not a JSON object.');
+        }
+        return (encoded: encoded, report: decoded);
+      });
+
+  /// Removes [encoded] only when it is still the oldest parked report.
+  Future<void> acknowledge({required String encoded}) => _serializeMutation(
+    () async {
+      final parked = await _persistence.readValues();
+      if (parked.isEmpty || parked.first != encoded) {
+        throw StateError('The parked report awaiting acknowledgement changed.');
+      }
+
+      final remaining = parked.sublist(1);
+      if (remaining.isEmpty) {
+        await _persistence.clearValues();
+      } else {
+        await _persistence.writeValues(remaining);
+      }
+    },
+  );
+
+  Future<T> _serializeMutation<T>(Future<T> Function() mutation) {
+    final completer = Completer<T>();
+    _mutationQueue = _mutationQueue.then((_) async {
+      try {
+        completer.complete(await mutation());
+      } catch (error, stackTrace) {
+        completer.completeError(error, stackTrace);
+      }
+    });
+    return completer.future;
   }
-
-  List<String> _read() =>
-      _sharedPreferences.getStringList(ParkedReportStoreKeys.parkedReports) ??
-      const <String>[];
 }

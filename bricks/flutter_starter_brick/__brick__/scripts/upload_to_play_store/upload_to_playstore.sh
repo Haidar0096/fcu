@@ -5,24 +5,36 @@
 # versions present at the project root.
 #
 # Usage:
-#   ./upload_to_playstore.sh development  # uses env/development.json
-#   ./upload_to_playstore.sh production   # uses env/production.json
+#   ./upload_to_playstore.sh development draft
+#   ./upload_to_playstore.sh production completed
 
-# Check for environment argument
-if [[ -z "$1" ]]; then
-    echo "❌ Usage: $0 <development|production>"
+# Check required arguments
+if [[ -z "${1:-}" || -z "${2:-}" ]]; then
+    echo "❌ Usage: $0 <development|production> <draft|completed>"
     echo "   development - builds with env/development.json"
     echo "   production  - builds with env/production.json"
+    echo "   draft       - creates a draft release"
+    echo "   completed   - rolls out to internal testers"
     exit 1
 fi
 
 ENVIRONMENT="$1"
+RELEASE_STATUS="$2"
 
 case "$ENVIRONMENT" in
     development|production) ;;
     *)
         echo "❌ Invalid environment: $ENVIRONMENT"
         echo "   Valid options: development, production"
+        exit 1
+        ;;
+esac
+
+case "$RELEASE_STATUS" in
+    draft|completed) ;;
+    *)
+        echo "❌ Invalid release status: $RELEASE_STATUS"
+        echo "   Valid options: draft, completed"
         exit 1
         ;;
 esac
@@ -64,14 +76,8 @@ if [[ ! -f "$service_account_json" ]]; then
     exit 1
 fi
 
-# Prepare project
-echo "📦 Preparing project..."
-# Clean first: a dev-only plugin left in a stale generated registrant by an
-# earlier debug run fails the release build.
-fvm flutter clean || { echo "❌ flutter clean failed"; exit 1; }
-fvm flutter pub get || { echo "❌ flutter pub get failed"; exit 1; }
-fvm flutter gen-l10n || { echo "❌ flutter gen-l10n failed"; exit 1; }
-fvm dart run build_runner build || { echo "❌ build_runner failed"; exit 1; }
+# Prepare project through the shared local preparation owner.
+"$PROJECT_ROOT/scripts/build_web/build_web.sh" --prepare-only || exit 1
 
 # Build AAB
 echo "🚀 Building AAB for version $android_version_name ($android_build_number) [$ENVIRONMENT]..."
@@ -114,7 +120,8 @@ echo "   Package: $package_name"
 python3 "$SCRIPT_DIR/upload_to_playstore.py" \
     "$aab_path" \
     "$service_account_json" \
-    "$package_name" || {
+    "$package_name" \
+    "$RELEASE_STATUS" || {
     echo "❌ Upload failed"
     exit 1
 }

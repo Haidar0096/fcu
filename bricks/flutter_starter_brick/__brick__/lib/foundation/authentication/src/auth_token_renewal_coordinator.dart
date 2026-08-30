@@ -47,9 +47,6 @@ final class AuthTokenRenewalCoordinator {
   /// given.
   Stream<AuthTokenRenewalOutcome> get outcomes => _outcomes.stream;
 
-  /// Whether a renewal is running right now.
-  bool get isRenewing => _inFlight != null;
-
   /// Renews [currentTokens], joining a renewal that is already running.
   Future<AuthTokenRenewalOutcome> renew({required AuthTokens currentTokens}) {
     final running = _inFlight;

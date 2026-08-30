@@ -82,9 +82,12 @@ final GoRouter router = GoRouter(
     // The last resort for routing failures the redirect above cannot recover
     // from: a redirect target that matches nothing, a redirect loop, or an
     // initial deep link blocked with no route left to fall back to.
+    final error = state.error;
+    final errorStackTrace = error is Error ? error.stackTrace : null;
     _reportRouteFailure(
-      message: 'Routing failed for path: ${state.uri.path}',
-      stackTrace: StackTrace.current,
+      message: 'Routing failed for path ${state.uri.path}: '
+          '${error ?? 'unknown routing error'}',
+      stackTrace: errorStackTrace ?? StackTrace.current,
     );
     router.go(CriticalErrorRoutePath.path);
   },
@@ -126,7 +129,12 @@ class RandomJokesScreenRoute extends GoRouteData with $RandomJokesScreenRoute {
         screenName: RandomJokesRoutePath.name,
         child: BlocProvider(
           create: (_) => serviceLocator.get<JokesCubit>(),
-          child: const RandomJokesScreen(),
+          child: RandomJokesScreen(
+            onNavigateToCriticalError: () {
+              if (!context.mounted) return;
+              const CriticalErrorScreenRoute().go(context);
+            },
+          ),
         ),
       );
 }

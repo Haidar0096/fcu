@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # This script activates the dart package globally
 
 # Get the directory where the script is located, regardless of where it's called from

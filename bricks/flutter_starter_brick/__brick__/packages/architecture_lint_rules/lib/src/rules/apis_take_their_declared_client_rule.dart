@@ -15,7 +15,8 @@
 ///     ProfileApi: loggedInBackendHttpClient
 /// ```
 ///
-/// An API that is not declared is not checked: the rule invents no mapping.
+/// Every HTTP API must be declared. The rule requires that declaration without
+/// inventing which named client the project should choose.
 library;
 
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
@@ -23,6 +24,8 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:architecture_lint_rules/src/rules/api_client_configuration_io.dart';
 import 'package:architecture_lint_rules/src/rules/rule_utils.dart';
@@ -34,8 +37,8 @@ class ApisTakeTheirDeclaredClientRule extends AnalysisRule {
     'apis_take_their_declared_client',
     'Build this class with the HTTP client declared for it.',
     correctionMessage:
-        'In the composition root, resolve the client under the instance name '
-        'this class is declared to take.',
+        'Declare this API under api_http_clients, then resolve the client '
+        'under that declared instance name.',
     // WARNING, like every rule here: a request that rides the wrong client
     // either carries a token where none belongs or carries none where one is
     // required, and both fail at the server rather than at the build.
@@ -84,9 +87,6 @@ const Map<String, String> _defaultDeclarations = {
 /// registry are not mistaken for a wiring decision.
 const String _compositionRoot = '/lib/dependency_injection/';
 
-/// Every `InstanceNames.<name>` reference inside an expression.
-final RegExp _instanceNameReference = RegExp(r'InstanceNames\.([A-Za-z0-9_]+)');
-
 class _ApiClientVisitor extends SimpleAstVisitor<void> {
   _ApiClientVisitor(this.rule, this.context, this.overrideDeclarations);
 
@@ -103,19 +103,69 @@ class _ApiClientVisitor extends SimpleAstVisitor<void> {
     final declarations =
         overrideDeclarations ??
         loadApiClientDeclarations(filePath, _defaultDeclarations);
-    final declaredClient = declarations[constructorTypeName(node)];
-    if (declaredClient == null) return;
+    final clientArguments = node.argumentList.arguments
+        .where(_isHttpClientArgument)
+        .toList();
+    final apiName = constructorTypeName(node);
+    final declaredClient = declarations[apiName];
+    if (declaredClient == null) {
+      if (apiName.endsWith('Api') && clientArguments.isNotEmpty) {
+        rule.reportAtNode(node);
+      }
+      return;
+    }
 
-    final namedClients = _instanceNameReference
-        .allMatches(node.argumentList.toSource())
-        .map((match) => match.group(1)!)
-        .toSet();
+    final resolvedClient = clientArguments.length == 1
+        ? _resolvedInstanceName(clientArguments.single.argumentExpression)
+        : null;
 
-    // Exactly one client, and the declared one. No name at all is a breach
-    // too: an unnamed client is whichever one the container happens to hand
-    // over.
-    if (namedClients.length != 1 || namedClients.first != declaredClient) {
+    if (resolvedClient != declaredClient) {
       rule.reportAtNode(node);
     }
+  }
+}
+
+bool _isHttpClientArgument(Argument argument) {
+  final parameterType = argument.correspondingParameter?.type;
+  return parameterType is InterfaceType &&
+      parameterType.element.displayName == 'HttpClient';
+}
+
+String? _resolvedInstanceName(Expression clientResolver) {
+  if (clientResolver is! MethodInvocation) return null;
+
+  final instanceNameArguments = clientResolver.argumentList.arguments
+      .where(
+        (argument) =>
+            argument.correspondingParameter?.displayName == 'instanceName',
+      )
+      .toList();
+  if (instanceNameArguments.length != 1) return null;
+
+  final visitor = _InstanceNameVisitor();
+  instanceNameArguments.single.argumentExpression.accept(visitor);
+  return visitor.name;
+}
+
+class _InstanceNameVisitor extends RecursiveAstVisitor<void> {
+  final Set<String> _names = {};
+
+  String? get name => _names.length == 1 ? _names.single : null;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    final element = node.element;
+    final variable = switch (element) {
+      FieldElement() => element,
+      PropertyAccessorElement() => element.variable,
+      _ => null,
+    };
+    if (variable is FieldElement &&
+        variable.isEnumConstant &&
+        variable.enclosingElement is EnumElement &&
+        variable.enclosingElement.displayName == 'InstanceNames') {
+      _names.add(variable.displayName);
+    }
+    super.visitSimpleIdentifier(node);
   }
 }
