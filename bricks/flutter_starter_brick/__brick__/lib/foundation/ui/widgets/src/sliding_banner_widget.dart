@@ -58,7 +58,7 @@ class _SlidingBannerWidgetState extends State<_SlidingBannerWidget>
       ),
     );
 
-    unawaited(_controller.forward());
+    _controller.forward();
   }
 
   @override

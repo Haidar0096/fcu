@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/ui/animations/animations.dart';
 import 'package:{{proj_name}}/foundation/ui/theme/theme.dart';
@@ -98,7 +96,7 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
           errorMessage = null;
         });
       }
-      unawaited(animationController.reverse());
+      animationController.reverse();
       return true;
     }
 
@@ -112,9 +110,9 @@ mixin ValidateableStateMixin<W extends StatefulWidget, V>
     }
 
     if (hasError) {
-      unawaited(animationController.forward());
+      animationController.forward();
     } else {
-      unawaited(animationController.reverse());
+      animationController.reverse();
     }
 
     return !hasError;

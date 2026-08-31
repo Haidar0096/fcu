@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:{{proj_name}}/foundation/ui/animations/animations.dart';
 
@@ -105,7 +103,7 @@ class ExpandableCardState extends State<ExpandableCard>
   /// Expands the card
   void expand() {
     if (!_isExpanded) {
-      unawaited(_controller.forward());
+      _controller.forward();
       setState(() {
         _isExpanded = true;
       });
@@ -116,7 +114,7 @@ class ExpandableCardState extends State<ExpandableCard>
   /// Collapses the card
   void collapse() {
     if (_isExpanded) {
-      unawaited(_controller.reverse());
+      _controller.reverse();
       setState(() {
         _isExpanded = false;
       });
