@@ -184,7 +184,7 @@ class DioHttpClient extends HttpClient {
         ...?additionalFields,
       });
 
-      return _request(
+      return await _request(
         path: path,
         method: 'POST',
         isMultipart: false,
