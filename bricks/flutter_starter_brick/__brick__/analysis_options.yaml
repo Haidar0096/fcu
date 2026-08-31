@@ -1,6 +1,6 @@
 # Run: dart analyze
 # The architecture plugin below fires under `dart analyze` only; `flutter analyze`
-# runs no analyzer plugin on Flutter 3.44.9 / Dart 3.12.2 (measured).
+# runs no analyzer plugin on Flutter 3.47.2 / Dart 3.13.2 (measured).
 
 include: package:very_good_analysis/analysis_options.yaml
 

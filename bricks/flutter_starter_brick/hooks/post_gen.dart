@@ -226,7 +226,7 @@ Future<void> run(HookContext context) async {
         'pub',
         'add',
         'get_it:^9.2.0',
-        'hydrated_bloc:^10.1.1',
+        'hydrated_bloc:^11.0.0',
         'flutter_bloc:^9.1.1',
         'bloc:^9.2.0',
         'path_provider:^2.1.5',
@@ -234,7 +234,7 @@ Future<void> run(HookContext context) async {
         'android_id:^0.5.1',
         'device_info_plus:^12.3.0',
         'package_info_plus:^9.0.0',
-        'go_router:^17.1.0',
+        'go_router:^18.0.0',
         'flutter_animate:^4.5.2',
         'rxdart:^0.28.0',
         // 5.10.0 is the floor: `DioExceptionType.transformTimeout`, which the
@@ -249,6 +249,10 @@ Future<void> run(HookContext context) async {
         // needs `win32 ^6`, while package_info_plus needs `win32 ^5`. Keep the
         // ruled compatible fallback until that conflict clears.
         'flutter_secure_storage:^9.2.4',
+        // The generated localization code imports `intl`, so it must be a
+        // direct dependency: without it the analyzer reports a missing
+        // dependency on every generated app.
+        'intl:^0.20.3',
         'json_annotation:^4.12.0',
         'shared_preferences:^2.5.4',
         'uuid:^4.5.2'

@@ -1,3 +1,26 @@
+# 4.8.0
+Release date: 2026-08-31. A minor release: the starter moves to Flutter
+3.47.2 and clears every analyzer finding that version raised.
+- The pinned Flutter version is now 3.47.2 (Dart 3.13.2), in the
+  starter's `.fvmrc` and in the repository's own `.fvmrc`.
+- Added: `intl` is now a direct dependency. The generated localization
+  code imports it, so without it Flutter 3.47.2 reports a missing
+  dependency in every generated app.
+- Fixed: the upload method in the networking client returned its request
+  without awaiting it inside a try block, so its catch arm could never
+  run. It now awaits the call.
+- Fixed: three animation calls were wrapped in `unawaited`, which
+  Flutter 3.47.2 reports as unnecessary; the wrappers are gone, in the
+  validateable-state mixin, the expandable card and the sliding banner.
+- `go_router` moves to 18.0.0 and `hydrated_bloc` to 11.0.0. Neither
+  change touched the starter's code.
+- Known, unchanged: three plugins (`android_id`, `device_info_plus`,
+  `package_info_plus`) still apply the old Kotlin Gradle plugin, so an
+  Android build prints a warning about it. The newer releases of
+  `device_info_plus` and `package_info_plus` require an Android API
+  level the current Flutter Android plugin does not support, so this
+  release stays on the working versions.
+
 # 4.7.2
 Release date: 2026-08-30. A patch: the four analyzer notes left in a
 4.7.1 generated app are gone; nothing is added or removed.
