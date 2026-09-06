@@ -95,7 +95,7 @@ Every diagnostic below has `WARNING` severity.
 - `no_backend_url_literals`: backend URL literals cannot live anywhere in Dart source.
 - `no_route_path_literals`: route path literals stay in the `RoutePath` family.
 - `no_dto_in_ui_or_bloc_state`: widgets and Bloc state cannot name a `*Dto` type.
-- `no_transport_imports_in_ui`: UI files cannot import API, networking, transport, or `NetworkFailure` code.
+- `no_transport_imports_in_ui`: widget files cannot import API, networking, transport, or `NetworkFailure` code; `foundation/ui/models/` is a UI model home, not a widget folder, and is excluded because a UI model is built at the Bloc boundary from the transport type it displays.
 - `no_framework_colors_in_ui`: UI cannot use `Colors.*`, except `Colors.transparent`.
 - `no_snackbar_outside_banner`: `SnackBar` and `ScaffoldMessenger` stay in shared banner code.
 - `no_flutter_form`: Flutter's `Form` widget is replaced by the project form helper.

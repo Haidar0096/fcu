@@ -1,4 +1,9 @@
 /// Stops API and transport imports at the Bloc boundary.
+///
+/// The rule guards WIDGET files. `foundation/ui/models/` is a UI MODEL home,
+/// not a widget folder: a UI model is the display-side twin of a transport
+/// type, built at the Bloc boundary, so it must name the transport type it
+/// converts from and is excluded from this rule.
 library;
 
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
@@ -23,6 +28,10 @@ bool _isUiFilePath(String filePath) {
   if (segments.length >= 2 &&
       segments[0] == 'foundation' &&
       segments[1] == 'ui') {
+    // `foundation/ui/models/` holds UI models, not widgets. A UI model is
+    // created at the Bloc boundary from the transport type it displays, so it
+    // names that type by design.
+    if (segments.length >= 3 && segments[2] == 'models') return false;
     return true;
   }
   if (segments.isEmpty || segments.first != 'features') return false;
