@@ -127,6 +127,9 @@ Before releasing either component:
 - [ ] Version bumped appropriately (follow [Semantic Versioning](https://semver.org/))
 - [ ] No hardcoded paths or development configurations
 - [ ] Brick bundle updated if brick was modified
+- [ ] Proof app generated from the LOCAL brick (`mason add --path`, not
+      BrickHub) and every command in its `.github/workflows/checks.yml`
+      run green in that app before publishing
 
 ## Version Synchronization
 

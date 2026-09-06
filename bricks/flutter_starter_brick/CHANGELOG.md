@@ -1,3 +1,23 @@
+# 4.8.1
+Release date: 2026-09-06. A patch: two bugs a 4.8.0 generated app hits on its own
+checks workflow. Nothing is added or removed, and the fcu CLI stays 4.4.2.
+- Fixed: the `no_transport_imports_in_ui` architecture rule reported the
+  starter's own `foundation/ui/models/src/ui_network_failure.dart`, so
+  `dart analyze` failed in every generated app. Brick 4.7.2 widened the
+  rule's file test from any path containing `/src/ui/` to the whole
+  `foundation/ui/` subtree, which swept the UI models folder in. The rule
+  guards WIDGET files; `foundation/ui/models/` is a UI model home, not a
+  widget folder, and a UI model is built at the Bloc boundary from the
+  transport type it displays. The folder is now excluded by the rule
+  itself, with no ignore comment and no file move. Two tests cover the
+  split: a widget under `foundation/ui/widgets/` importing networking is
+  still reported, and the UI model is not.
+- Fixed: the URL-strategy platform-divergence family shipped without its
+  `url_strategy_io.dart` sibling, so `dart run tool/check_structure_io.dart`
+  failed in every generated app. The no-op `_io` file is now present and the
+  facade carries its `if (dart.library.io)` arm, matching the shape of the
+  template's five other conditional families.
+
 # 4.8.0
 Release date: 2026-08-31. A minor release: the starter moves to Flutter
 3.47.2 and clears every analyzer finding that version raised.

@@ -4,13 +4,8 @@ Audience: Flutter CLI Utils contributors and adopters; public project setup and 
 
 ## Getting Started 🚀
 
-If the CLI application is available on [pub.dev](https://pub.dev), activate globally via:
-
-```sh
-dart pub global activate flutter_cli_utils
-```
-
-Or locally via:
+The CLI application is distributed as source on GitHub, not on
+[pub.dev](https://pub.dev), so activate it from a local clone:
 
 - Clone this repository
 - Run the following script from the project root to activate the CLI application globally:
@@ -31,5 +26,5 @@ $ fcu --help
 
 Example:
 ```sh
-fcu create --desc "My starter app" --org "com.my_startup" --name "starter_app" --ios-lang swift --android-lang "kotlin" --template app --target-platforms "android,ios" --output-directory "starter_app" --overwrite-existing-directory --use-starter-brick --initialize-git-repo
+fcu create --desc "My starter app" --org "com.my_startup" --name "starter_app" --dev-name "developer" --ios-lang swift --android-lang "kotlin" --template app --target-platforms "android,ios" --output-directory "starter_app" --overwrite-existing-directory --use-starter-brick --initialize-git-repo
 ```
