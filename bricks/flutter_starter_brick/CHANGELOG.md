@@ -1,5 +1,5 @@
 # 4.8.1
-Release date: TBD. A patch: two bugs a 4.8.0 generated app hits on its own
+Release date: 2026-09-06. A patch: two bugs a 4.8.0 generated app hits on its own
 checks workflow. Nothing is added or removed, and the fcu CLI stays 4.4.2.
 - Fixed: the `no_transport_imports_in_ui` architecture rule reported the
   starter's own `foundation/ui/models/src/ui_network_failure.dart`, so
