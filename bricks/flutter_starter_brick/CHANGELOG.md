@@ -4,7 +4,7 @@ checks workflow. Nothing is added or removed, and the fcu CLI stays 4.4.2.
 - Fixed: the `no_transport_imports_in_ui` architecture rule reported the
   starter's own `foundation/ui/models/src/ui_network_failure.dart`, so
   `dart analyze` failed in every generated app. Brick 4.7.2 widened the
-  rule's file test from `foundation/ui/src/ui/` to the whole
+  rule's file test from any path containing `/src/ui/` to the whole
   `foundation/ui/` subtree, which swept the UI models folder in. The rule
   guards WIDGET files; `foundation/ui/models/` is a UI model home, not a
   widget folder, and a UI model is built at the Bloc boundary from the
