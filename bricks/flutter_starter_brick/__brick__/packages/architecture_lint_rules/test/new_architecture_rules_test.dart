@@ -477,6 +477,34 @@ class NoTransportImportsInUiRuleTest extends AnalysisRuleTest {
     newFile(path, source);
     await assertNoDiagnosticsInFile(path);
   }
+
+  Future<void> test_networkingImportInFoundationUiWidget_reports() async {
+    newFile(
+      '$testPackageLibPath/foundation/networking/networking.dart',
+      'class NetworkFailure {}',
+    );
+    const source =
+        "import 'package:test/foundation/networking/networking.dart';\n"
+        'NetworkFailure? failure;\n';
+    final path =
+        '$testPackageLibPath/foundation/ui/widgets/src/status_banner.dart';
+    newFile(path, source);
+    await assertDiagnosticsInFile(path, [lint(0, source.indexOf('\n'))]);
+  }
+
+  Future<void> test_networkingImportInFoundationUiModel_isQuiet() async {
+    newFile(
+      '$testPackageLibPath/foundation/networking/networking.dart',
+      'class NetworkFailure {}',
+    );
+    const source =
+        "import 'package:test/foundation/networking/networking.dart';\n"
+        'NetworkFailure? failure;\n';
+    final path =
+        '$testPackageLibPath/foundation/ui/models/src/ui_network_failure.dart';
+    newFile(path, source);
+    await assertNoDiagnosticsInFile(path);
+  }
 }
 
 @reflectiveTest
