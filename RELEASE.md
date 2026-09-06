@@ -91,7 +91,7 @@ the flow this repo uses.
    CLI release `vX.Y.Z` would collide with the brick tag of that number.
 
    **The brick section above carries no git flow of its own, so a brick release
-   uses steps 1 and 5 to 8 of this section — and takes the brick tag.**
+   uses steps 1, 4 and 5 to 8 of this section — and takes the brick tag.**
 
    ```bash
    git switch production && git pull
@@ -129,7 +129,36 @@ Before releasing either component:
 - [ ] Brick bundle updated if brick was modified
 - [ ] Proof app generated from the LOCAL brick (`mason add --path`, not
       BrickHub) and every command in its `.github/workflows/checks.yml`
-      run green in that app before publishing
+      run green in that app before publishing. `fcu create` has no
+      local-brick flag — it always runs `mason add flutter_starter_brick`
+      against BrickHub — so the local proof takes two stages: create the
+      empty Flutter app, then point Mason at the working tree.
+
+      ```bash
+      # Stage 1 — the same answers you would give `fcu create`.
+      flutter create --empty --project-name my_proof --org com.example \
+        -t app --platforms android,ios,web,windows,linux,macos my_proof
+      cd my_proof
+
+      # Stage 2 — the brick from this working tree, not BrickHub.
+      mason init
+      mason add flutter_starter_brick --path <repo>/bricks/flutter_starter_brick
+      mason get
+
+      # The pre-gen hook replaces `lib/` only in fresh `flutter create`
+      # output. It requires `.metadata`, `pubspec.yaml` and `lib/main.dart`
+      # in the project root, plus a sentinel naming the same token that
+      # `mason make` is given. The sentinel holds three newline-terminated
+      # lines: the literal version marker, the token, and the
+      # symlink-resolved absolute project root. The hook deletes it.
+      TOKEN=$(openssl rand -hex 32)
+      printf '%s\n%s\n%s\n' fcu-fresh-flutter-output-v1 "$TOKEN" "$(pwd -P)" \
+        > fcu_fresh_flutter_output.sentinel
+
+      mason make flutter_starter_brick --on-conflict overwrite \
+        --proj_name my_proof --proj_desc 'A proof app' --org_name com.example \
+        --dev_name developer --fresh_output_token "$TOKEN"
+      ```
 
 ## Version Synchronization
 
