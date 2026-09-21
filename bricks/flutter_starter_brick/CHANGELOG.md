@@ -1,3 +1,15 @@
+# 4.8.2
+Release date: 2026-09-21. A patch: the starter moves to Flutter 3.47.5, and a
+generated app's own checks print no warning. Nothing is added or removed, and the
+fcu CLI stays 4.4.2.
+- Changed: the pinned Flutter version is now 3.47.5 (Dart 3.13.4), in the
+  starter's `.fvmrc` and in the repository's own `.fvmrc`. The analysis options
+  note that `flutter analyze` runs no analyzer plugin was measured again on it.
+- Fixed: every `build_runner build` the starter runs or documents passed
+  `--delete-conflicting-outputs`, an option build_runner has removed, so it
+  printed a warning in every generated app. The option is gone from the setup
+  hook's two build steps, the checks workflow and the generated README.
+
 # 4.8.1
 Release date: 2026-09-06. A patch: two bugs a 4.8.0 generated app hits on its own
 checks workflow. Nothing is added or removed, and the fcu CLI stays 4.4.2.
