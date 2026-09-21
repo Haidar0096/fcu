@@ -37,7 +37,7 @@ jobs:
         run: flutter gen-l10n
 
       - name: Run build_runner
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test

@@ -13,7 +13,7 @@ For release process and building, see [RELEASE.md](RELEASE.md).
    fvm install
    fvm flutter pub get
    fvm flutter gen-l10n
-   fvm dart run build_runner build --delete-conflicting-outputs
+   fvm dart run build_runner build
    fvm flutter run --dart-define-from-file=env/development.json
    ```
 
